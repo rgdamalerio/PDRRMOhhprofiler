@@ -1,7 +1,7 @@
 import React from "react";
 
-import Respondents from "./app/screens/RespondentScreen";
+import Register from "./app/screens/RegisterScreen";
 
 export default function App() {
-  return <Respondents />;
+  return <Register />;
 }
