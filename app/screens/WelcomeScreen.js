@@ -16,10 +16,7 @@ function WelcomeScreen(props) {
           style={styles.logo}
           source={require("../assets/logo.png")}
         />
-        <Text style={styles.tagline}>
-          Comprehensive Information System for Disaster Risk Assessment in
-          Agusan del norte
-        </Text>
+        <Text style={styles.tagline}>Comprehensive Information System</Text>
       </View>
       <View style={styles.buttonsContainer}>
         <Button title="Login" />
@@ -34,6 +31,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
+    opacity: 5,
   },
   buttonsContainer: {
     padding: 20,
@@ -56,8 +54,7 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     paddingVertical: 100,
     textAlign: "center",
-    //alignContent: "center",
-    //marginBottom: 50,
+    marginBottom: 50,
   },
 });
 

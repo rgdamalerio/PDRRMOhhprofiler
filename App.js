@@ -1,7 +1,7 @@
 import React from "react";
 
-import Welcome from "./app/screens/WelcomeScreen";
+import RegisterScreen from "./app/screens/RegisterScreen";
 
 export default function App() {
-  return <Welcome />;
+  return <RegisterScreen />;
 }
