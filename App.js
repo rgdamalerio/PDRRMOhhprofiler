@@ -1,7 +1,7 @@
 import React from "react";
 
-import Account from "./app/screens/AccountScreen";
+import Respondents from "./app/screens/RespondentScreen";
 
 export default function App() {
-  return <Account />;
+  return <Respondents />;
 }
