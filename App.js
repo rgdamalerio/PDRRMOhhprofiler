@@ -1,6 +1,7 @@
 import React from "react";
 import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
+import * as SQLite from "expo-sqlite";
 
 import Respondents from "./app/screens/RespondentScreen";
 
