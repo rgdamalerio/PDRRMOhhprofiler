@@ -1,7 +1,7 @@
 import React from "react";
 
-import Login from "./app/screens/LoginScreen";
+import Account from "./app/screens/AccountScreen";
 
 export default function App() {
-  return <Login />;
+  return <Account />;
 }
