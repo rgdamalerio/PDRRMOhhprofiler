@@ -1,7 +1,7 @@
 import React from "react";
 
-import RegisterScreen from "./app/screens/RegisterScreen";
+import Login from "./app/screens/LoginScreen";
 
 export default function App() {
-  return <RegisterScreen />;
+  return <Login />;
 }
