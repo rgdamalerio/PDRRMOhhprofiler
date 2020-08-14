@@ -1,13 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, ScrollView } from "react-native";
 import * as Yup from "yup";
+import * as SQLite from "expo-sqlite";
 
 import Screen from "../components/Screen";
+import AppPicker from "../components/Picker";
+import AddressPickerItem from "../components/AddressPickerItem";
 import {
   AppForm as Form,
   AppFormField as FormField,
+  FormPicker as Picker,
   SubmitButton,
 } from "../components/forms";
+
+const province = [
+  {
+    id: 1,
+    label: "Jeremy Bacquial",
+    value: "test",
+    description: "Panaytayon R.T.R Agusan del norte",
+    image: require("../assets/house1.jpg"),
+  },
+  {
+    id: 2,
+    label: "Kirby Balaba",
+    value: "testing",
+    description: "Balang-balang R.T.R Agusan del norte",
+    image: require("../assets/house2.jpg"),
+  },
+];
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 const validationSchema = Yup.object().shape({
@@ -21,7 +42,29 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required().min(4).label("Password"),
 });
 
+const db = SQLite.openDatabase("hhprofiler.db");
+
 function RegisterScreen() {
+  const [pro, setPro] = useState(null);
+  const [reg, setReg] = useState(null);
+  const [mun, setMun] = useState(null);
+  const [brgy, setBrgy] = useState(null);
+
+  db.transaction((tx) => {
+    //tx.executeSql("SELECT * FROM tbl_psgc_prov;", [], (tx, results) => {
+    //  (_, { rows: { _array } }) => setPro(_array);
+    //  console.log(pro);
+    //});
+    tx.executeSql(
+      "select * from tbl_psgc_prov",
+      [],
+      (_, { rows }) => setPro(JSON.stringify(rows))
+      //
+    );
+  });
+
+  // console.log(pro);
+
   return (
     <Screen style={styles.container}>
       <ScrollView>
@@ -66,26 +109,26 @@ function RegisterScreen() {
             width={320}
             keyboardType="number-pad"
           />
-          <FormField
-            autoCorrect={false}
+          <Picker
             icon="earth"
+            items={pro}
             name="prov"
+            //numberOfColumns={3}
+            PickerItemComponent={AddressPickerItem}
             placeholder="Province"
-            chevron="chevron-down"
+            //width="50%"
           />
-          <FormField
+          <AppPicker
             autoCorrect={false}
             icon="earth"
             name="mun"
             placeholder="Municipality"
-            chevron="chevron-down"
           />
-          <FormField
+          <AppPicker
             autoCorrect={false}
             icon="earth"
             name="brgy"
             placeholder="Barangay"
-            chevron="chevron-down"
           />
           <FormField
             autoCapitalize="none"

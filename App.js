@@ -1,48 +1,48 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
-import * as SQLite from "expo-sqlite";
 
-import Respondents from "./app/screens/RespondentScreen";
+import RegisterScreens from "./app/screens/RegisterScreen";
+
+async function removeDatabase() {
+  const sqlDir = FileSystem.documentDirectory + "SQLite/";
+  await FileSystem.deleteAsync(sqlDir + "hhprofiler.db", { idempotent: true });
+}
+
+const openDatabaseIShipWithApp = async () => {
+  const internalDbName = "hhprofiler.db"; // Call whatever you want
+  const sqlDir = FileSystem.documentDirectory + "SQLite/";
+  if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
+    await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
+    const asset = Asset.fromModule(
+      require("./app/assets/database/hhprofiler.db")
+    );
+    await FileSystem.downloadAsync(asset.uri, sqlDir + internalDbName)
+      .then(({ uri }) => {
+        console.log("Finished downloading to ", uri);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
+};
+
+//const db = SQLite.openDatabase("hhprofiler.db");
 
 export default function App() {
+  ///useEffect(() => {
+  // openDatabaseIShipWithApp();
+  //}, []);
   /*
-  async function openDatabaseIShipWithApp() {
-    const internalDbName = "hhprofiler.db"; // Call whatever you want
-    const sqlDir = FileSystem.documentDirectory + "SQLite/";
-    if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
-      await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
-      const asset = Asset.fromModule(
-        require("./app/assets/database/hhprofiler.db")
-      );
-      await FileSystem.downloadAsync(asset.uri, sqlDir + internalDbName);
-    }
-    this.database = SQLite.openDatabase(internalDbName);
-  }
+  const [items, setItems] = useState(null);
 
-  const db = SQLite.openDatabase("hhprofiler.db");
+  db.transaction((tx) => {
+    tx.executeSql("SELECT * FROM tbl_psgc_prov;", [], (tx, results) => {
+      setItems(results);
+    });
+  });
 
-  console.log(db);
+  //console.log(items);
   */
-  const [db, setDb] = useState(null);
-
-  const openDatabaseIShipWithApp = async () => {
-    const internalDbName = "hhprofiler.db"; // Call whatever you want
-    const sqlDir = FileSystem.documentDirectory + "SQLite/";
-    if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
-      await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
-      const asset = Asset.fromModule(
-        require("./app/assets/database/hhprofiler.db")
-      );
-      await FileSystem.downloadAsync(asset.uri, sqlDir + internalDbName);
-    }
-    setDb(SQLite.openDatabase("hhprofiler"));
-  };
-
-  /*useEffect(() => {
-    const db = openDatabaseIShipWithApp();
-    //console.log(db);
-  }, []);
-  */
-  return <Respondents />;
+  return <RegisterScreens />;
 }
