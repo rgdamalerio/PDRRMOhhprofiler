@@ -3,6 +3,7 @@ import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
 
 import RegisterScreens from "./app/screens/RegisterScreen";
+import RespondentScreen from "./app/screens/RespondentScreen";
 
 async function removeDatabase() {
   const sqlDir = FileSystem.documentDirectory + "SQLite/";
