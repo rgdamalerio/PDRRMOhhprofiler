@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import { SearchBar } from "react-native-elements";
 
 import Screen from "../components/Screen";

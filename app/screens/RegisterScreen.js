@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, ScrollView } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 
 import Screen from "../components/Screen";
-import AppPicker from "../components/Picker";
+import AppPicker from "../components/AppPicker";
 import AddressPickerItem from "../components/AddressPickerItem";
 import {
   AppForm as Form,
@@ -15,18 +15,84 @@ import {
 
 const province = [
   {
-    id: 1,
-    label: "Jeremy Bacquial",
-    value: "test",
-    description: "Panaytayon R.T.R Agusan del norte",
-    image: require("../assets/house1.jpg"),
+    id: "00000001",
+    label: "Agusan del Norte",
+    tbl_psgc_region_id_fk: "0000001",
   },
   {
-    id: 2,
-    label: "Kirby Balaba",
-    value: "testing",
-    description: "Balang-balang R.T.R Agusan del norte",
-    image: require("../assets/house2.jpg"),
+    id: "00000002",
+    label: "Agusan del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000003",
+    label: "Dinagat islands",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000004",
+    label: "Surigao del Norte",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
+  },
+  {
+    id: "00000005",
+    label: "Suriga del Sur",
+    tbl_psgc_region_id_fk: "0000001",
   },
 ];
 
@@ -50,21 +116,20 @@ function RegisterScreen() {
   const [mun, setMun] = useState(null);
   const [brgy, setBrgy] = useState(null);
 
-  db.transaction((tx) => {
-    //tx.executeSql("SELECT * FROM tbl_psgc_prov;", [], (tx, results) => {
-    //  (_, { rows: { _array } }) => setPro(_array);
-    //  console.log(pro);
-    //});
-    tx.executeSql(
-      "select * from tbl_psgc_prov",
-      [],
-      (_, { rows }) => setPro(JSON.stringify(rows))
-      //
+  /*useEffect(() => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql("SELECT * FROM tbl_psgc_prov", [], ({ rows }) =>
+          //setPro(JSON.stringify(rows))
+          console.log(JSON.stringify(rows))
+        );
+      },
+      (err) => {
+        console.log(err);
+      }
     );
-  });
-
-  // console.log(pro);
-
+  }, []);
+  */
   return (
     <Screen style={styles.container}>
       <ScrollView>
@@ -111,12 +176,13 @@ function RegisterScreen() {
           />
           <Picker
             icon="earth"
-            items={pro}
+            items={province}
             name="prov"
             //numberOfColumns={3}
             PickerItemComponent={AddressPickerItem}
             placeholder="Province"
             //width="50%"
+            searchable
           />
           <AppPicker
             autoCorrect={false}

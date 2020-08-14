@@ -8,6 +8,7 @@ import {
   FlatList,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { SearchBar } from "react-native-elements";
 
 import Text from "./Text";
 import defaultStyles from "../config/styles";
@@ -23,8 +24,11 @@ function AppPicker({
   placeholder,
   selectedItem,
   width = "100%",
+  searchable,
 }) {
   const [modalVisible, setModalVisible] = useState(false);
+  const [itemsearch, setItemsearch] = useState(items);
+  const [search, setSearch] = useState("");
   //console.log(items);
   return (
     <>
@@ -39,7 +43,7 @@ function AppPicker({
             />
           )}
           {selectedItem ? (
-            <Text style={styles.text}>{selectedItem.tbl_psgc_provname}</Text>
+            <Text style={styles.text}>{selectedItem.label}</Text>
           ) : (
             <Text style={styles.placeholder}>{placeholder}</Text>
           )}
@@ -54,14 +58,32 @@ function AppPicker({
       <Modal visible={modalVisible} animationType="slide">
         <Screen style={{ marginTop: -12 }}>
           <Button title="Close" onPress={() => setModalVisible(false)} />
+          {searchable && (
+            <SearchBar
+              placeholder="Search Here"
+              lightTheme
+              onChangeText={(text) => {
+                setSearch(text);
+                const newData = itemsearch.filter((item) => {
+                  const itemData = `${item.label.toUpperCase()}`;
+
+                  const textData = text.toUpperCase();
+                  return itemData.indexOf(textData) > -1;
+                });
+                setItemsearch(text === "" ? items : newData);
+              }}
+              autoCorrect={false}
+              value={search}
+            />
+          )}
           <FlatList
             data={items}
-            keyExtractor={(item) => item.idtbl_psgc_prov}
+            keyExtractor={(item) => item.id.toString()}
             numColumns={numberOfColumns}
             renderItem={({ item }) => (
               <PickerItemComponent
                 item={item}
-                label={item.tbl_psgc_provname}
+                label={item.label}
                 onPress={() => {
                   setModalVisible(false);
                   onSelectItem(item);

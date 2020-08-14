@@ -24,15 +24,19 @@ const openDatabaseIShipWithApp = async () => {
       .catch((error) => {
         console.error(error);
       });
+  } else {
+    console.log("dir exists");
   }
 };
 
 //const db = SQLite.openDatabase("hhprofiler.db");
 
 export default function App() {
-  ///useEffect(() => {
-  // openDatabaseIShipWithApp();
-  //}, []);
+  useEffect(() => {
+    openDatabaseIShipWithApp();
+  }, []);
+
+  removeDatabase();
   /*
   const [items, setItems] = useState(null);
 
