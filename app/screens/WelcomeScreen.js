@@ -19,8 +19,8 @@ function WelcomeScreen(props) {
         <Text style={styles.tagline}>Comprehensive Information System</Text>
       </View>
       <View style={styles.buttonsContainer}>
-        <Button title="Login" />
-        <Button title="Register" color="pdark" />
+        <Button title="Login" color="pdark" />
+        <Button title="Register" />
       </View>
     </ImageBackground>
   );

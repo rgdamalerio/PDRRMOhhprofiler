@@ -115,8 +115,8 @@ const validationSchema = Yup.object().shape({
 const db = SQLite.openDatabase("hhprofiler.db");
 
 function RegisterScreen() {
-  const [pro, setPro] = useState(null);
-  const [reg, setReg] = useState(province);
+  const [reg, setReg] = useState(null);
+  const [pro, setPro] = useState(province);
   const [mun, setMun] = useState(municipality);
   const [brgy, setBrgy] = useState(barangay);
 

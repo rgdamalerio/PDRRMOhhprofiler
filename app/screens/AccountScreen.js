@@ -18,7 +18,7 @@ const menuItems = [
     title: "Add Respondent",
     icon: {
       name: "account-plus",
-      backgroundColor: colors.secondary,
+      backgroundColor: colors.sblack,
     },
   },
 ];
@@ -61,7 +61,7 @@ function AccountScreen(props) {
 
 const styles = StyleSheet.create({
   screen: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.slight,
   },
   container: {
     marginVertical: 20,

@@ -6,6 +6,7 @@ import RegisterScreens from "./app/screens/RegisterScreen";
 import RespondentScreen from "./app/screens/RespondentScreen";
 import AccountScreen from "./app/screens/AccountScreen";
 import WelcomeScreen from "./app/screens/WelcomeScreen";
+import LoginScreen from "./app/screens/LoginScreen";
 
 async function removeDatabase() {
   const sqlDir = FileSystem.documentDirectory + "SQLite/";
@@ -51,5 +52,5 @@ export default function App() {
 
   //console.log(items);
   */
-  return <WelcomeScreen />;
+  return <RespondentScreen />;
 }
