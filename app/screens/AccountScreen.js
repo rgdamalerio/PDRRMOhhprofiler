@@ -61,7 +61,7 @@ function AccountScreen(props) {
 
 const styles = StyleSheet.create({
   screen: {
-    backgroundColor: colors.light,
+    backgroundColor: colors.secondary,
   },
   container: {
     marginVertical: 20,

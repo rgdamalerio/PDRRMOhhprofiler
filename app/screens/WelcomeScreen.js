@@ -20,7 +20,7 @@ function WelcomeScreen(props) {
       </View>
       <View style={styles.buttonsContainer}>
         <Button title="Login" />
-        <Button title="Register" color="secondary" />
+        <Button title="Register" color="pdark" />
       </View>
     </ImageBackground>
   );

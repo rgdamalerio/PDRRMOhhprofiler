@@ -4,6 +4,8 @@ import { Asset } from "expo-asset";
 
 import RegisterScreens from "./app/screens/RegisterScreen";
 import RespondentScreen from "./app/screens/RespondentScreen";
+import AccountScreen from "./app/screens/AccountScreen";
+import WelcomeScreen from "./app/screens/WelcomeScreen";
 
 async function removeDatabase() {
   const sqlDir = FileSystem.documentDirectory + "SQLite/";
@@ -49,5 +51,5 @@ export default function App() {
 
   //console.log(items);
   */
-  return <RegisterScreens />;
+  return <WelcomeScreen />;
 }

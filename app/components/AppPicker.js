@@ -77,7 +77,7 @@ function AppPicker({
             />
           )}
           <FlatList
-            data={items}
+            data={itemsearch}
             keyExtractor={(item) => item.id.toString()}
             numColumns={numberOfColumns}
             renderItem={({ item }) => (

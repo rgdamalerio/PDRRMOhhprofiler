@@ -36,63 +36,64 @@ const province = [
   },
   {
     id: "00000005",
-    label: "Suriga del Sur",
+    label: "Surigao del Sur",
     tbl_psgc_region_id_fk: "0000001",
+  },
+];
+
+const municipality = [
+  {
+    id: "00000001",
+    label: "Butuan City",
+    tbl_psgc_province_id_fk: "00000001",
+  },
+  {
+    id: "00000002",
+    label: "San francisco",
+    tbl_psgc_province_id_fk: "00000002",
+  },
+  {
+    id: "00000003",
+    label: "PolomoLok",
+    tbl_psgc_province_id_fk: "00000003",
+  },
+  {
+    id: "00000004",
+    label: "Tagiki",
+    tbl_psgc_province_id_fk: "00000004",
   },
   {
     id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
+    label: "Surgaw",
+    tbl_psgc_province_id_fk: "00000005",
+  },
+];
+
+const barangay = [
+  {
+    id: "00000001",
+    label: "Panaytayon",
+    tbl_psgc_province_id_fk: "00000001",
+  },
+  {
+    id: "00000002",
+    label: "Barangay 1",
+    tbl_psgc_province_id_fk: "00000002",
+  },
+  {
+    id: "00000003",
+    label: "Barangay 2",
+    tbl_psgc_province_id_fk: "00000003",
+  },
+  {
+    id: "00000004",
+    label: "Barangay 3",
+    tbl_psgc_province_id_fk: "00000004",
   },
   {
     id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Suriga del Sur",
-    tbl_psgc_region_id_fk: "0000001",
+    label: "Surgaw",
+    tbl_psgc_province_id_fk: "00000005",
   },
 ];
 
@@ -100,7 +101,10 @@ const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2
 const validationSchema = Yup.object().shape({
   fname: Yup.string().required().label("First Name"),
   lname: Yup.string().required().label("Last Name"),
-  phoneNumber: Yup.string().matches(phoneRegExp, "Phone number is not valid"),
+  phoneNumber: Yup.string()
+    .matches(phoneRegExp, "Phone number is not valid")
+    .required()
+    .label("Phone number"),
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
   brgy: Yup.string().required().label("Barangay"),
@@ -112,9 +116,9 @@ const db = SQLite.openDatabase("hhprofiler.db");
 
 function RegisterScreen() {
   const [pro, setPro] = useState(null);
-  const [reg, setReg] = useState(null);
-  const [mun, setMun] = useState(null);
-  const [brgy, setBrgy] = useState(null);
+  const [reg, setReg] = useState(province);
+  const [mun, setMun] = useState(municipality);
+  const [brgy, setBrgy] = useState(barangay);
 
   /*useEffect(() => {
     db.transaction(
@@ -176,25 +180,27 @@ function RegisterScreen() {
           />
           <Picker
             icon="earth"
-            items={province}
+            items={pro}
             name="prov"
-            //numberOfColumns={3}
             PickerItemComponent={AddressPickerItem}
             placeholder="Province"
-            //width="50%"
             searchable
           />
-          <AppPicker
-            autoCorrect={false}
+          <Picker
             icon="earth"
+            items={mun}
             name="mun"
+            PickerItemComponent={AddressPickerItem}
             placeholder="Municipality"
+            searchable
           />
-          <AppPicker
-            autoCorrect={false}
+          <Picker
             icon="earth"
+            items={brgy}
             name="brgy"
+            PickerItemComponent={AddressPickerItem}
             placeholder="Barangay"
+            searchable
           />
           <FormField
             autoCapitalize="none"
