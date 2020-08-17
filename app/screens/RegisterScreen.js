@@ -116,24 +116,20 @@ const db = SQLite.openDatabase("hhprofiler.db");
 
 function RegisterScreen() {
   const [reg, setReg] = useState(null);
-  const [pro, setPro] = useState(province);
+  const [pro, setPro] = useState(null);
   const [mun, setMun] = useState(municipality);
   const [brgy, setBrgy] = useState(barangay);
 
-  /*useEffect(() => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql("SELECT * FROM tbl_psgc_prov", [], ({ rows }) =>
-          //setPro(JSON.stringify(rows))
-          console.log(JSON.stringify(rows))
-        );
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
+  useEffect(() => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `select idtbl_psgc_prov AS id, tbl_psgc_provname AS label from tbl_psgc_prov`,
+        [],
+        (_, { rows: { _array } }) => setPro(_array)
+      );
+    });
   }, []);
-  */
+
   return (
     <Screen style={styles.container}>
       <ScrollView>

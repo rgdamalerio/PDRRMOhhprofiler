@@ -29,7 +29,7 @@ function AppPicker({
   const [modalVisible, setModalVisible] = useState(false);
   const [itemsearch, setItemsearch] = useState(items);
   const [search, setSearch] = useState("");
-  //console.log(items);
+
   return (
     <>
       <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
@@ -64,7 +64,7 @@ function AppPicker({
               lightTheme
               onChangeText={(text) => {
                 setSearch(text);
-                const newData = itemsearch.filter((item) => {
+                const newData = items.filter((item) => {
                   const itemData = `${item.label.toUpperCase()}`;
 
                   const textData = text.toUpperCase();
@@ -77,7 +77,7 @@ function AppPicker({
             />
           )}
           <FlatList
-            data={itemsearch}
+            data={itemsearch ? itemsearch : items}
             keyExtractor={(item) => item.id.toString()}
             numColumns={numberOfColumns}
             renderItem={({ item }) => (
