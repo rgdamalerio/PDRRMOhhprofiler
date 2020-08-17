@@ -4,7 +4,6 @@ import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 
 import Screen from "../components/Screen";
-import AppPicker from "../components/AppPicker";
 import AddressPickerItem from "../components/AddressPickerItem";
 import {
   AppForm as Form,

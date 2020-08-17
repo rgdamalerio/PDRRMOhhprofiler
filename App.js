@@ -26,7 +26,10 @@ const openDatabaseIShipWithApp = async () => {
     const asset = Asset.fromModule(
       require("./app/assets/database/hhprofiler.db")
     );
-    await FileSystem.downloadAsync(asset.uri, sqlDir + internalDbName)
+    await FileSystem.downloadAsync(
+      "https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/SQLITEregister/app/assets/database/hhprofiler.db",
+      sqlDir + internalDbName
+    )
       .then(({ uri }) => {
         console.log("Finished downloading to ", uri);
       })
@@ -53,8 +56,9 @@ const Stack = createStackNavigator();
 export default function App() {
   useEffect(() => {
     openDatabaseIShipWithApp();
+    //removeDatabase();
   }, []);
-  //removeDatabase();
+
   //checkDatabaseExist();
 
   return (
