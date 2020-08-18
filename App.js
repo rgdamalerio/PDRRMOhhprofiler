@@ -3,6 +3,7 @@ import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import * as SQLite from "expo-sqlite";
 
 import RegisterScreens from "./app/screens/RegisterScreen";
 import RespondentScreen from "./app/screens/RespondentScreen";
@@ -50,10 +51,17 @@ const checkDatabaseExist = async () => {
 
 const Stack = createStackNavigator();
 
+const db = SQLite.openDatabase("hhprofiler.db");
+
 export default function App() {
   useEffect(() => {
     openDatabaseIShipWithApp();
     //removeDatabase();
+    db.transaction((tx) => {
+      tx.executeSql("select * from tbl_enumerator", [], (_, { rows }) =>
+        console.log(JSON.stringify(rows))
+      );
+    });
   }, []);
 
   //checkDatabaseExist();

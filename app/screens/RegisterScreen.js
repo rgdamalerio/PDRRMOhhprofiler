@@ -43,20 +43,6 @@ function RegisterScreen() {
         (_, { rows: { _array } }) => setPro(_array)
       );
     });
-    db.transaction((tx) => {
-      tx.executeSql(
-        `select idtbl_psgc_mun AS id, tbl_psgc_munname AS label from tbl_psgc_mun`,
-        [],
-        (_, { rows: { _array } }) => setMun(_array)
-      );
-    });
-    db.transaction((tx) => {
-      tx.executeSql(
-        `select idtbl_psgc_brgy AS id, tbl_psgc_brgyname AS label from tbl_psgc_brgy`,
-        [],
-        (_, { rows: { _array } }) => setBrgy(_array)
-      );
-    });
   }, []);
 
   return (
@@ -74,7 +60,27 @@ function RegisterScreen() {
             email: "",
             password: "",
           }}
-          onSubmit={(values) => console.log(values)}
+          onSubmit={(values) =>
+            db.transaction((tx) => {
+              tx.executeSql(
+                "insert into enumerator (tbl_enumeratorfname,tbl_enumeratorlname,tbl_enumeratormname,tbl_enumeratoremail,tbl_enumeratorcontact,tbl_enumeratorprov,tbl_enumeratormun,tbl_enumeratorbrgy) values (?,?,?,?,?,?,?,?,?)",
+                [
+                  values.fname,
+                  values.lname,
+                  values.mname,
+                  values.email,
+                  values.phoneNumber,
+                  values.prov.id,
+                  values.mun.id,
+                  values.brgy.id,
+                  values.password,
+                ]
+              );
+              tx.executeSql("select * from enumerator", [], (_, { rows }) =>
+                console.log(JSON.stringify(rows))
+              );
+            }, null)
+          }
           validationSchema={validationSchema}
         >
           <FormField
