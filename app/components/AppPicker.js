@@ -1,19 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
-  TouchableWithoutFeedback,
   Modal,
   Button,
   FlatList,
+  TouchableOpacity,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { SearchBar } from "react-native-elements";
+import * as SQLite from "expo-sqlite";
 
 import Text from "./Text";
 import defaultStyles from "../config/styles";
 import PickerItem from "./PickerItem";
 import Screen from "./Screen";
+
+function getMunicipality({ id }) {
+  const [filtermun, setFiltermun] = useState(null);
+
+  db.transaction((tx) => {
+    tx.executeSql(
+      `select idtbl_psgc_mun AS id, tbl_psgc_munname AS label from tbl_psgc_mun where tbl_psgc_prov_id_fk = ?;`,
+      [id],
+      (_, { rows: { _array } }) => setFiltermun(_array)
+    );
+  });
+}
+
+const db = SQLite.openDatabase("hhprofiler.db");
 
 function AppPicker({
   icon,
@@ -25,6 +40,9 @@ function AppPicker({
   selectedItem,
   width = "100%",
   searchable,
+  setMun,
+  setBrgy,
+  setbrgyValue,
 }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [itemsearch, setItemsearch] = useState(items);
@@ -32,7 +50,7 @@ function AppPicker({
 
   return (
     <>
-      <TouchableWithoutFeedback onPress={() => setModalVisible(true)}>
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
         <View style={[styles.container, { width }]}>
           {icon && (
             <MaterialCommunityIcons
@@ -54,7 +72,7 @@ function AppPicker({
             color={defaultStyles.colors.medium}
           />
         </View>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
       <Modal visible={modalVisible} animationType="slide">
         <Screen style={{ marginTop: -12 }}>
           <Button title="Close" onPress={() => setModalVisible(false)} />
@@ -66,7 +84,6 @@ function AppPicker({
                 setSearch(text);
                 const newData = items.filter((item) => {
                   const itemData = `${item.label.toUpperCase()}`;
-
                   const textData = text.toUpperCase();
                   return itemData.indexOf(textData) > -1;
                 });
@@ -76,21 +93,71 @@ function AppPicker({
               value={search}
             />
           )}
-          <FlatList
-            data={itemsearch ? itemsearch : items}
-            keyExtractor={(item) => item.id.toString()}
-            numColumns={numberOfColumns}
-            renderItem={({ item }) => (
-              <PickerItemComponent
-                item={item}
-                label={item.label}
-                onPress={() => {
-                  setModalVisible(false);
-                  onSelectItem(item);
-                }}
-              />
-            )}
-          />
+          {setMun && (
+            <FlatList
+              data={itemsearch ? itemsearch : items}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={numberOfColumns}
+              renderItem={({ item }) => (
+                <PickerItemComponent
+                  item={item}
+                  label={item.label}
+                  onPress={() => {
+                    setModalVisible(false);
+                    onSelectItem(item);
+                    db.transaction((tx) => {
+                      tx.executeSql(
+                        `select idtbl_psgc_mun AS id, tbl_psgc_munname AS label from tbl_psgc_mun where tbl_psgc_prov_id_fk = ?;`,
+                        [item.id],
+                        (_, { rows: { _array } }) => setMun(_array)
+                      );
+                    });
+                  }}
+                />
+              )}
+            />
+          )}
+          {setBrgy && (
+            <FlatList
+              data={itemsearch ? itemsearch : items}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={numberOfColumns}
+              renderItem={({ item }) => (
+                <PickerItemComponent
+                  item={item}
+                  label={item.label}
+                  onPress={() => {
+                    setModalVisible(false);
+                    onSelectItem(item);
+                    db.transaction((tx) => {
+                      tx.executeSql(
+                        `select idtbl_psgc_brgy AS id, tbl_psgc_brgyname AS label from tbl_psgc_brgy where tbl_psgc_mun_id_fk = ?;`,
+                        [item.id],
+                        (_, { rows: { _array } }) => setBrgy(_array)
+                      );
+                    });
+                  }}
+                />
+              )}
+            />
+          )}
+          {setbrgyValue && (
+            <FlatList
+              data={itemsearch ? itemsearch : items}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={numberOfColumns}
+              renderItem={({ item }) => (
+                <PickerItemComponent
+                  item={item}
+                  label={item.label}
+                  onPress={() => {
+                    setModalVisible(false);
+                    onSelectItem(item);
+                  }}
+                />
+              )}
+            />
+          )}
         </Screen>
       </Modal>
     </>
@@ -114,6 +181,11 @@ const styles = StyleSheet.create({
   },
   text: {
     flex: 1,
+  },
+  danger: {
+    color: defaultStyles.colors.danger,
+    paddingVertical: 15,
+    marginLeft: 10,
   },
 });
 

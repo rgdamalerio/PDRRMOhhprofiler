@@ -17,7 +17,6 @@ function AddressPickerItem({ item, onPress }) {
 
 const styles = StyleSheet.create({
   container: {
-    //paddingHorizontal: 10,
     paddingVertical: 10,
     width: "100%",
   },

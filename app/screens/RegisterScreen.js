@@ -12,90 +12,6 @@ import {
   SubmitButton,
 } from "../components/forms";
 
-const province = [
-  {
-    id: "00000001",
-    label: "Agusan del Norte",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000002",
-    label: "Agusan del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000003",
-    label: "Dinagat islands",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000004",
-    label: "Surigao del Norte",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-  {
-    id: "00000005",
-    label: "Surigao del Sur",
-    tbl_psgc_region_id_fk: "0000001",
-  },
-];
-
-const municipality = [
-  {
-    id: "00000001",
-    label: "Butuan City",
-    tbl_psgc_province_id_fk: "00000001",
-  },
-  {
-    id: "00000002",
-    label: "San francisco",
-    tbl_psgc_province_id_fk: "00000002",
-  },
-  {
-    id: "00000003",
-    label: "PolomoLok",
-    tbl_psgc_province_id_fk: "00000003",
-  },
-  {
-    id: "00000004",
-    label: "Tagiki",
-    tbl_psgc_province_id_fk: "00000004",
-  },
-  {
-    id: "00000005",
-    label: "Surgaw",
-    tbl_psgc_province_id_fk: "00000005",
-  },
-];
-
-const barangay = [
-  {
-    id: "00000001",
-    label: "Panaytayon",
-    tbl_psgc_province_id_fk: "00000001",
-  },
-  {
-    id: "00000002",
-    label: "Barangay 1",
-    tbl_psgc_province_id_fk: "00000002",
-  },
-  {
-    id: "00000003",
-    label: "Barangay 2",
-    tbl_psgc_province_id_fk: "00000003",
-  },
-  {
-    id: "00000004",
-    label: "Barangay 3",
-    tbl_psgc_province_id_fk: "00000004",
-  },
-  {
-    id: "00000005",
-    label: "Surgaw",
-    tbl_psgc_province_id_fk: "00000005",
-  },
-];
-
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 const validationSchema = Yup.object().shape({
   fname: Yup.string().required().label("First Name"),
@@ -116,8 +32,8 @@ const db = SQLite.openDatabase("hhprofiler.db");
 function RegisterScreen() {
   const [reg, setReg] = useState(null);
   const [pro, setPro] = useState(null);
-  const [mun, setMun] = useState(municipality);
-  const [brgy, setBrgy] = useState(barangay);
+  const [mun, setMun] = useState(null);
+  const [brgy, setBrgy] = useState(null);
 
   useEffect(() => {
     db.transaction((tx) => {
@@ -125,6 +41,20 @@ function RegisterScreen() {
         `select idtbl_psgc_prov AS id, tbl_psgc_provname AS label from tbl_psgc_prov`,
         [],
         (_, { rows: { _array } }) => setPro(_array)
+      );
+    });
+    db.transaction((tx) => {
+      tx.executeSql(
+        `select idtbl_psgc_mun AS id, tbl_psgc_munname AS label from tbl_psgc_mun`,
+        [],
+        (_, { rows: { _array } }) => setMun(_array)
+      );
+    });
+    db.transaction((tx) => {
+      tx.executeSql(
+        `select idtbl_psgc_brgy AS id, tbl_psgc_brgyname AS label from tbl_psgc_brgy`,
+        [],
+        (_, { rows: { _array } }) => setBrgy(_array)
       );
     });
   }, []);
@@ -180,6 +110,7 @@ function RegisterScreen() {
             PickerItemComponent={AddressPickerItem}
             placeholder="Province"
             searchable
+            setMun={setMun}
           />
           <Picker
             icon="earth"
@@ -188,6 +119,7 @@ function RegisterScreen() {
             PickerItemComponent={AddressPickerItem}
             placeholder="Municipality"
             searchable
+            setBrgy={setBrgy}
           />
           <Picker
             icon="earth"
@@ -196,6 +128,7 @@ function RegisterScreen() {
             PickerItemComponent={AddressPickerItem}
             placeholder="Barangay"
             searchable
+            setbrgyValue
           />
           <FormField
             autoCapitalize="none"

@@ -26,10 +26,7 @@ const openDatabaseIShipWithApp = async () => {
     const asset = Asset.fromModule(
       require("./app/assets/database/hhprofiler.db")
     );
-    await FileSystem.downloadAsync(
-      "https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/SQLITEregister/app/assets/database/hhprofiler.db",
-      sqlDir + internalDbName
-    )
+    await FileSystem.downloadAsync(asset.uri, sqlDir + internalDbName)
       .then(({ uri }) => {
         console.log("Finished downloading to ", uri);
       })
@@ -64,9 +61,21 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreens} />
+        <Stack.Screen
+          name="Welcome"
+          options={{ headerShown: false }}
+          component={WelcomeScreen}
+        />
+        <Stack.Screen
+          name="Login"
+          options={{ headerShown: false }}
+          component={LoginScreen}
+        />
+        <Stack.Screen
+          name="Register"
+          options={{ headerShown: false }}
+          component={RegisterScreens}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
