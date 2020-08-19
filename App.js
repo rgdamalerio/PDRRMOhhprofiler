@@ -51,17 +51,15 @@ const checkDatabaseExist = async () => {
 
 const Stack = createStackNavigator();
 
-const db = SQLite.openDatabase("hhprofiler.db");
-
 export default function App() {
   useEffect(() => {
-    openDatabaseIShipWithApp();
     //removeDatabase();
-    db.transaction((tx) => {
-      tx.executeSql("select * from tbl_enumerator", [], (_, { rows }) =>
-        console.log(JSON.stringify(rows))
-      );
-    });
+    openDatabaseIShipWithApp();
+    //db.transaction((tx) => {
+    //  tx.executeSql("select * from tbl_enumerator", [], (_, { rows }) =>
+    //    console.log(JSON.stringify(rows))
+    //  );
+    //});
   }, []);
 
   //checkDatabaseExist();

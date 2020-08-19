@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   StyleSheet,
@@ -12,21 +12,10 @@ import { SearchBar } from "react-native-elements";
 import * as SQLite from "expo-sqlite";
 
 import Text from "./Text";
+import EmptyFlatlist from "./EmptyFlatlist";
 import defaultStyles from "../config/styles";
 import PickerItem from "./PickerItem";
 import Screen from "./Screen";
-
-function getMunicipality({ id }) {
-  const [filtermun, setFiltermun] = useState(null);
-
-  db.transaction((tx) => {
-    tx.executeSql(
-      `select idtbl_psgc_mun AS id, tbl_psgc_munname AS label from tbl_psgc_mun where tbl_psgc_prov_id_fk = ?;`,
-      [id],
-      (_, { rows: { _array } }) => setFiltermun(_array)
-    );
-  });
-}
 
 const db = SQLite.openDatabase("hhprofiler.db");
 
@@ -95,9 +84,14 @@ function AppPicker({
           )}
           {setMun && (
             <FlatList
-              data={itemsearch ? itemsearch : items}
+              data={items}
               keyExtractor={(item) => item.id.toString()}
               numColumns={numberOfColumns}
+              ListEmptyComponent={
+                <EmptyFlatlist style={styles.textEmpty}>
+                  Error loading address library, Please contact developer
+                </EmptyFlatlist>
+              }
               renderItem={({ item }) => (
                 <PickerItemComponent
                   item={item}
@@ -122,6 +116,11 @@ function AppPicker({
               data={itemsearch ? itemsearch : items}
               keyExtractor={(item) => item.id.toString()}
               numColumns={numberOfColumns}
+              ListEmptyComponent={
+                <EmptyFlatlist style={styles.textEmpty}>
+                  Select Province first to display available municipality
+                </EmptyFlatlist>
+              }
               renderItem={({ item }) => (
                 <PickerItemComponent
                   item={item}
@@ -146,6 +145,11 @@ function AppPicker({
               data={itemsearch ? itemsearch : items}
               keyExtractor={(item) => item.id.toString()}
               numColumns={numberOfColumns}
+              ListEmptyComponent={
+                <EmptyFlatlist style={styles.textEmpty}>
+                  Select Municipality first to display available barangay
+                </EmptyFlatlist>
+              }
               renderItem={({ item }) => (
                 <PickerItemComponent
                   item={item}
@@ -158,6 +162,7 @@ function AppPicker({
               )}
             />
           )}
+          {}
         </Screen>
       </Modal>
     </>
@@ -181,6 +186,9 @@ const styles = StyleSheet.create({
   },
   text: {
     flex: 1,
+  },
+  textEmpty: {
+    color: defaultStyles.colors.danger,
   },
   danger: {
     color: defaultStyles.colors.danger,
