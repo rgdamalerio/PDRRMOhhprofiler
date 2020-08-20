@@ -82,6 +82,11 @@ export default function App() {
           options={{ headerShown: false }}
           component={RegisterScreens}
         />
+        <Stack.Screen
+          name="Account"
+          options={{ headerShown: false }}
+          component={AccountScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

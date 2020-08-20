@@ -1,6 +1,7 @@
 import React from "react";
-import { StyleSheet, Image, ScrollView, View } from "react-native";
+import { StyleSheet, Image, ScrollView, View, Alert } from "react-native";
 import * as Yup from "yup";
+import * as SQLite from "expo-sqlite";
 
 import Screen from "../components/Screen";
 import { AppForm, AppFormField, SubmitButton } from "../components/forms";
@@ -10,6 +11,8 @@ const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
   password: Yup.string().required().min(4).label("Password"),
 });
+
+const db = SQLite.openDatabase("hhprofiler.db");
 
 function LoginScreen({ navigation }) {
   return (
@@ -22,7 +25,23 @@ function LoginScreen({ navigation }) {
         />
         <AppForm
           initialValues={{ email: "", password: "" }}
-          onSubmit={(values) => console.log(values)}
+          onSubmit={(values) =>
+            db.transaction((tx) => {
+              tx.executeSql(
+                "select * from tbl_enumerator where tbl_enumeratoremail = ? and password = ?;",
+                [values.email, values.password],
+                (tx, results) => {
+                  if (results.rows.length > 0) {
+                    navigation.navigate("Account");
+                  } else {
+                    alert(
+                      "Enumerator not found! please check email and password"
+                    );
+                  }
+                }
+              );
+            })
+          }
           validationSchema={validationSchema}
         >
           <AppFormField
