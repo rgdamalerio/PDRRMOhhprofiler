@@ -10,7 +10,9 @@ import RespondentScreen from "./app/screens/RespondentScreen";
 import AccountScreen from "./app/screens/AccountScreen";
 import WelcomeScreen from "./app/screens/WelcomeScreen";
 import LoginScreen from "./app/screens/LoginScreen";
+import Profiler from "./app/screens/ProfilerScreen";
 import { View, Text } from "react-native";
+import Camera from "./app/components/Camera";
 
 async function removeDatabase() {
   const sqlDir = FileSystem.documentDirectory + "SQLite/";
@@ -65,6 +67,7 @@ export default function App() {
   //checkDatabaseExist();
 
   return (
+    /*
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
@@ -89,5 +92,7 @@ export default function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
+    */
+    <Camera />
   );
 }
