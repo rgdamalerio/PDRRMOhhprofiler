@@ -40,31 +40,36 @@ function CameraInput() {
     else setHasPermission(true);
   };
 
-  const requestImagePickerPermission = async () => {
-    const { granted } = await ImagePicker.requestCameraRollPermissionsAsync();
-    if (!granted) {
-      alert(
-        "You need to enable permission to access the Image Picker library."
-      );
-      return;
-    }
-  };
-
   const takePicture = async () => {
-    if (camera) {
-      const temp = await camera.takePictureAsync();
-      const photo = await FileSystem.copyAsync(temp.uri);
-      setImageUri(photo.uri);
-    }
+    //const temp = await camera.takePictureAsync();
+    //const photo = await FileSystem.copyAsync(temp.uri);
+    //setImageUri(temp.uri);
+    console.log("called out");
+    //if (camera) {
+    //  const temp = await camera.takePictureAsync();
+    //const photo = await FileSystem.copyAsync(temp.uri);
+    //setImageUri(temp.uri);
+    //  console.log(temp.uri);
+    //}
   };
 
   const handlePress = () => {
+    requestPermission();
     if (!imageUri) setModalVisible(true);
     else
       Alert.alert(
         "Change Image",
         "Are you sure you want to change this image?",
-        [{ text: "Yes", onPress: () => setImageUri(null) }, { text: "No" }]
+        [
+          {
+            text: "Yes",
+            onPress: () => {
+              setModalVisible(true);
+              setImageUri(null);
+            },
+          },
+          { text: "No" },
+        ]
       );
   };
 
@@ -110,23 +115,22 @@ function CameraInput() {
             <ErrorPermission
               style={{
                 color: colors.danger,
+                textAlign: "center",
               }}
             >
-              No access to camera
+              You need to check Permissions to use Camera and Media Library
             </ErrorPermission>
 
             <TouchableOpacity
               style={{
-                //alignSelf: "flex-end",
                 alignItems: "center",
-                //backgroundColor: "red",
                 margin: 10,
               }}
               onPress={() => setModalVisible(false)}
             >
               <MaterialCommunityIcons
-                name="close-circle"
-                style={{ color: colors.danger, fontSize: 40 }}
+                name="keyboard-backspace"
+                style={{ color: colors.black, fontSize: 40 }}
               />
               <Text>Back to form</Text>
             </TouchableOpacity>
