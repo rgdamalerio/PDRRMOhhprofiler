@@ -22,7 +22,7 @@ import ErrorPermission from "./ErrormPermission";
 function CameraInput() {
   const [hasPermission, setHasPermission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [camera, setCamera] = useState();
+  const [cameraRef, setCameraRef] = useState(null);
   const [imageUri, setImageUri] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.front);
 
@@ -146,7 +146,7 @@ function CameraInput() {
             <Camera
               style={{ flex: 3 }}
               type={type}
-              ref={(ref) => setCamera(ref)}
+              ref={(ref) => setCameraRef(ref)}
             >
               <View
                 style={{
@@ -200,9 +200,15 @@ function CameraInput() {
                   alignItems: "center",
                   backgroundColor: "transparent",
                 }}
-                onPress={() => {
-                  takePicture;
-                  setModalVisible(false);
+                onPress={async () => {
+                  //takePicture;
+                  //setModalVisible(false);
+                  if (cameraRef) {
+                    let photo = await cameraRef.takePictureAsync();
+                    console.log("photo", photo);
+                    setImageUri(photo.uri);
+                    setModalVisible(false);
+                  }
                 }}
               >
                 <MaterialCommunityIcons
