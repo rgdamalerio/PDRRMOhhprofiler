@@ -13,6 +13,7 @@ import WelcomeScreen from "./app/screens/WelcomeScreen";
 import LoginScreen from "./app/screens/LoginScreen";
 import Profiler from "./app/screens/ProfilerScreen";
 import CameraInput from "./app/components/CameraInput";
+import LocationInput from "./app/components/LocationInput";
 
 async function removeDatabase() {
   const sqlDir = FileSystem.documentDirectory + "SQLite/";
@@ -94,6 +95,6 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
     */
-    <Profiler />
+    <LocationInput />
   );
 }
