@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import * as FileSystem from "expo-file-system";
+import { View, Text } from "react-native";
 import { Asset } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -11,8 +12,7 @@ import AccountScreen from "./app/screens/AccountScreen";
 import WelcomeScreen from "./app/screens/WelcomeScreen";
 import LoginScreen from "./app/screens/LoginScreen";
 import Profiler from "./app/screens/ProfilerScreen";
-import { View, Text } from "react-native";
-import Camera from "./app/components/Camera";
+import CameraInput from "./app/components/CameraInput";
 
 async function removeDatabase() {
   const sqlDir = FileSystem.documentDirectory + "SQLite/";
@@ -29,15 +29,16 @@ const openDatabaseIShipWithApp = async () => {
     const asset = Asset.fromModule(
       require("./app/assets/database/hhprofiler.db")
     );
-    await FileSystem.downloadAsync(asset.uri, sqlDir + internalDbName)
+    await FileSystem.downloadAsync(
+      "https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/master/app/assets/database/hhprofiler.db",
+      sqlDir + internalDbName
+    )
       .then(({ uri }) => {
         console.log("Finished downloading to ", uri);
       })
       .catch((error) => {
         console.error(error);
       });
-  } else {
-    console.log("dir exists");
   }
 };
 
@@ -93,6 +94,6 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
     */
-    <Camera />
+    <CameraInput />
   );
 }
