@@ -12,19 +12,16 @@ import {
 import * as Permissions from "expo-permissions";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import colors from "../config/colors";
 import ErrorPermission from "./ErrormPermission";
 
-function CameraInput() {
+function CameraInput({ imageUri, onChangeImage }) {
   const [hasPermission, setHasPermission] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [cameraRef, setCameraRef] = useState(null);
-  const [imageUri, setImageUri] = useState(null);
-  const [type, setType] = useState(Camera.Constants.Type.front);
+  const [type, setType] = useState(Camera.Constants.Type.back);
 
   useEffect(() => {
     requestPermission();
@@ -41,16 +38,11 @@ function CameraInput() {
   };
 
   const takePicture = async () => {
-    //const temp = await camera.takePictureAsync();
-    //const photo = await FileSystem.copyAsync(temp.uri);
-    //setImageUri(temp.uri);
-    console.log("called out");
-    //if (camera) {
-    //  const temp = await camera.takePictureAsync();
-    //const photo = await FileSystem.copyAsync(temp.uri);
-    //setImageUri(temp.uri);
-    //  console.log(temp.uri);
-    //}
+    if (cameraRef) {
+      let photo = await cameraRef.takePictureAsync();
+      onChangeImage(photo.uri);
+      setModalVisible(false);
+    }
   };
 
   const handlePress = () => {
@@ -65,7 +57,7 @@ function CameraInput() {
             text: "Yes",
             onPress: () => {
               setModalVisible(true);
-              setImageUri(null);
+              onChangeImage(null);
             },
           },
           { text: "No" },
@@ -80,7 +72,7 @@ function CameraInput() {
         quality: 0.5,
       });
       if (!result.cancelled) {
-        setImageUri(result.uri);
+        onChangeImage(result.uri);
       }
     } catch (error) {
       console.log("Error reading an image", error);
@@ -179,11 +171,7 @@ function CameraInput() {
               }}
             >
               <TouchableOpacity
-                style={{
-                  alignSelf: "center",
-                  alignItems: "center",
-                  backgroundColor: "transparent",
-                }}
+                style={styles.cameraControl}
                 onPress={() => {
                   selectImage();
                   setModalVisible(false);
@@ -195,20 +183,9 @@ function CameraInput() {
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                style={{
-                  alignSelf: "center",
-                  alignItems: "center",
-                  backgroundColor: "transparent",
-                }}
-                onPress={async () => {
-                  //takePicture;
-                  //setModalVisible(false);
-                  if (cameraRef) {
-                    let photo = await cameraRef.takePictureAsync();
-                    console.log("photo", photo);
-                    setImageUri(photo.uri);
-                    setModalVisible(false);
-                  }
+                style={styles.cameraControl}
+                onPress={() => {
+                  takePicture();
                 }}
               >
                 <MaterialCommunityIcons
@@ -217,11 +194,7 @@ function CameraInput() {
                 />
               </TouchableOpacity>
               <TouchableOpacity
-                style={{
-                  alignSelf: "center",
-                  alignItems: "center",
-                  backgroundColor: "transparent",
-                }}
+                style={styles.cameraControl}
                 onPress={() => {
                   setType(
                     type === Camera.Constants.Type.back
@@ -244,6 +217,11 @@ function CameraInput() {
 }
 
 const styles = StyleSheet.create({
+  cameraControl: {
+    alignSelf: "center",
+    alignItems: "center",
+    backgroundColor: "transparent",
+  },
   container: {
     backgroundColor: colors.secondary,
     borderRadius: 15,

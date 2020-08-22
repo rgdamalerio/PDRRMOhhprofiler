@@ -9,6 +9,7 @@ import {
   AppForm as Form,
   AppFormField as FormField,
   FormPicker as Picker,
+  FormImagePicker,
   SubmitButton,
 } from "../components/forms";
 
@@ -17,6 +18,7 @@ const validationSchema = Yup.object().shape({
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
   brgy: Yup.string().required().label("Barangay"),
+  image: Yup.string().required().nullable().label("Image"),
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
@@ -57,6 +59,7 @@ function RegisterScreen({ navigation }) {
             prov: "",
             mun: "",
             brgy: "",
+            image: null,
           }}
           onSubmit={(values) =>
             db.transaction(
@@ -94,6 +97,7 @@ function RegisterScreen({ navigation }) {
           }
           validationSchema={validationSchema}
         >
+          <FormImagePicker name="image" />
           <FormField
             autoCorrect={false}
             icon="account"
