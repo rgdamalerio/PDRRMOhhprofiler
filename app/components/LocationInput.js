@@ -1,23 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   StyleSheet,
   Modal,
   Dimensions,
   TouchableOpacity,
-  Button,
 } from "react-native";
 import Constants from "expo-constants";
-import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import {
+  MaterialIcons,
+  MaterialCommunityIcons,
+  FontAwesome,
+} from "@expo/vector-icons";
 import MapView from "react-native-maps";
 
 import defaultStyles from "../config/styles";
 import Text from "./Text";
 
 function LocationInput({ coordinates, icon, placeholder, width = "100%" }) {
+  const [marker, setMarker] = useState();
   const [modalVisible, setModalVisible] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
-  //const [coordinates, setCoordinates] = useState(coordinates);
+  const [region, setRegion] = useState();
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    setRegion({
+      latitude: 11.768925925341028,
+      longitude: 122.77700671926141,
+      latitudeDelta: 17.693017262718715,
+      longitudeDelta: 9.623784385621548,
+    });
+  }, []);
 
   return (
     <>
@@ -38,9 +52,33 @@ function LocationInput({ coordinates, icon, placeholder, width = "100%" }) {
           )}
         </View>
       </TouchableOpacity>
+      {marker && <Text>{marker.latitude + " " + marker.longitude}</Text>}
       <Modal visible={modalVisible}>
         <View style={styles.mapContainer}>
-          <MapView style={styles.mapStyle} />
+          <MapView
+            ref={mapRef}
+            style={styles.mapStyle}
+            mapType="satellite"
+            region={region}
+            showsUserLocation={true}
+            followsUserLocation={true}
+            onRegionChangeComplete={(region) => setRegion(region)}
+          ></MapView>
+
+          <FontAwesome
+            name="dot-circle-o"
+            style={{
+              zIndex: 3,
+              position: "absolute",
+              marginTop: -37,
+              marginLeft: -11,
+              left: "50%",
+              top: "50%",
+            }}
+            size={10}
+            color={defaultStyles.colors.green}
+          />
+
           <View
             style={{
               flexDirection: "row",
@@ -49,7 +87,6 @@ function LocationInput({ coordinates, icon, placeholder, width = "100%" }) {
               zIndex: 999,
               justifyContent: "space-around",
               position: "absolute",
-              //top: 0,
               left: 0,
               right: 0,
               bottom: 0,
@@ -76,12 +113,16 @@ function LocationInput({ coordinates, icon, placeholder, width = "100%" }) {
             <TouchableOpacity
               style={styles.cameraControl}
               onPress={() => {
-                takePicture();
+                setMarker(region);
+                setModalVisible(false);
               }}
             >
               <MaterialCommunityIcons
                 name="map-marker-plus"
-                style={{ color: defaultStyles.colors.black, fontSize: 40 }}
+                style={{
+                  color: defaultStyles.colors.green,
+                  fontSize: 40,
+                }}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -92,7 +133,10 @@ function LocationInput({ coordinates, icon, placeholder, width = "100%" }) {
             >
               <MaterialCommunityIcons
                 name="close-circle"
-                style={{ color: defaultStyles.colors.black, fontSize: 40 }}
+                style={{
+                  color: defaultStyles.colors.danger,
+                  fontSize: 40,
+                }}
               />
             </TouchableOpacity>
           </View>
