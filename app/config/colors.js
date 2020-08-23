@@ -17,4 +17,5 @@ export default {
   anccentColor: "#536DFE",
   dividerColor: "#BDBDBD",
   darkPrimaryColor: "#0097A7",
+  green: "#69f0ae",
 };

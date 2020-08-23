@@ -95,6 +95,6 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
     */
-    <LocationInput />
+    <LocationInput icon="add-location" placeholder="coordinates" width="50%" />
   );
 }

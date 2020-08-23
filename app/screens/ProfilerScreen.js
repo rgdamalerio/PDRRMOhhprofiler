@@ -98,13 +98,13 @@ function RegisterScreen({ navigation }) {
           validationSchema={validationSchema}
         >
           <FormImagePicker name="image" />
+
           <FormField
             autoCorrect={false}
             icon="account"
             name="fname"
             placeholder="First Name"
           />
-
           <Picker
             icon="earth"
             items={pro}

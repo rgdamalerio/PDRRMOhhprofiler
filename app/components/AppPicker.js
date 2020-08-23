@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   placeholder: {
-    color: defaultStyles.colors.medium,
+    color: defaultStyles.colors.black,
     flex: 1,
   },
   text: {
