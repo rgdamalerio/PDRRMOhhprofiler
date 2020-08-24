@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { StyleSheet, ScrollView, Alert } from "react-native";
+import { StyleSheet, ScrollView, Alert, Switch } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 
@@ -20,16 +19,16 @@ import {
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const validationSchema = Yup.object().shape({
+  respondentname: Yup.string().required().label("Respondent Name"),
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
   brgy: Yup.string().required().label("Barangay"),
   coordinates: Yup.string().required().nullable().label("Coordinates"),
   image: Yup.string().required().nullable().label("Image"),
   typebuilding: Yup.string().required().label("Type of building"),
-  yearconstract: Yup.string().required().label("Year construct"),
+  //yearconstract: Yup.string().required().label("Year construct"),
+  beadroom: Yup.number().label("Number of bedrooms"),
 });
-
-const db = SQLite.openDatabase("hhprofiler.db");
 
 const categories = [
   { label: "Furniture", value: 1 },
@@ -37,12 +36,25 @@ const categories = [
   { label: "Camera", value: 3 },
 ];
 
+const db = SQLite.openDatabase("hhprofiler.db");
+
 function ProfilerScreen({ navigation }) {
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
+  const [typebuilding, setTypebuilding] = useState();
+  const [tenuralStatus, settenuralStatus] = useState();
+
+  const [isEnabled, setIsEnabled] = useState(false);
+  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
   useEffect(() => {
+    getProvince();
+    gettypeBuilding();
+    gettenuralStatus();
+  }, []);
+
+  const getProvince = () => {
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -63,13 +75,61 @@ function ProfilerScreen({ navigation }) {
         );
       }
     );
-  }, []);
+  };
 
+  const gettypeBuilding = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, lib_buildingtypedesc AS label from lib_typeofbuilding`,
+          [],
+          (_, { rows: { _array } }) => setTypebuilding(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Type of Building Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const gettenuralStatus = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, lib_tenuralstatusdesc AS label from lib_tenuralstatus`,
+          [],
+          (_, { rows: { _array } }) => settenuralStatus(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Tenural status Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
   return (
     <Screen style={styles.container}>
       <ScrollView>
         <Form
           initialValues={{
+            respondentname: "",
             prov: "",
             mun: "",
             brgy: "",
@@ -77,6 +137,8 @@ function ProfilerScreen({ navigation }) {
             image: null,
             yearconstract: "",
             typebuilding: "",
+            tenuralstatus: "",
+            beadroom: "",
           }}
           onSubmit={(values) =>
             db.transaction(
@@ -114,12 +176,11 @@ function ProfilerScreen({ navigation }) {
           }
           validationSchema={validationSchema}
         >
-          <FormCameraPicker name="image" />
-          <FormLocationPicker
-            name="coordinates"
-            icon="add-location"
-            placeholder="coordinates"
-            width="50%"
+          <FormField
+            autoCorrect={false}
+            icon="account"
+            name="respondentname"
+            placeholder="Respondent Name"
           />
           <AddressPicker
             icon="earth"
@@ -148,29 +209,54 @@ function ProfilerScreen({ navigation }) {
             searchable
             setbrgyValue
           />
+          <FormLocationPicker
+            name="coordinates"
+            icon="add-location"
+            placeholder="coordinates"
+            width="50%"
+          />
+          <FormCameraPicker name="image" />
+
           <Picker
             icon="warehouse"
-            items={categories}
+            items={typebuilding}
             name="typebuilding"
             PickerItemComponent={PickerItem}
             placeholder="Type of building"
+          />
+          <Picker
+            icon="warehouse"
+            items={tenuralStatus}
+            name="tenuralstatus"
+            PickerItemComponent={PickerItem}
+            placeholder="Tenural Status"
+          />
+          <Switch
+            trackColor={{ false: "#767577", true: "#81b0ff" }}
+            thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleSwitch}
+            value={isEnabled}
+            activeText={"On"}
+            inActiveText={"Off"}
           />
           <FormDatePicker
             name="yearconstract"
             icon="date"
             placeholder="Year construct"
             width="50%"
-            display="default"
+            display="spinner"
             mode="date"
             year
           />
           <FormField
             autoCorrect={false}
-            icon="account"
-            name="fname"
-            placeholder="First Name"
+            icon="bed-empty"
+            name="beadroom"
+            placeholder="Number of bedrooms"
+            width="75%"
+            keyboardType="number-pad"
           />
-
           <SubmitButton title="Save" />
         </Form>
       </ScrollView>

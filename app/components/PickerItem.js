@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 import Text from "./Text";
+import defaultStyles from "../config/styles";
 import { ListItemSeparator } from "../components/lists";
 
 function AddressPickerItem({ item, onPress }) {
@@ -21,6 +22,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   label: {
+    color: defaultStyles.colors.medium,
     paddingHorizontal: 5,
     marginTop: 5,
     marginBottom: 23,
