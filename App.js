@@ -34,7 +34,7 @@ const openDatabaseIShipWithApp = async () => {
       require("./app/assets/database/hhprofiler.db")
     );
     await FileSystem.downloadAsync(
-      "https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/master/app/assets/database/hhprofiler.db",
+      "https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/Profiler/app/assets/database/hhprofiler.db",
       sqlDir + internalDbName
     )
       .then(({ uri }) => {
