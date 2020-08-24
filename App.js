@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, Profiler } from "react";
 import * as FileSystem from "expo-file-system";
 import { View, Text } from "react-native";
 import { Asset } from "expo-asset";
@@ -58,12 +58,6 @@ const checkDatabaseExist = async () => {
 
 const Stack = createStackNavigator();
 
-const categories = [
-  { label: "Furniture", value: 1 },
-  { label: "Clothing", value: 2 },
-  { label: "Camera", value: 3 },
-];
-
 export default function App() {
   useEffect(() => {
     //removeDatabase();
@@ -104,13 +98,6 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
     */
-    <Picker
-      items={categories}
-      name="coordinates"
-      icon="warehouse"
-      placeholder="Picker"
-      width="50%"
-    />
     /*
     <LocationInput
       name="coordinates"
@@ -128,5 +115,6 @@ export default function App() {
       //datevalue
       year
     />*/
+    <ProfilerScreen />
   );
 }

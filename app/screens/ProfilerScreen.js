@@ -5,10 +5,11 @@ import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 
 import Screen from "../components/Screen";
-import AddressPickerItem from "../components/AddressPickerItem";
+import PickerItem from "../components/PickerItem";
 import {
   AppForm as Form,
   AppFormField as FormField,
+  FormPicker as Picker,
   AddressPicker,
   FormCameraPicker,
   FormLocationPicker,
@@ -24,10 +25,17 @@ const validationSchema = Yup.object().shape({
   brgy: Yup.string().required().label("Barangay"),
   coordinates: Yup.string().required().nullable().label("Coordinates"),
   image: Yup.string().required().nullable().label("Image"),
+  typebuilding: Yup.string().required().label("Type of building"),
   yearconstract: Yup.string().required().label("Year construct"),
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
+
+const categories = [
+  { label: "Furniture", value: 1 },
+  { label: "Clothing", value: 2 },
+  { label: "Camera", value: 3 },
+];
 
 function ProfilerScreen({ navigation }) {
   const [pro, setPro] = useState();
@@ -68,6 +76,7 @@ function ProfilerScreen({ navigation }) {
             coordinates: null,
             image: null,
             yearconstract: "",
+            typebuilding: "",
           }}
           onSubmit={(values) =>
             db.transaction(
@@ -116,7 +125,7 @@ function ProfilerScreen({ navigation }) {
             icon="earth"
             items={pro}
             name="prov"
-            PickerItemComponent={AddressPickerItem}
+            PickerItemComponent={PickerItem}
             placeholder="Province"
             searchable
             setMun={setMun}
@@ -125,7 +134,7 @@ function ProfilerScreen({ navigation }) {
             icon="earth"
             items={mun}
             name="mun"
-            PickerItemComponent={AddressPickerItem}
+            PickerItemComponent={PickerItem}
             placeholder="Municipality"
             searchable
             setBrgy={setBrgy}
@@ -134,12 +143,18 @@ function ProfilerScreen({ navigation }) {
             icon="earth"
             items={brgy}
             name="brgy"
-            PickerItemComponent={AddressPickerItem}
+            PickerItemComponent={PickerItem}
             placeholder="Barangay"
             searchable
             setbrgyValue
           />
-
+          <Picker
+            icon="warehouse"
+            items={categories}
+            name="typebuilding"
+            PickerItemComponent={PickerItem}
+            placeholder="Type of building"
+          />
           <FormDatePicker
             name="yearconstract"
             icon="date"
