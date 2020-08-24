@@ -19,7 +19,7 @@ import Screen from "./Screen";
 
 const db = SQLite.openDatabase("hhprofiler.db");
 
-function AppPicker({
+function AddressPicker({
   icon,
   items,
   numberOfColumns = 1,
@@ -197,4 +197,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AppPicker;
+export default AddressPicker;

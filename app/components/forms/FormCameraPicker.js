@@ -4,7 +4,7 @@ import { useFormikContext } from "formik";
 import ErrorMessage from "./ErrorMessage";
 import CameraInput from "../CameraInput";
 
-function FormImagePicker({ name }) {
+function FormCameraPicker({ name }) {
   const { errors, setFieldValue, touched, values } = useFormikContext();
   const imageUri = values[name];
 
@@ -20,4 +20,4 @@ function FormImagePicker({ name }) {
   );
 }
 
-export default FormImagePicker;
+export default FormCameraPicker;

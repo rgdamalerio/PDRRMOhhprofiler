@@ -11,9 +11,12 @@ import RespondentScreen from "./app/screens/RespondentScreen";
 import AccountScreen from "./app/screens/AccountScreen";
 import WelcomeScreen from "./app/screens/WelcomeScreen";
 import LoginScreen from "./app/screens/LoginScreen";
-import Profiler from "./app/screens/ProfilerScreen";
+import ProfilerScreen from "./app/screens/ProfilerScreen";
 import CameraInput from "./app/components/CameraInput";
 import LocationInput from "./app/components/LocationInput";
+import DateInput from "./app/components/DateInput";
+import RegisterScreen from "./app/screens/RegisterScreen";
+import Picker from "./app/components/Picker";
 
 async function removeDatabase() {
   const sqlDir = FileSystem.documentDirectory + "SQLite/";
@@ -55,6 +58,12 @@ const checkDatabaseExist = async () => {
 
 const Stack = createStackNavigator();
 
+const categories = [
+  { label: "Furniture", value: 1 },
+  { label: "Clothing", value: 2 },
+  { label: "Camera", value: 3 },
+];
+
 export default function App() {
   useEffect(() => {
     //removeDatabase();
@@ -95,6 +104,29 @@ export default function App() {
       </Stack.Navigator>
     </NavigationContainer>
     */
-    <LocationInput icon="add-location" placeholder="coordinates" width="50%" />
+    <Picker
+      items={categories}
+      name="coordinates"
+      icon="warehouse"
+      placeholder="Picker"
+      width="50%"
+    />
+    /*
+    <LocationInput
+      name="coordinates"
+      icon="add-location"
+      placeholder="coordinates"
+      width="50%"
+    />*/
+    /*<DateInput
+      name="yearconstract"
+      icon="date"
+      placeholder="Year construct"
+      width="45%"
+      display="spinner"
+      mode="date"
+      //datevalue
+      year
+    />*/
   );
 }

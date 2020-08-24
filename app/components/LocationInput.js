@@ -17,8 +17,13 @@ import MapView from "react-native-maps";
 import defaultStyles from "../config/styles";
 import Text from "./Text";
 
-function LocationInput({ coordinates, icon, placeholder, width = "100%" }) {
-  const [marker, setMarker] = useState();
+function LocationInput({
+  coordinates,
+  onChangeCoordinates,
+  icon,
+  placeholder,
+  width,
+}) {
   const [modalVisible, setModalVisible] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
   const [region, setRegion] = useState();
@@ -26,12 +31,16 @@ function LocationInput({ coordinates, icon, placeholder, width = "100%" }) {
 
   useEffect(() => {
     setRegion({
-      latitude: 11.768925925341028,
-      longitude: 122.77700671926141,
-      latitudeDelta: 17.693017262718715,
-      longitudeDelta: 9.623784385621548,
+      latitude: 9.190489360418237,
+      latitudeDelta: 2.239664674768459,
+      longitude: 125.57549066841602,
+      longitudeDelta: 1.365918293595314,
     });
   }, []);
+
+  const onChangeCoord = () => {
+    onChangeCoordinates(region);
+  };
 
   return (
     <>
@@ -46,13 +55,14 @@ function LocationInput({ coordinates, icon, placeholder, width = "100%" }) {
             />
           )}
           {coordinates ? (
-            <Text style={styles.text}>{coordinates}</Text>
+            <Text style={styles.text}>
+              {coordinates.longitude + " " + coordinates.latitude}
+            </Text>
           ) : (
             <Text style={styles.placeholder}>{placeholder}</Text>
           )}
         </View>
       </TouchableOpacity>
-      {marker && <Text>{marker.latitude + " " + marker.longitude}</Text>}
       <Modal visible={modalVisible}>
         <View style={styles.mapContainer}>
           <MapView
@@ -113,7 +123,7 @@ function LocationInput({ coordinates, icon, placeholder, width = "100%" }) {
             <TouchableOpacity
               style={styles.cameraControl}
               onPress={() => {
-                setMarker(region);
+                onChangeCoord(region);
                 setModalVisible(false);
               }}
             >

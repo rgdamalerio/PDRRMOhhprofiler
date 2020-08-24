@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { StyleSheet, ScrollView, Alert } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
@@ -8,22 +9,27 @@ import AddressPickerItem from "../components/AddressPickerItem";
 import {
   AppForm as Form,
   AppFormField as FormField,
-  FormPicker as Picker,
-  FormImagePicker,
+  AddressPicker,
+  FormCameraPicker,
+  FormLocationPicker,
+  FormDatePicker,
   SubmitButton,
 } from "../components/forms";
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
+
 const validationSchema = Yup.object().shape({
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
   brgy: Yup.string().required().label("Barangay"),
+  coordinates: Yup.string().required().nullable().label("Coordinates"),
   image: Yup.string().required().nullable().label("Image"),
+  yearconstract: Yup.string().required().label("Year construct"),
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
 
-function RegisterScreen({ navigation }) {
+function ProfilerScreen({ navigation }) {
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
@@ -59,7 +65,9 @@ function RegisterScreen({ navigation }) {
             prov: "",
             mun: "",
             brgy: "",
+            coordinates: null,
             image: null,
+            yearconstract: "",
           }}
           onSubmit={(values) =>
             db.transaction(
@@ -97,15 +105,14 @@ function RegisterScreen({ navigation }) {
           }
           validationSchema={validationSchema}
         >
-          <FormImagePicker name="image" />
-
-          <FormField
-            autoCorrect={false}
-            icon="account"
-            name="fname"
-            placeholder="First Name"
+          <FormCameraPicker name="image" />
+          <FormLocationPicker
+            name="coordinates"
+            icon="add-location"
+            placeholder="coordinates"
+            width="50%"
           />
-          <Picker
+          <AddressPicker
             icon="earth"
             items={pro}
             name="prov"
@@ -114,7 +121,7 @@ function RegisterScreen({ navigation }) {
             searchable
             setMun={setMun}
           />
-          <Picker
+          <AddressPicker
             icon="earth"
             items={mun}
             name="mun"
@@ -123,7 +130,7 @@ function RegisterScreen({ navigation }) {
             searchable
             setBrgy={setBrgy}
           />
-          <Picker
+          <AddressPicker
             icon="earth"
             items={brgy}
             name="brgy"
@@ -132,6 +139,23 @@ function RegisterScreen({ navigation }) {
             searchable
             setbrgyValue
           />
+
+          <FormDatePicker
+            name="yearconstract"
+            icon="date"
+            placeholder="Year construct"
+            width="50%"
+            display="default"
+            mode="date"
+            year
+          />
+          <FormField
+            autoCorrect={false}
+            icon="account"
+            name="fname"
+            placeholder="First Name"
+          />
+
           <SubmitButton title="Save" />
         </Form>
       </ScrollView>
@@ -145,4 +169,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RegisterScreen;
+export default ProfilerScreen;
