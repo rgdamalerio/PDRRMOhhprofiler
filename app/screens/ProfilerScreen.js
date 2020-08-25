@@ -45,13 +45,21 @@ function ProfilerScreen({ navigation }) {
   const [brgy, setBrgy] = useState();
   const [typebuilding, setTypebuilding] = useState();
   const [tenuralStatus, settenuralStatus] = useState();
-  const [roofmaterial, setRoofmaterial] = useState();
+  const [roofmaterials, setRoofmaterials] = useState();
+  const [wallmaterials, setWallmaterials] = useState();
+  const [watertenuralstatus, setWatertenuralstatus] = useState();
+  const [lvlwatersystem, setLvlwatersystems] = useState();
+  const [evacuationarea, setEvacuationarea] = useState();
 
   useEffect(() => {
     getProvince();
     gettypeBuilding();
     gettenuralStatus();
     getroofMaterials();
+    getwallMaterials();
+    getWaterTenuralStatus();
+    getLvlWaterSystem();
+    getEvacuationareas();
   }, []);
 
   const getProvince = () => {
@@ -81,7 +89,7 @@ function ProfilerScreen({ navigation }) {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          `select id, lib_buildingtypedesc AS label from lib_typeofbuilding`,
+          `select id, lib_buildingtypedesc AS label from lib_hhtypeofbuilding`,
           [],
           (_, { rows: { _array } }) => setTypebuilding(_array)
         );
@@ -105,7 +113,7 @@ function ProfilerScreen({ navigation }) {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          `select id, lib_tenuralstatusdesc AS label from lib_tenuralstatus`,
+          `select id, lib_tenuralstatusdesc AS label from lib_hhtenuralstatus`,
           [],
           (_, { rows: { _array } }) => settenuralStatus(_array)
         );
@@ -129,9 +137,9 @@ function ProfilerScreen({ navigation }) {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          `select id, lib_roofmaterialsdesc AS label from lib_roofmaterials`,
+          `select id, lib_roofmaterialsdesc AS label from lib_hhroofmaterials`,
           [],
-          (_, { rows: { _array } }) => setRoofmaterial(_array)
+          (_, { rows: { _array } }) => setRoofmaterials(_array)
         );
       },
       (error) => {
@@ -148,6 +156,103 @@ function ProfilerScreen({ navigation }) {
       }
     );
   };
+
+  const getwallMaterials = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, lib_wallmaterialsdesc AS label from lib_hhwallconmaterials`,
+          [],
+          (_, { rows: { _array } }) => setWallmaterials(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Roof materials Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const getWaterTenuralStatus = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, lib_wtdesc AS label from lib_hhwatertenuralstatus`,
+          [],
+          (_, { rows: { _array } }) => setWatertenuralstatus(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Water tenural library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const getLvlWaterSystem = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          'select id, lib_hhwatersystemlvl || " : " || lib_hhlvldesc AS label from lib_hhlvlwatersystem',
+          [],
+          (_, { rows: { _array } }) => setLvlwatersystems(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Level water system library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const getEvacuationareas = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, lib_heaname AS label from lib_hhevacuationarea`,
+          [],
+          (_, { rows: { _array } }) => setEvacuationarea(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Evacuation area library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
   return (
     <Screen style={styles.container}>
       <ScrollView>
@@ -297,10 +402,71 @@ function ProfilerScreen({ navigation }) {
 
           <Picker
             icon="material-ui"
-            items={roofmaterial}
+            items={roofmaterials}
             name="roofmaterial"
             PickerItemComponent={PickerItem}
             placeholder="Roof material"
+          />
+          <Picker
+            icon="wall"
+            items={wallmaterials}
+            name="wallmaterial"
+            PickerItemComponent={PickerItem}
+            placeholder="Wall material"
+          />
+
+          <SwitchInput
+            icon="water-pump"
+            name="awater"
+            placeholder="Access to Water"
+          />
+
+          <SwitchInput
+            icon="water"
+            name="wpotable"
+            placeholder="Water is potable"
+          />
+
+          <Picker
+            icon="infinity"
+            items={watertenuralstatus}
+            name="wtenuralstatus"
+            PickerItemComponent={PickerItem}
+            placeholder="Water tenural status"
+          />
+
+          <Picker
+            icon="cup-water"
+            items={lvlwatersystem}
+            name="wlvlsystem"
+            PickerItemComponent={PickerItem}
+            placeholder="Level of water"
+          />
+
+          <Picker
+            icon="home-flood"
+            items={evacuationarea}
+            name="evacuationarea"
+            PickerItemComponent={PickerItem}
+            placeholder="Evacuation center location"
+          />
+
+          <SwitchInput
+            icon="medical-bag"
+            name="accessmedfacility"
+            placeholder="Access to health/medical Fac"
+          />
+
+          <SwitchInput
+            icon="access-point-network"
+            name="accesstelecommunication"
+            placeholder="Access to Telecomunications"
+          />
+
+          <SwitchInput
+            icon="bag-personal"
+            name="accessdrillsimulation"
+            placeholder="Access to drill/simulation"
           />
 
           <SubmitButton title="Save" />
