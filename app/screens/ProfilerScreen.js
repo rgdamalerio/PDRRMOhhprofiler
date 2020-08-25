@@ -27,8 +27,9 @@ const validationSchema = Yup.object().shape({
   coordinates: Yup.string().required().nullable().label("Coordinates"),
   image: Yup.string().required().nullable().label("Image"),
   typebuilding: Yup.string().required().label("Type of building"),
+  storeys: Yup.string().required().label("Number of Storey"),
   //yearconstract: Yup.string().required().label("Year construct"),
-  beadroom: Yup.number().label("Number of bedrooms"),
+  //beadroom: Yup.number().label("Number of bedrooms"),
 });
 
 const categories = [
@@ -266,8 +267,9 @@ function ProfilerScreen({ navigation }) {
             coordinates: null,
             image: null,
             yearconstract: "",
+            cost: 0,
             beadroom: 0,
-            storeys: 0,
+            storeys: "",
             aelectricity: 0,
             internet: 0,
             roofmaterial: 0,
@@ -393,6 +395,16 @@ function ProfilerScreen({ navigation }) {
             mode="date"
             year
           />
+
+          <FormField
+            autoCorrect={false}
+            icon="cash"
+            name="cost"
+            placeholder="Estimated cost"
+            width="75%"
+            keyboardType="number-pad"
+          />
+
           <FormField
             autoCorrect={false}
             icon="bed-empty"
