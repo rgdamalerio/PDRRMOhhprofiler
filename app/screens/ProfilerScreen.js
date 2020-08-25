@@ -262,6 +262,7 @@ function ProfilerScreen({ navigation }) {
             prov: "",
             mun: "",
             brgy: "",
+            purok: "",
             coordinates: null,
             image: null,
             yearconstract: "",
@@ -351,6 +352,15 @@ function ProfilerScreen({ navigation }) {
             searchable
             setbrgyValue
           />
+
+          <FormField
+            autoCorrect={false}
+            icon="earth"
+            name="purok"
+            placeholder="Purok/Sitio"
+            width="70%"
+          />
+
           <FormLocationPicker
             name="coordinates"
             icon="add-location"
