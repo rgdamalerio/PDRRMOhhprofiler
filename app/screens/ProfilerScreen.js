@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, ScrollView, Alert, Switch } from "react-native";
+import { StyleSheet, ScrollView, Alert } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 
@@ -15,6 +15,7 @@ import {
   FormDatePicker,
   SubmitButton,
 } from "../components/forms";
+import SwitchInput from "../components/SwitchInput";
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
@@ -44,14 +45,13 @@ function ProfilerScreen({ navigation }) {
   const [brgy, setBrgy] = useState();
   const [typebuilding, setTypebuilding] = useState();
   const [tenuralStatus, settenuralStatus] = useState();
-
-  const [isEnabled, setIsEnabled] = useState(false);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+  const [roofmaterial, setRoofmaterial] = useState();
 
   useEffect(() => {
     getProvince();
     gettypeBuilding();
     gettenuralStatus();
+    getroofMaterials();
   }, []);
 
   const getProvince = () => {
@@ -114,6 +114,30 @@ function ProfilerScreen({ navigation }) {
         Alert.alert(
           "SQLITE ERROR",
           "Error loading Tenural status Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const getroofMaterials = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, lib_roofmaterialsdesc AS label from lib_roofmaterials`,
+          [],
+          (_, { rows: { _array } }) => setRoofmaterial(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Roof materials Library, Please contact developer, " +
             error,
           [
             {
@@ -225,21 +249,13 @@ function ProfilerScreen({ navigation }) {
             placeholder="Type of building"
           />
           <Picker
-            icon="warehouse"
+            icon="alpha-t-box"
             items={tenuralStatus}
             name="tenuralstatus"
             PickerItemComponent={PickerItem}
             placeholder="Tenural Status"
           />
-          <Switch
-            trackColor={{ false: "#767577", true: "#81b0ff" }}
-            thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={toggleSwitch}
-            value={isEnabled}
-            activeText={"On"}
-            inActiveText={"Off"}
-          />
+
           <FormDatePicker
             name="yearconstract"
             icon="date"
@@ -257,6 +273,36 @@ function ProfilerScreen({ navigation }) {
             width="75%"
             keyboardType="number-pad"
           />
+
+          <FormField
+            autoCorrect={false}
+            icon="office-building"
+            name="storeys"
+            placeholder="Number of storeys"
+            width="75%"
+            keyboardType="number-pad"
+          />
+
+          <SwitchInput
+            icon="electric-switch"
+            name="aelectricity"
+            placeholder="Access to electricity"
+          />
+
+          <SwitchInput
+            icon="internet-explorer"
+            name="internet"
+            placeholder="Access to internet"
+          />
+
+          <Picker
+            icon="material-ui"
+            items={roofmaterial}
+            name="roofmaterial"
+            PickerItemComponent={PickerItem}
+            placeholder="Roof material"
+          />
+
           <SubmitButton title="Save" />
         </Form>
       </ScrollView>
