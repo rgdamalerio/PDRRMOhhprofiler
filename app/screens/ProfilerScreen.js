@@ -266,6 +266,7 @@ function ProfilerScreen({ navigation }) {
             purok: "",
             coordinates: null,
             image: null,
+            typebuilding: "",
             yearconstract: "",
             cost: 0,
             beadroom: 0,
@@ -282,7 +283,6 @@ function ProfilerScreen({ navigation }) {
             accessmedfacility: 0,
             accesstelecommunication: 0,
             accessdrillsimulation: 0,
-            typebuilding: "",
             tenuralstatus: 0,
           }}
           onSubmit={(values) =>
