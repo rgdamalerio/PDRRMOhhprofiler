@@ -1,11 +1,14 @@
 import React, { useState } from "react";
-import { View, TextInput, Switch, StyleSheet } from "react-native";
+import { useFormikContext } from "formik";
+import { View, Text, Switch, StyleSheet } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import defaultStyles from "../config/styles";
+import ErrorMessage from "../components/forms/ErrorMessage";
 
-function SwitchInput({ icon, width = "100%", ...otherProps }) {
-  const [isEnabled, setIsEnabled] = useState(false);
+function SwitchInput({ name, icon, width = "100%", placeholder }) {
+  const { setFieldTouched, values, errors, touched } = useFormikContext();
+  const [isEnabled, setIsEnabled] = useState(values[name]);
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
   return (
@@ -18,20 +21,17 @@ function SwitchInput({ icon, width = "100%", ...otherProps }) {
           style={styles.icon}
         />
       )}
-      <TextInput
-        placeholderTextColor={defaultStyles.colors.medium}
-        style={[defaultStyles.text, styles.text]}
-        {...otherProps}
-      />
+      <Text style={[, defaultStyles.text, styles.text]}>{placeholder}</Text>
       <Switch
         trackColor={{ false: "#767577", true: "#81b0ff" }}
         thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
         ios_backgroundColor="#3e3e3e"
-        onValueChange={toggleSwitch}
+        onValueChange={() => setFieldTouched(toggleSwitch())}
         value={isEnabled}
         activeText={"On"}
         inActiveText={"Off"}
       />
+      <ErrorMessage error={errors[name]} visible={touched[name]} />
     </View>
   );
 }
@@ -49,6 +49,7 @@ const styles = StyleSheet.create({
   },
   text: {
     flex: 1,
+    color: defaultStyles.colors.medium,
   },
 });
 

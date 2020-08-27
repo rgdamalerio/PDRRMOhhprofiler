@@ -24,12 +24,12 @@ const validationSchema = Yup.object().shape({
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
   brgy: Yup.string().required().label("Barangay"),
-  coordinates: Yup.string().required().nullable().label("Coordinates"),
-  image: Yup.string().required().nullable().label("Image"),
+  // image: Yup.string().required().nullable().label("Image"),
+  //coordinates: Yup.string().required().nullable().label("Coordinates"),
   typebuilding: Yup.string().required().label("Type of building"),
   storeys: Yup.string().required().label("Number of Storey"),
-  //yearconstract: Yup.string().required().label("Year construct"),
-  //beadroom: Yup.number().label("Number of bedrooms"),
+  roofmaterial: Yup.string().required().label("Roof material"),
+  wallmaterial: Yup.string().required().label("Wall material"),
 });
 
 const categories = [
@@ -267,28 +267,30 @@ function ProfilerScreen({ navigation }) {
             coordinates: null,
             image: null,
             typebuilding: "",
-            yearconstract: "",
+            yearconstract: 0,
             cost: 0,
             beadroom: 0,
             storeys: "",
-            aelectricity: 0,
-            internet: 0,
-            roofmaterial: 0,
-            wallmaterial: 0,
-            awater: 0,
-            wpotable: 0,
+            aelectricity: false,
+            internet: false,
+            roofmaterial: "",
+            wallmaterial: "",
+            awater: false,
+            wpotable: false,
             wtenuralstatus: 0,
             wlvlsystem: 0,
             evacuationarea: 0,
-            accessmedfacility: 0,
-            accesstelecommunication: 0,
-            accessdrillsimulation: 0,
+            accessmedfacility: false,
+            accesstelecommunication: false,
+            accessdrillsimulation: false,
             tenuralstatus: 0,
           }}
           onSubmit={(values) =>
             db.transaction(
               (tx) => {
                 tx.executeSql(
+                  console.log(values)
+                  /*
                   "insert into tbl_enumerator (tbl_enumeratorprov,tbl_enumeratormun,tbl_enumeratorbrgy) values (?,?,?)",
                   [values.prov.id, values.mun.id, values.brgy.id],
                   (tx, results) => {
@@ -305,6 +307,7 @@ function ProfilerScreen({ navigation }) {
                       );
                     } else alert("Registration Failed");
                   }
+                  */
                 );
               },
               (error) => {

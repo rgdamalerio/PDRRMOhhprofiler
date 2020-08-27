@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   text: {
-    color: defaultStyles.colors.medium,
+    color: defaultStyles.colors.black,
     flex: 1,
   },
 });
