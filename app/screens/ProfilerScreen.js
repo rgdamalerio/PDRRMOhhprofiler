@@ -20,23 +20,19 @@ import SwitchInput from "../components/SwitchInput";
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const validationSchema = Yup.object().shape({
-  respondentname: Yup.string().required().label("Respondent Name"),
-  prov: Yup.string().required().label("Province"),
-  mun: Yup.string().required().label("Municipality"),
-  brgy: Yup.string().required().label("Barangay"),
-  // image: Yup.string().required().nullable().label("Image"),
-  //coordinates: Yup.string().required().nullable().label("Coordinates"),
-  typebuilding: Yup.string().required().label("Type of building"),
-  storeys: Yup.string().required().label("Number of Storey"),
-  roofmaterial: Yup.string().required().label("Roof material"),
-  wallmaterial: Yup.string().required().label("Wall material"),
+  //respondentname: Yup.string().required().label("Respondent Name"),
+  //prov: Yup.string().required().label("Province"),
+  //mun: Yup.string().required().label("Municipality"),
+  //brgy: Yup.string().required().label("Barangay"),
+  //// image: Yup.string().required().nullable().label("Image"),
+  ////coordinates: Yup.string().required().nullable().label("Coordinates"),
+  //typebuilding: Yup.string().required().label("Type of building"),
+  //yearconstract: Yup.string().label("Number of Storey"),
+  //cost: Yup.number().label("Estimated Cost"),
+  //beadroom: Yup.number().label("Number of bedrooms"),
+  //storeys: Yup.number().required().label("Number of Storey"),
+  //wallmaterial: Yup.string().required().label("Wall material"),
 });
-
-const categories = [
-  { label: "Furniture", value: 1 },
-  { label: "Clothing", value: 2 },
-  { label: "Camera", value: 3 },
-];
 
 const db = SQLite.openDatabase("hhprofiler.db");
 

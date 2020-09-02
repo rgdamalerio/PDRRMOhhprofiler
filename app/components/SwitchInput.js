@@ -7,9 +7,7 @@ import defaultStyles from "../config/styles";
 import ErrorMessage from "../components/forms/ErrorMessage";
 
 function SwitchInput({ name, icon, width = "100%", placeholder }) {
-  const { setFieldTouched, values, errors, touched } = useFormikContext();
-  const [isEnabled, setIsEnabled] = useState(values[name]);
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
+  const { setFieldValue, values, errors, touched } = useFormikContext();
 
   return (
     <View style={[styles.container, { width }]}>
@@ -21,15 +19,13 @@ function SwitchInput({ name, icon, width = "100%", placeholder }) {
           style={styles.icon}
         />
       )}
-      <Text style={[, defaultStyles.text, styles.text]}>{placeholder}</Text>
+      <Text style={[defaultStyles.text, styles.text]}>{placeholder}</Text>
       <Switch
         trackColor={{ false: "#767577", true: "#81b0ff" }}
-        thumbColor={isEnabled ? "#f5dd4b" : "#f4f3f4"}
+        thumbColor={values[name] ? "#f5dd4b" : "#f4f3f4"}
         ios_backgroundColor="#3e3e3e"
-        onValueChange={() => setFieldTouched(name, toggleSwitch())}
-        value={isEnabled}
-        activeText={"On"}
-        inActiveText={"Off"}
+        onValueChange={(value) => setFieldValue(name, value)}
+        value={values[name]}
       />
       <ErrorMessage error={errors[name]} visible={touched[name]} />
     </View>
