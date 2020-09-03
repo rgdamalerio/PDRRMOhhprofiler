@@ -21,8 +21,8 @@ function SwitchInput({ name, icon, width = "100%", placeholder }) {
       )}
       <Text style={[defaultStyles.text, styles.text]}>{placeholder}</Text>
       <Switch
-        trackColor={{ false: "#767577", true: "#81b0ff" }}
-        thumbColor={values[name] ? "#f5dd4b" : "#f4f3f4"}
+        trackColor={{ false: "#767577", true: "#c3fdff" }}
+        thumbColor={values[name] ? "#81b0ff" : "#f4f3f4"}
         ios_backgroundColor="#3e3e3e"
         onValueChange={(value) => setFieldValue(name, value)}
         value={values[name]}

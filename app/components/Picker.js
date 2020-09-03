@@ -23,6 +23,7 @@ function AppPicker({
   placeholder,
   selectedItem,
   width = "100%",
+  setOther,
 }) {
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -65,6 +66,12 @@ function AppPicker({
                 onPress={() => {
                   setModalVisible(false);
                   onSelectItem(item);
+
+                  if (setOther) {
+                    item.label == "Other, Please specify"
+                      ? setOther(true)
+                      : setOther(false);
+                  }
                 }}
               />
             )}

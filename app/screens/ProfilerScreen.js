@@ -20,18 +20,22 @@ import SwitchInput from "../components/SwitchInput";
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const validationSchema = Yup.object().shape({
-  //respondentname: Yup.string().required().label("Respondent Name"),
-  //prov: Yup.string().required().label("Province"),
-  //mun: Yup.string().required().label("Municipality"),
-  //brgy: Yup.string().required().label("Barangay"),
-  //// image: Yup.string().required().nullable().label("Image"),
-  ////coordinates: Yup.string().required().nullable().label("Coordinates"),
-  //typebuilding: Yup.string().required().label("Type of building"),
-  //yearconstract: Yup.string().label("Number of Storey"),
-  //cost: Yup.number().label("Estimated Cost"),
-  //beadroom: Yup.number().label("Number of bedrooms"),
-  //storeys: Yup.number().required().label("Number of Storey"),
-  //wallmaterial: Yup.string().required().label("Wall material"),
+  respondentname: Yup.string().required().label("Respondent Name"),
+  prov: Yup.string().required().label("Province"),
+  mun: Yup.string().required().label("Municipality"),
+  brgy: Yup.string().required().label("Barangay"),
+  // image: Yup.string().required().nullable().label("Image"),
+  //coordinates: Yup.string().required().nullable().label("Coordinates"),
+  typebuilding: Yup.string().required().label("Type of building"),
+  yearconstract: Yup.string().label("Number of Storey"),
+  cost: Yup.number().label("Estimated Cost"),
+  beadroom: Yup.number().label("Number of bedrooms"),
+  storeys: Yup.number().required().label("Number of Storey"),
+  wallmaterial: Yup.string().required().label("Wall material"),
+  otherevacuation: Yup.string().when("evacuationarea.id", {
+    is: 9,
+    then: Yup.string().required().label("Add other evacuation"),
+  }), //adjust this if there is item added to evacuation area library
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
@@ -47,6 +51,7 @@ function ProfilerScreen({ navigation }) {
   const [watertenuralstatus, setWatertenuralstatus] = useState();
   const [lvlwatersystem, setLvlwatersystems] = useState();
   const [evacuationarea, setEvacuationarea] = useState();
+  const [otherEvacuation, setOtherEvacuation] = useState(false);
 
   useEffect(() => {
     getProvince();
@@ -276,6 +281,7 @@ function ProfilerScreen({ navigation }) {
             wtenuralstatus: 0,
             wlvlsystem: 0,
             evacuationarea: 0,
+            otherevacuation: "",
             accessmedfacility: false,
             accesstelecommunication: false,
             accessdrillsimulation: false,
@@ -287,7 +293,7 @@ function ProfilerScreen({ navigation }) {
                 tx.executeSql(
                   console.log(values)
                   /*
-                  "insert into tbl_enumerator (tbl_enumeratorprov,tbl_enumeratormun,tbl_enumeratorbrgy) values (?,?,?)",
+                  "INSERT INTO tbl_household (tbl_enumeratorprov,tbl_enumeratormun,tbl_enumeratorbrgy) values (?,?,?)",
                   [values.prov.id, values.mun.id, values.brgy.id],
                   (tx, results) => {
                     if (results.rowsAffected > 0) {
@@ -483,7 +489,17 @@ function ProfilerScreen({ navigation }) {
             name="evacuationarea"
             PickerItemComponent={PickerItem}
             placeholder="Evacuation center location"
+            setOther={setOtherEvacuation}
           />
+
+          {otherEvacuation && (
+            <FormField
+              autoCorrect={false}
+              icon="bank-plus"
+              name="otherevacuation"
+              placeholder="Add other evacuation center"
+            />
+          )}
 
           <SwitchInput
             icon="medical-bag"

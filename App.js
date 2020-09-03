@@ -84,7 +84,6 @@ export default function App() {
   //checkDatabaseExist();
 
   return (
-    /*
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen
@@ -109,7 +108,7 @@ export default function App() {
         />
       </Stack.Navigator>
     </NavigationContainer>
-     */
+
     /*
     <LocationInput
       name="coordinates"
@@ -127,6 +126,6 @@ export default function App() {
       //datevalue
       year
     />*/
-    <ProfilerScreen />
+    /*<ProfilerScreen />*/
   );
 }
