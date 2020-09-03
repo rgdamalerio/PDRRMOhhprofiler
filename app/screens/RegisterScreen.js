@@ -4,11 +4,11 @@ import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 
 import Screen from "../components/Screen";
-import AddressPickerItem from "../components/AddressPickerItem";
+import PickerItem from "../components/PickerItem";
 import {
   AppForm as Form,
   AppFormField as FormField,
-  FormPicker as Picker,
+  AddressPicker,
   SubmitButton,
 } from "../components/forms";
 
@@ -144,29 +144,29 @@ function RegisterScreen({ navigation }) {
             width={320}
             keyboardType="number-pad"
           />
-          <Picker
+          <AddressPicker
             icon="earth"
             items={pro}
             name="prov"
-            PickerItemComponent={AddressPickerItem}
+            PickerItemComponent={PickerItem}
             placeholder="Province"
             searchable
             setMun={setMun}
           />
-          <Picker
+          <AddressPicker
             icon="earth"
             items={mun}
             name="mun"
-            PickerItemComponent={AddressPickerItem}
+            PickerItemComponent={PickerItem}
             placeholder="Municipality"
             searchable
             setBrgy={setBrgy}
           />
-          <Picker
+          <AddressPicker
             icon="earth"
             items={brgy}
             name="brgy"
-            PickerItemComponent={AddressPickerItem}
+            PickerItemComponent={PickerItem}
             placeholder="Barangay"
             searchable
             setbrgyValue

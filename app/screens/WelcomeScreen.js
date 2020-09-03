@@ -16,7 +16,9 @@ function WelcomeScreen({ navigation }) {
           style={styles.logo}
           source={require("../assets/logo.png")}
         />
-        <Text style={styles.tagline}>Comprehensive Information System</Text>
+        <Text style={styles.tagline}>
+          Household Profiler Mobile Application
+        </Text>
       </View>
       <View style={styles.buttonsContainer}>
         <Button
@@ -58,8 +60,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "800",
     paddingVertical: 2, //100
-    //textAlign: "center",
-    //marginBottom: 50,
+    textAlign: "center",
   },
 });
 

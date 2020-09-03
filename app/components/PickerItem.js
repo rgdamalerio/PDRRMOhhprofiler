@@ -1,20 +1,32 @@
 import React from "react";
-import { TouchableOpacity, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 import Text from "./Text";
+import defaultStyles from "../config/styles";
+import { ListItemSeparator } from "../components/lists";
 
-function PickerItem({ item, onPress }) {
+function AddressPickerItem({ item, onPress }) {
   return (
-    <TouchableOpacity onPress={onPress}>
-      <Text style={styles.text}>{item.label}</Text>
-    </TouchableOpacity>
+    <View style={styles.container}>
+      <TouchableOpacity onPress={onPress}>
+        <Text style={styles.label}>{item.label}</Text>
+      </TouchableOpacity>
+      <ListItemSeparator />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  text: {
-    padding: 20,
+  container: {
+    paddingVertical: 10,
+    width: "100%",
+  },
+  label: {
+    color: defaultStyles.colors.medium,
+    paddingHorizontal: 5,
+    marginTop: 5,
+    marginBottom: 23,
   },
 });
 
-export default PickerItem;
+export default AddressPickerItem;

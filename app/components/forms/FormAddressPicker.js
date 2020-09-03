@@ -1,37 +1,43 @@
 import React from "react";
 import { useFormikContext } from "formik";
 
-import Picker from "../Picker";
+import AddressPicker from "../AddressPicker";
 import ErrorMessage from "./ErrorMessage";
 
-function AppFormPicker({
+function FormAddressPicker({
+  icon,
   items,
   name,
-  icon,
   numberOfColumns,
   PickerItemComponent,
   placeholder,
   width,
-  setOther,
+  searchable,
+  setMun,
+  setBrgy,
+  setbrgyValue,
 }) {
   const { errors, setFieldValue, touched, values } = useFormikContext();
 
   return (
     <>
-      <Picker
-        items={items}
+      <AddressPicker
         icon={icon}
+        items={items}
         numberOfColumns={numberOfColumns}
-        onSelectItem={(item) => setFieldValue(name, item)}
+        onSelectItem={(item) => setFieldValue(name, item)} //console.log(item)
         PickerItemComponent={PickerItemComponent}
         placeholder={placeholder}
         selectedItem={values[name]}
         width={width}
-        setOther={setOther}
+        searchable={searchable}
+        setMun={setMun}
+        setBrgy={setBrgy}
+        setbrgyValue={setbrgyValue}
       />
       <ErrorMessage error={errors[name]} visible={touched[name]} />
     </>
   );
 }
 
-export default AppFormPicker;
+export default FormAddressPicker;
