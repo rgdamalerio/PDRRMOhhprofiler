@@ -89,6 +89,8 @@ function RegisterScreen({ navigation }) {
                     values.brgy.id,
                   ],
                   (tx, results) => {
+                    console.log(results);
+
                     if (results.rowsAffected > 0) {
                       Alert.alert(
                         "Success",
@@ -105,6 +107,7 @@ function RegisterScreen({ navigation }) {
                 );
               },
               (error) => {
+                console.log(error);
                 if (
                   error.message ==
                   "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"

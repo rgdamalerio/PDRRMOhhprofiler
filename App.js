@@ -62,23 +62,23 @@ export default function App() {
   const openDatabaseIShipWithApp = async () => {
     const sqlDir = FileSystem.documentDirectory + "SQLite/";
     const internalDbName = "hhprofiler.db"; // Call whatever you want
-    //if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
-    await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
-    const asset = Asset.fromModule(
-      require("./app/assets/database/hhprofiler.db")
-    );
-    await FileSystem.downloadAsync(
-      //"https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/Profiler/app/assets/database/hhprofiler.db",
-      asset.uri,
-      sqlDir + internalDbName
-    )
-      .then(({ uri }) => {
-        console.log("Finished downloading to " + uri);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-    //} else console.log("human na download");
+    if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
+      await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
+      const asset = Asset.fromModule(
+        require("./app/assets/database/hhprofiler.db")
+      );
+      await FileSystem.downloadAsync(
+        //"https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/Profiler/app/assets/database/hhprofiler.db",
+        asset.uri,
+        sqlDir + internalDbName
+      )
+        .then(({ uri }) => {
+          console.log("Finished downloading to " + uri);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    } else console.log("human na download");
   };
 
   //checkDatabaseExist();
