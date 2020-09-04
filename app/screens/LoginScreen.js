@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { StyleSheet, Image, ScrollView, View, Alert } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
@@ -6,6 +6,8 @@ import * as SQLite from "expo-sqlite";
 import Screen from "../components/Screen";
 import { AppForm, AppFormField, SubmitButton } from "../components/forms";
 import AppText from "../components/AppText";
+import AuthContext from "../auth/context";
+import authStorage from "../auth/storage";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
@@ -15,6 +17,26 @@ const validationSchema = Yup.object().shape({
 const db = SQLite.openDatabase("hhprofiler.db");
 
 function LoginScreen({ navigation }) {
+  const authContext = useContext(AuthContext);
+
+  const handleSubmit = async ({ email, password }) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "select * from tbl_enumerator where tbl_enumeratoremail = ? and password = ?;",
+        [email, password],
+        (tx, results) => {
+          if (results.rows.length > 0) {
+            const user = results.rows._array[0];
+            authContext.setUser(user);
+            authStorage.storeUserinfo(JSON.stringify(results.rows._array[0]));
+          } else {
+            alert("Enumerator not found! please check email and password");
+          }
+        }
+      );
+    });
+  };
+
   return (
     <Screen style={styles.container}>
       <ScrollView>
@@ -25,23 +47,7 @@ function LoginScreen({ navigation }) {
         />
         <AppForm
           initialValues={{ email: "", password: "" }}
-          onSubmit={(values) =>
-            db.transaction((tx) => {
-              tx.executeSql(
-                "select * from tbl_enumerator where tbl_enumeratoremail = ? and password = ?;",
-                [values.email, values.password],
-                (tx, results) => {
-                  if (results.rows.length > 0) {
-                    navigation.navigate("Account");
-                  } else {
-                    alert(
-                      "Enumerator not found! please check email and password"
-                    );
-                  }
-                }
-              );
-            })
-          }
+          onSubmit={handleSubmit}
           validationSchema={validationSchema}
         >
           <AppFormField

@@ -1,10 +1,9 @@
-import React, { useEffect, Profiler } from "react";
+import React, { useEffect, useState } from "react";
 import * as FileSystem from "expo-file-system";
 import { View, Text } from "react-native";
 import { Asset } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import * as SQLite from "expo-sqlite";
+import { AppLoading } from "expo";
 
 import RegisterScreens from "./app/screens/RegisterScreen";
 import RespondentScreen from "./app/screens/RespondentScreen";
@@ -17,6 +16,11 @@ import LocationInput from "./app/components/LocationInput";
 import DateInput from "./app/components/DateInput";
 import RegisterScreen from "./app/screens/RegisterScreen";
 import Picker from "./app/components/Picker";
+import navigationTheme from "./app/navigation/navigationTheme";
+import AppNavigator from "./app/navigation/AppNavigator";
+import AuthNavigator from "./app/navigation/AuthNavigator";
+import AuthContext from "./app/auth/context";
+import authStorage from "./app/auth/storage";
 
 async function removeDatabase() {
   const sqlDir = FileSystem.documentDirectory + "SQLite/";
@@ -46,18 +50,20 @@ const checkDatabaseExist = async () => {
   }
 };
 
-const Stack = createStackNavigator();
-
 export default function App() {
-  useEffect(() => {
-    //removeDatabase();
+  const [user, setUser] = useState();
+  const [isReady, setIsReady] = useState(false);
+
+  const startup = () => {
+    restoreInfo();
     openDatabaseIShipWithApp();
-    //db.transaction((tx) => {
-    //  tx.executeSql("select * from tbl_enumerator", [], (_, { rows }) =>
-    //    console.log(JSON.stringify(rows))
-    //  );
-    //});
-  }, []);
+  };
+
+  const restoreInfo = async () => {
+    const info = await authStorage.getUserinfo();
+    if (!info) return;
+    setUser(JSON.parse(info));
+  };
 
   const openDatabaseIShipWithApp = async () => {
     const sqlDir = FileSystem.documentDirectory + "SQLite/";
@@ -81,33 +87,19 @@ export default function App() {
     } else console.log("human na download");
   };
 
+  if (!isReady)
+    return (
+      <AppLoading startAsync={startup} onFinish={() => setIsReady(true)} />
+    );
+
   //checkDatabaseExist();
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Welcome"
-          options={{ headerShown: false }}
-          component={WelcomeScreen}
-        />
-        <Stack.Screen
-          name="Login"
-          options={{ headerShown: false }}
-          component={LoginScreen}
-        />
-        <Stack.Screen
-          name="Register"
-          options={{ headerShown: false }}
-          component={RegisterScreens}
-        />
-        <Stack.Screen
-          name="Account"
-          options={{ headerShown: false }}
-          component={AccountScreen}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <AuthContext.Provider value={{ user, setUser }}>
+      <NavigationContainer theme={navigationTheme}>
+        {user ? <AppNavigator /> : <AuthNavigator />}
+      </NavigationContainer>
+    </AuthContext.Provider>
 
     /*
     <LocationInput
