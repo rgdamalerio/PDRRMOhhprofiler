@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React from "react";
 import { StyleSheet, Image, ScrollView, View, Alert } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
@@ -6,8 +6,7 @@ import * as SQLite from "expo-sqlite";
 import Screen from "../components/Screen";
 import { AppForm, AppFormField, SubmitButton } from "../components/forms";
 import AppText from "../components/AppText";
-import AuthContext from "../auth/context";
-import authStorage from "../auth/storage";
+import useAuth from "../auth/useAuth";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
@@ -17,7 +16,7 @@ const validationSchema = Yup.object().shape({
 const db = SQLite.openDatabase("hhprofiler.db");
 
 function LoginScreen({ navigation }) {
-  const authContext = useContext(AuthContext);
+  const auth = useAuth();
 
   const handleSubmit = async ({ email, password }) => {
     db.transaction((tx) => {
@@ -26,9 +25,7 @@ function LoginScreen({ navigation }) {
         [email, password],
         (tx, results) => {
           if (results.rows.length > 0) {
-            const user = results.rows._array[0];
-            authContext.setUser(user);
-            authStorage.storeUserinfo(JSON.stringify(results.rows._array[0]));
+            auth.logIn(results.rows._array[0]);
           } else {
             alert("Enumerator not found! please check email and password");
           }

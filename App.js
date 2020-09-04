@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import * as FileSystem from "expo-file-system";
 import { View, Text } from "react-native";
 import { Asset } from "expo-asset";
@@ -55,14 +55,14 @@ export default function App() {
   const [isReady, setIsReady] = useState(false);
 
   const startup = () => {
-    restoreInfo();
+    restoreUser();
     openDatabaseIShipWithApp();
   };
 
-  const restoreInfo = async () => {
-    const info = await authStorage.getUserinfo();
-    if (!info) return;
-    setUser(JSON.parse(info));
+  const restoreUser = async () => {
+    const user = await authStorage.getUser();
+    if (!user) return;
+    setUser(user);
   };
 
   const openDatabaseIShipWithApp = async () => {

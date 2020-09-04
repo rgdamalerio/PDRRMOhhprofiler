@@ -20,7 +20,7 @@ const getUserinfo = async () => {
 
 const getUser = async () => {
   const user = await getUserinfo();
-  return user ? user : null;
+  return user ? JSON.parse(user) : null;
 };
 
 const removeUserinfo = async () => {
@@ -31,4 +31,4 @@ const removeUserinfo = async () => {
   }
 };
 
-export default { getUserinfo, getUserinfo, removeUserinfo, storeUserinfo };
+export default { getUserinfo, getUser, removeUserinfo, storeUserinfo };
