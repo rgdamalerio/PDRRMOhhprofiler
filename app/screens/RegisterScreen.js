@@ -60,13 +60,8 @@ function RegisterScreen({ navigation }) {
   }, []);
 
   const handleSubmit = (data) => {
-    //const filename = createAlbum(data.image);
     const res = data.image.split("/");
     const filename = res[res.length - 1];
-
-    console.log("uri: " + data.image);
-    console.log("lenght: " + res.length);
-    console.log("filename: " + filename);
 
     db.transaction(
       (tx) => {

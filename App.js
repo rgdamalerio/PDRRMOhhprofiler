@@ -70,12 +70,12 @@ export default function App() {
     const internalDbName = "hhprofiler.db"; // Call whatever you want
     if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
       await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
-      const asset = Asset.fromModule(
-        require("./app/assets/database/hhprofiler.db")
-      );
+      //const asset = Asset.fromModule(
+      //  require("./app/assets/database/hhprofiler.db")
+      //);
       await FileSystem.downloadAsync(
-        //"https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/Profiler/app/assets/database/hhprofiler.db",
-        asset.uri,
+        "https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/RefactorAuth/app/assets/database/hhprofiler.db",
+        //asset.uri,
         sqlDir + internalDbName
       )
         .then(({ uri }) => {

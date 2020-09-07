@@ -31,7 +31,7 @@ function AccountScreen(props) {
     <Screen style={styles.screen}>
       <View style={styles.container}>
         <ListItem
-          title={user.tbl_enumeratorfname}
+          title={user.tbl_enumeratorfname + " " + user.tbl_enumeratorlname}
           subTitle={user.tbl_enumeratoremail}
           image={
             user.tbl_imagepath == ""
