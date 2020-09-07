@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, ScrollView, Alert } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
+import * as MediaLibrary from "expo-media-library";
 
 import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
@@ -10,6 +11,7 @@ import {
   AppFormField as FormField,
   AddressPicker,
   SubmitButton,
+  FormCameraPicker,
 } from "../components/forms";
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
@@ -57,11 +59,80 @@ function RegisterScreen({ navigation }) {
     );
   }, []);
 
+  const handleSubmit = (data) => {
+    //const filename = createAlbum(data.image);
+    const res = data.image.split("/");
+    const filename = res[res.length - 1];
+
+    console.log("uri: " + data.image);
+    console.log("lenght: " + res.length);
+    console.log("filename: " + filename);
+
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "insert into tbl_enumerator (tbl_enumeratorfname,tbl_enumeratorlname,tbl_enumeratormname,tbl_enumeratoremail,password,tbl_enumeratorcontact,tbl_enumeratorprov,tbl_enumeratormun,tbl_enumeratorbrgy,tbl_imagepath) values (?,?,?,?,?,?,?,?,?,?)",
+          [
+            data.fname,
+            data.lname,
+            data.mname,
+            data.email,
+            data.password,
+            data.phoneNumber,
+            data.prov.id,
+            data.mun.id,
+            data.brgy.id,
+            filename,
+          ],
+          (tx, results) => {
+            console.log(results);
+
+            if (results.rowsAffected > 0) {
+              createAlbum(data.image);
+              Alert.alert(
+                "Success",
+                "You are Registered Successfully, you can now Login to start encoding household information",
+                [
+                  {
+                    text: "OK",
+                    onPress: () => navigation.navigate("Login"),
+                  },
+                ]
+              );
+            } else alert("Registration Failed");
+          }
+        );
+      },
+      (error) => {
+        console.log(error);
+        if (
+          error.message ==
+          "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"
+        ) {
+          alert("Email address already exist! Please try to use another email");
+        }
+      }
+    );
+  };
+
+  const createAlbum = async (uri) => {
+    const asset = await MediaLibrary.createAssetAsync(uri);
+    MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset)
+      .then(() => {
+        return asset.filename;
+      })
+      .catch((error) => {
+        alert("Error saving image, Error details: " + error);
+        return null;
+      });
+  };
+
   return (
     <Screen style={styles.container}>
       <ScrollView>
         <Form
           initialValues={{
+            image: null,
             fname: "",
             lname: "",
             mname: "",
@@ -72,55 +143,10 @@ function RegisterScreen({ navigation }) {
             email: "",
             password: "",
           }}
-          onSubmit={(values) =>
-            db.transaction(
-              (tx) => {
-                tx.executeSql(
-                  "insert into tbl_enumerator (tbl_enumeratorfname,tbl_enumeratorlname,tbl_enumeratormname,tbl_enumeratoremail,password,tbl_enumeratorcontact,tbl_enumeratorprov,tbl_enumeratormun,tbl_enumeratorbrgy) values (?,?,?,?,?,?,?,?,?)",
-                  [
-                    values.fname,
-                    values.lname,
-                    values.mname,
-                    values.email,
-                    values.password,
-                    values.phoneNumber,
-                    values.prov.id,
-                    values.mun.id,
-                    values.brgy.id,
-                  ],
-                  (tx, results) => {
-                    console.log(results);
-
-                    if (results.rowsAffected > 0) {
-                      Alert.alert(
-                        "Success",
-                        "You are Registered Successfully, you can now Login to start encoding household information",
-                        [
-                          {
-                            text: "OK",
-                            onPress: () => navigation.navigate("Login"),
-                          },
-                        ]
-                      );
-                    } else alert("Registration Failed");
-                  }
-                );
-              },
-              (error) => {
-                console.log(error);
-                if (
-                  error.message ==
-                  "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"
-                ) {
-                  alert(
-                    "Email address already exist! Please try to use another email"
-                  );
-                }
-              }
-            )
-          }
+          onSubmit={(values) => handleSubmit(values)}
           validationSchema={validationSchema}
         >
+          <FormCameraPicker name="image" />
           <FormField
             autoCorrect={false}
             icon="account"

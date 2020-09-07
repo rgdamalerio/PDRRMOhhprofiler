@@ -33,7 +33,11 @@ function AccountScreen(props) {
         <ListItem
           title={user.tbl_enumeratorfname}
           subTitle={user.tbl_enumeratoremail}
-          image={require("../assets/rgd.jpg")}
+          image={
+            user.tbl_imagepath == ""
+              ? require("../assets/rgd.jpg")
+              : require("../assets/rgd.jpg")
+          }
         />
       </View>
       <View style={styles.container}>
