@@ -36,7 +36,11 @@ function AccountScreen(props) {
           image={
             user.tbl_imagepath == ""
               ? require("../assets/rgd.jpg")
-              : require("../assets/rgd.jpg")
+              : {
+                  uri:
+                    "file:///storage/emulated/0/PDRRMOProfiler/" +
+                    user.tbl_imagepath,
+                } //require(getProfilePicture(user.tbl_imagepath))
           }
         />
       </View>

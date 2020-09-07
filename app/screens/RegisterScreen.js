@@ -80,8 +80,6 @@ function RegisterScreen({ navigation }) {
             filename,
           ],
           (tx, results) => {
-            console.log(results);
-
             if (results.rowsAffected > 0) {
               createAlbum(data.image);
               Alert.alert(
@@ -99,7 +97,6 @@ function RegisterScreen({ navigation }) {
         );
       },
       (error) => {
-        console.log(error);
         if (
           error.message ==
           "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"
@@ -112,9 +109,9 @@ function RegisterScreen({ navigation }) {
 
   const createAlbum = async (uri) => {
     const asset = await MediaLibrary.createAssetAsync(uri);
-    MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset)
+    MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
       .then(() => {
-        return asset.filename;
+        return asset.uri;
       })
       .catch((error) => {
         alert("Error saving image, Error details: " + error);
