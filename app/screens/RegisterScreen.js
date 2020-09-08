@@ -81,14 +81,16 @@ function RegisterScreen({ navigation }) {
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
-              createAlbum(data.image);
               Alert.alert(
                 "Success",
                 "You are Registered Successfully, you can now Login to start encoding household information",
                 [
                   {
                     text: "OK",
-                    onPress: () => navigation.navigate("Login"),
+                    onPress: () => {
+                      createAlbum(data.image);
+                      navigation.navigate("Login");
+                    },
                   },
                 ]
               );
@@ -135,7 +137,7 @@ function RegisterScreen({ navigation }) {
             email: "",
             password: "",
           }}
-          onSubmit={(values) => handleSubmit(values)}
+          onSubmit={handleSubmit}
           validationSchema={validationSchema}
         >
           <FormCameraPicker name="image" />

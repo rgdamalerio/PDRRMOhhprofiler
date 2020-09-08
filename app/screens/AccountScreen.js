@@ -24,7 +24,7 @@ const menuItems = [
   },
 ];
 
-function AccountScreen(props) {
+function AccountScreen({ navigation }) {
   const { user, logOut } = useAuth();
 
   return (
@@ -40,7 +40,7 @@ function AccountScreen(props) {
                   uri:
                     "file:///storage/emulated/0/PDRRMOProfiler/" +
                     user.tbl_imagepath,
-                } //require(getProfilePicture(user.tbl_imagepath))
+                }
           }
         />
       </View>
@@ -58,6 +58,7 @@ function AccountScreen(props) {
                   backgroundColor={item.icon.backgroundColor}
                 />
               }
+              onPress={() => navigation.navigate("Profiler")}
             />
           )}
         />
