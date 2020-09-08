@@ -272,19 +272,20 @@ function ProfilerScreen({ navigation }) {
 
   const getDate = () => {
     const d = new Date();
-    setDate(d.getDate());
+    setDate(d);
   };
 
   const parseYear = (date) => {
     try {
       return date.getFullYear();
     } catch (error) {
-      console.log("error: " + error);
+      return "";
     }
   };
 
   const handleSubmit = (data) => {
-    //console.log(parseYear(data.yearconstract));
+    //console.log(filename);
+
     if (data.image != null) {
       const res = data.image.split("/");
       setFilename(res[res.length - 1]);
@@ -320,13 +321,13 @@ function ProfilerScreen({ navigation }) {
             "tbl_hasaccessdrillsandsimulations," +
             "tbl_householdpuroksittio," +
             "tbl_hhimage," +
-            "tbl_respondents" +
+            "tbl_respondent" +
             ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
-            randomBtyes,
+            "yeah",
             date,
-            data.coordinates.latitude,
-            data.coordinates.longitude,
+            data.coordinates.latitude ? data.coordinates.latitude : "",
+            data.coordinates.longitude ? data.coordinates.longitude : "",
             parseYear(data.yearconstract),
             data.cost,
             data.beadroom,
@@ -335,23 +336,24 @@ function ProfilerScreen({ navigation }) {
             data.internet ? 1 : 0,
             user.idtbl_enumerator,
             data.brgy.id,
-            data.typebuilding.id,
-            data.tenuralstatus.id,
-            data.roofmaterial.id,
-            data.wallmaterial.id,
+            data.typebuilding.id ? data.typebuilding.id : 0,
+            data.tenuralstatus.id ? data.tenuralstatus.id : 0,
+            data.roofmaterial.id ? data.roofmaterial.id : 0,
+            data.wallmaterial.id ? data.wallmaterial.id : 0,
             data.awater ? 1 : 0,
             data.wpotable ? 1 : 0,
-            data.wtenuralstatus.id,
-            data.wlvlsystem.id,
-            data.evacuationarea.id,
+            data.wtenuralstatus.id ? data.wtenuralstatus.id : 0,
+            data.wlvlsystem.id ? data.wlvlsystem.id : 0,
+            data.evacuationarea.id ? data.evacuationarea.id : 0,
             data.accessmedfacility ? 1 : 0,
             data.accesstelecommunication ? 1 : 0,
             data.accessdrillsimulation ? 1 : 0,
             data.purok,
-            filename,
+            filename ? filename : "",
             data.respondentname,
           ],
           (tx, results) => {
+            console.log(results);
             if (results.rowsAffected > 0) {
               Alert.alert("Success", "Household information save.", [
                 {
@@ -364,6 +366,7 @@ function ProfilerScreen({ navigation }) {
         );
       },
       (error) => {
+        console.log(error);
         if (
           error.message ==
           "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"
@@ -380,9 +383,9 @@ function ProfilerScreen({ navigation }) {
         <Form
           initialValues={{
             respondentname: "",
-            prov: "",
-            mun: "",
-            brgy: "",
+            prov: 0,
+            mun: 0,
+            brgy: 0,
             purok: "",
             coordinates: null,
             image: null,
@@ -390,11 +393,11 @@ function ProfilerScreen({ navigation }) {
             yearconstract: 0,
             cost: 0,
             beadroom: 0,
-            storeys: "",
+            storeys: 0,
             aelectricity: false,
             internet: false,
-            roofmaterial: "",
-            wallmaterial: "",
+            roofmaterial: 0,
+            wallmaterial: 0,
             awater: false,
             wpotable: false,
             wtenuralstatus: 0,
