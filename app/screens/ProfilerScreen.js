@@ -284,8 +284,6 @@ function ProfilerScreen({ navigation }) {
   };
 
   const handleSubmit = (data) => {
-    //console.log(filename);
-
     if (data.image != null) {
       const res = data.image.split("/");
       setFilename(res[res.length - 1]);
@@ -303,7 +301,8 @@ function ProfilerScreen({ navigation }) {
             "tbl_hhecost," +
             "tbl_hhnobedroms," +
             "tbl_hhnostorey," +
-            "tbl_hhaelectricity," +
+            "tbl_hhaelectricity" +
+            /*
             "tbl_hhainternet," +
             "tbl_enumerator_id_fk," +
             "tbl_psgc_brgy_id," +
@@ -322,17 +321,23 @@ function ProfilerScreen({ navigation }) {
             "tbl_householdpuroksittio," +
             "tbl_hhimage," +
             "tbl_respondent" +
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            */
+            ") values (?,?,?,?,?,?,?,?,?)",
           [
             "yeah",
-            date,
-            data.coordinates.latitude ? data.coordinates.latitude : "",
-            data.coordinates.longitude ? data.coordinates.longitude : "",
+            String(date),
+            data.coordinates != null ? data.coordinates.latitude : "",
+            data.coordinates != null ? data.coordinates.longitude : "",
             parseYear(data.yearconstract),
+
             data.cost,
+
             data.beadroom,
+
             data.storeys,
+
             data.aelectricity ? 1 : 0,
+            /*
             data.internet ? 1 : 0,
             user.idtbl_enumerator,
             data.brgy.id,
@@ -351,9 +356,9 @@ function ProfilerScreen({ navigation }) {
             data.purok,
             filename ? filename : "",
             data.respondentname,
+            */
           ],
           (tx, results) => {
-            console.log(results);
             if (results.rowsAffected > 0) {
               Alert.alert("Success", "Household information save.", [
                 {
