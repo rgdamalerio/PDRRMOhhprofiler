@@ -91,7 +91,7 @@ function RegisterScreen({ navigation }) {
                   {
                     text: "OK",
                     onPress: () => {
-                      createAlbum(data.image);
+                      if (data.image != null) createAlbum(data.image);
                       navigation.navigate("Login");
                     },
                   },

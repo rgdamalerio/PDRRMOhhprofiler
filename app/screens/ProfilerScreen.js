@@ -320,8 +320,8 @@ function ProfilerScreen({ navigation }) {
             "tbl_hasaccessdrillsandsimulations," +
             "tbl_householdpuroksittio," +
             "tbl_hhimage," +
-            "tbl_respondent" +
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "tbl_respondents" +
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             randomBtyes,
             date,
@@ -331,39 +331,35 @@ function ProfilerScreen({ navigation }) {
             data.cost,
             data.beadroom,
             data.storeys,
-            data.aelectricity,
-            data.internet,
+            data.aelectricity ? 1 : 0,
+            data.internet ? 1 : 0,
             user.idtbl_enumerator,
             data.brgy.id,
             data.typebuilding.id,
             data.tenuralstatus.id,
             data.roofmaterial.id,
             data.wallmaterial.id,
-            data.awater,
-            data.wpotable,
+            data.awater ? 1 : 0,
+            data.wpotable ? 1 : 0,
             data.wtenuralstatus.id,
             data.wlvlsystem.id,
             data.evacuationarea.id,
-            data.accessmedfacility,
-            data.accesstelecommunication,
-            data.accessdrillsimulation,
+            data.accessmedfacility ? 1 : 0,
+            data.accesstelecommunication ? 1 : 0,
+            data.accessdrillsimulation ? 1 : 0,
             data.purok,
             filename,
             data.respondentname,
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
-              Alert.alert(
-                "Success",
-                "You are Registered Successfully, you can now Login to start encoding household information",
-                [
-                  {
-                    text: "OK",
-                    onPress: () => navigation.navigate("Login"),
-                  },
-                ]
-              );
-            } else alert("Registration Failed");
+              Alert.alert("Success", "Household information save.", [
+                {
+                  text: "OK",
+                  onPress: () => navigation.navigate("Profiler"),
+                },
+              ]);
+            } else alert("Adding household information Failed");
           }
         );
       },
