@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View, FlatList } from "react-native";
 
 import { ListItem, ListItemSeparator } from "../components/lists";
@@ -25,7 +25,15 @@ const menuItems = [
 ];
 
 function AccountScreen({ navigation }) {
+  const [filename, setFilename] = useState();
   const { user, logOut } = useAuth();
+
+  useEffect(() => {
+    if (user.tbl_imagepath != null) {
+      const res = user.tbl_imagepath.split("/");
+      setFilename(res[res.length - 1]);
+    } else setFilename("");
+  }, []);
 
   return (
     <Screen style={styles.screen}>
@@ -34,12 +42,10 @@ function AccountScreen({ navigation }) {
           title={user.tbl_enumeratorfname + " " + user.tbl_enumeratorlname}
           subTitle={user.tbl_enumeratoremail}
           image={
-            user.tbl_imagepath == null
+            user.tbl_imagepath === null
               ? require("../assets/user.png")
               : {
-                  uri:
-                    "file:///storage/emulated/0/PDRRMOProfiler/" +
-                    user.tbl_imagepath,
+                  uri: "file:///storage/emulated/0/PDRRMOProfiler/" + filename,
                 }
           }
         />

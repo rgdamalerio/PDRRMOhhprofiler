@@ -16,6 +16,7 @@ import {
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 const validationSchema = Yup.object().shape({
+  /*
   fname: Yup.string().required().label("First Name"),
   lname: Yup.string().required().label("Last Name"),
   phoneNumber: Yup.string()
@@ -27,6 +28,7 @@ const validationSchema = Yup.object().shape({
   brgy: Yup.string().required().label("Barangay"),
   email: Yup.string().required().email().label("Email"),
   password: Yup.string().required().min(4).label("Password"),
+  */
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
@@ -35,7 +37,6 @@ function RegisterScreen({ navigation }) {
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
-  const [filename, setFilename] = useState();
 
   useEffect(() => {
     db.transaction(
@@ -61,15 +62,21 @@ function RegisterScreen({ navigation }) {
   }, []);
 
   const handleSubmit = (data) => {
-    if (data.image != null) {
-      const res = data.image.split("/");
-      setFilename(res[res.length - 1]);
-    } else setFilename("");
-
     db.transaction(
       (tx) => {
         tx.executeSql(
-          "insert into tbl_enumerator (tbl_enumeratorfname,tbl_enumeratorlname,tbl_enumeratormname,tbl_enumeratoremail,password,tbl_enumeratorcontact,tbl_enumeratorprov,tbl_enumeratormun,tbl_enumeratorbrgy,tbl_imagepath) values (?,?,?,?,?,?,?,?,?,?)",
+          "insert into tbl_enumerator (" +
+            "tbl_enumeratorfname," +
+            "tbl_enumeratorlname," +
+            "tbl_enumeratormname," +
+            "tbl_enumeratoremail," +
+            "password," +
+            "tbl_enumeratorcontact," +
+            "tbl_enumeratorprov," +
+            "tbl_enumeratormun," +
+            "tbl_enumeratorbrgy," +
+            "tbl_imagepath) " +
+            "values (?,?,?,?,?,?,?,?,?,?)",
           [
             data.fname,
             data.lname,
@@ -80,7 +87,7 @@ function RegisterScreen({ navigation }) {
             data.prov.id,
             data.mun.id,
             data.brgy.id,
-            filename,
+            data.image,
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
