@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, ScrollView, Alert } from "react-native";
+import * as Random from "expo-random";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 
@@ -16,10 +17,12 @@ import {
   SubmitButton,
 } from "../components/forms";
 import SwitchInput from "../components/SwitchInput";
+import useAuth from "../auth/useAuth";
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const validationSchema = Yup.object().shape({
+  /*
   respondentname: Yup.string().required().label("Respondent Name"),
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
@@ -36,6 +39,7 @@ const validationSchema = Yup.object().shape({
     is: 9,
     then: Yup.string().required().label("Add other evacuation"),
   }), //adjust this if there is item added to evacuation area library
+  */
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
@@ -52,6 +56,10 @@ function ProfilerScreen({ navigation }) {
   const [lvlwatersystem, setLvlwatersystems] = useState();
   const [evacuationarea, setEvacuationarea] = useState();
   const [otherEvacuation, setOtherEvacuation] = useState(false);
+  const [randomBtyes, setRandomBtyes] = useState();
+  const [filename, setFilename] = useState();
+  const [date, setDate] = useState();
+  const { user } = useAuth();
 
   useEffect(() => {
     getProvince();
@@ -62,6 +70,8 @@ function ProfilerScreen({ navigation }) {
     getWaterTenuralStatus();
     getLvlWaterSystem();
     getEvacuationareas();
+    getRandomBytes();
+    getDate();
   }, []);
 
   const getProvince = () => {
@@ -255,6 +265,119 @@ function ProfilerScreen({ navigation }) {
     );
   };
 
+  const getRandomBytes = async () => {
+    const randomBytes = await Random.getRandomBytesAsync(16);
+    setRandomBtyes(randomBytes);
+  };
+
+  const getDate = () => {
+    const d = new Date();
+    setDate(d.getDate());
+  };
+
+  const parseYear = (date) => {
+    try {
+      return date.getFullYear();
+    } catch (error) {
+      console.log("error: " + error);
+    }
+  };
+
+  const handleSubmit = (data) => {
+    //console.log(parseYear(data.yearconstract));
+    if (data.image != null) {
+      const res = data.image.split("/");
+      setFilename(res[res.length - 1]);
+    } else setFilename("");
+
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "INSERT INTO tbl_household (" +
+            "tbl_hhcontrolnumber," +
+            "tbl_hhdateinterview," +
+            "tbl_hhlatitude," +
+            "tbl_hhlongitude," +
+            "tbl_hhyearconstruct," +
+            "tbl_hhecost," +
+            "tbl_hhnobedroms," +
+            "tbl_hhnostorey," +
+            "tbl_hhaelectricity," +
+            "tbl_hhainternet," +
+            "tbl_enumerator_id_fk," +
+            "tbl_psgc_brgy_id," +
+            "lib_typeofbuilding_id," +
+            "tbl_tenuralstatus_id," +
+            "tbl_typeofconmaterials_id," +
+            "tbl_wallconmaterials_id," +
+            "tbl_hhaccesswater," +
+            "tbl_hhwaterpotable," +
+            "tbl_watertenuralstatus_id," +
+            "tbl_hhlvlwatersystem_id," +
+            "tbl_evacuation_areas_id," +
+            "tbl_hhhasaccesshealtmedicalfacility," +
+            "tbl_hhhasaccesstelecom," +
+            "tbl_hasaccessdrillsandsimulations," +
+            "tbl_householdpuroksittio," +
+            "tbl_hhimage," +
+            "tbl_respondent" +
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+          [
+            randomBtyes,
+            date,
+            data.coordinates.latitude,
+            data.coordinates.longitude,
+            parseYear(data.yearconstract),
+            data.cost,
+            data.beadroom,
+            data.storeys,
+            data.aelectricity,
+            data.internet,
+            user.idtbl_enumerator,
+            data.brgy.id,
+            data.typebuilding.id,
+            data.tenuralstatus.id,
+            data.roofmaterial.id,
+            data.wallmaterial.id,
+            data.awater,
+            data.wpotable,
+            data.wtenuralstatus.id,
+            data.wlvlsystem.id,
+            data.evacuationarea.id,
+            data.accessmedfacility,
+            data.accesstelecommunication,
+            data.accessdrillsimulation,
+            data.purok,
+            filename,
+            data.respondentname,
+          ],
+          (tx, results) => {
+            if (results.rowsAffected > 0) {
+              Alert.alert(
+                "Success",
+                "You are Registered Successfully, you can now Login to start encoding household information",
+                [
+                  {
+                    text: "OK",
+                    onPress: () => navigation.navigate("Login"),
+                  },
+                ]
+              );
+            } else alert("Registration Failed");
+          }
+        );
+      },
+      (error) => {
+        if (
+          error.message ==
+          "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"
+        ) {
+          alert("Email address already exist! Please try to use another email");
+        }
+      }
+    );
+  };
+
   return (
     <Screen style={styles.container}>
       <ScrollView>
@@ -287,43 +410,7 @@ function ProfilerScreen({ navigation }) {
             accessdrillsimulation: false,
             tenuralstatus: 0,
           }}
-          onSubmit={(values) =>
-            db.transaction(
-              (tx) => {
-                tx.executeSql(
-                  console.log(values)
-                  /*
-                  "INSERT INTO tbl_household (tbl_enumeratorprov,tbl_enumeratormun,tbl_enumeratorbrgy) values (?,?,?)",
-                  [values.prov.id, values.mun.id, values.brgy.id],
-                  (tx, results) => {
-                    if (results.rowsAffected > 0) {
-                      Alert.alert(
-                        "Success",
-                        "You are Registered Successfully, you can now Login to start encoding household information",
-                        [
-                          {
-                            text: "OK",
-                            onPress: () => navigation.navigate("Login"),
-                          },
-                        ]
-                      );
-                    } else alert("Registration Failed");
-                  }
-                  */
-                );
-              },
-              (error) => {
-                if (
-                  error.message ==
-                  "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"
-                ) {
-                  alert(
-                    "Email address already exist! Please try to use another email"
-                  );
-                }
-              }
-            )
-          }
+          onSubmit={handleSubmit}
           validationSchema={validationSchema}
         >
           <FormField

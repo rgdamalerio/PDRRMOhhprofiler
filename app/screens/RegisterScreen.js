@@ -35,6 +35,7 @@ function RegisterScreen({ navigation }) {
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
+  const [filename, setFilename] = useState();
 
   useEffect(() => {
     db.transaction(
@@ -60,8 +61,10 @@ function RegisterScreen({ navigation }) {
   }, []);
 
   const handleSubmit = (data) => {
-    const res = data.image.split("/");
-    const filename = res[res.length - 1];
+    if (data.image != null) {
+      const res = data.image.split("/");
+      setFilename(res[res.length - 1]);
+    } else setFilename("");
 
     db.transaction(
       (tx) => {

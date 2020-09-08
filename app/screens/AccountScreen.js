@@ -34,8 +34,8 @@ function AccountScreen({ navigation }) {
           title={user.tbl_enumeratorfname + " " + user.tbl_enumeratorlname}
           subTitle={user.tbl_enumeratoremail}
           image={
-            user.tbl_imagepath == ""
-              ? require("../assets/rgd.jpg")
+            user.tbl_imagepath == null
+              ? require("../assets/user.png")
               : {
                   uri:
                     "file:///storage/emulated/0/PDRRMOProfiler/" +
