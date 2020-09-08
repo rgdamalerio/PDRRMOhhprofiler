@@ -366,7 +366,7 @@ function ProfilerScreen({ navigation }) {
         );
       },
       (error) => {
-        console.log(error);
+        console.log("MALI: " + error.message);
         if (
           error.message ==
           "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"
