@@ -301,12 +301,12 @@ function ProfilerScreen({ navigation }) {
             "tbl_hhecost," +
             "tbl_hhnobedroms," +
             "tbl_hhnostorey," +
-            "tbl_hhaelectricity" +
-            /*
+            "tbl_hhaelectricity," +
             "tbl_hhainternet," +
             "tbl_enumerator_id_fk," +
             "tbl_psgc_brgy_id," +
-            "lib_typeofbuilding_id," +
+            "lib_typeofbuilding_id" +
+            /*
             "tbl_tenuralstatus_id," +
             "tbl_typeofconmaterials_id," +
             "tbl_wallconmaterials_id," +
@@ -322,7 +322,7 @@ function ProfilerScreen({ navigation }) {
             "tbl_hhimage," +
             "tbl_respondent" +
             */
-            ") values (?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             "yeah",
             String(date),
@@ -337,11 +337,15 @@ function ProfilerScreen({ navigation }) {
             data.storeys,
 
             data.aelectricity ? 1 : 0,
-            /*
+
             data.internet ? 1 : 0,
+
             user.idtbl_enumerator,
+
             data.brgy.id,
+
             data.typebuilding.id ? data.typebuilding.id : 0,
+            /*
             data.tenuralstatus.id ? data.tenuralstatus.id : 0,
             data.roofmaterial.id ? data.roofmaterial.id : 0,
             data.wallmaterial.id ? data.wallmaterial.id : 0,
