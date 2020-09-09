@@ -305,8 +305,9 @@ function ProfilerScreen({ navigation }) {
             "tbl_hhainternet," +
             "tbl_enumerator_id_fk," +
             "tbl_psgc_brgy_id," +
-            "lib_typeofbuilding_id" +
-            /*
+            "tbl_psgc_mun_id," +
+            "tbl_psgc_pro_id," +
+            "lib_typeofbuilding_id," +
             "tbl_tenuralstatus_id," +
             "tbl_typeofconmaterials_id," +
             "tbl_wallconmaterials_id," +
@@ -321,8 +322,7 @@ function ProfilerScreen({ navigation }) {
             "tbl_householdpuroksittio," +
             "tbl_hhimage," +
             "tbl_respondent" +
-            */
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             "yeah",
             String(date),
@@ -343,24 +343,38 @@ function ProfilerScreen({ navigation }) {
             user.idtbl_enumerator,
 
             data.brgy.id,
+            data.mun.id,
+            data.prov.id,
 
             data.typebuilding.id ? data.typebuilding.id : 0,
-            /*
+
             data.tenuralstatus.id ? data.tenuralstatus.id : 0,
+
             data.roofmaterial.id ? data.roofmaterial.id : 0,
+
             data.wallmaterial.id ? data.wallmaterial.id : 0,
+
             data.awater ? 1 : 0,
+
             data.wpotable ? 1 : 0,
+
             data.wtenuralstatus.id ? data.wtenuralstatus.id : 0,
+
             data.wlvlsystem.id ? data.wlvlsystem.id : 0,
+
             data.evacuationarea.id ? data.evacuationarea.id : 0,
+
             data.accessmedfacility ? 1 : 0,
+
             data.accesstelecommunication ? 1 : 0,
+
             data.accessdrillsimulation ? 1 : 0,
+
             data.purok,
+
             filename ? filename : "",
+
             data.respondentname,
-            */
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
