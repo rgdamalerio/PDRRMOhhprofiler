@@ -74,7 +74,7 @@ export default function App() {
       //  require("./app/assets/database/hhprofiler.db")
       //);
       await FileSystem.downloadAsync(
-        "https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/RefactorAuth/app/assets/database/hhprofiler.db",
+        "https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/RefactorProfiler/app/assets/database/hhprofiler.db",
         //asset.uri,
         sqlDir + internalDbName
       )
