@@ -22,7 +22,6 @@ import useAuth from "../auth/useAuth";
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const validationSchema = Yup.object().shape({
-  /*
   respondentname: Yup.string().required().label("Respondent Name"),
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
@@ -39,7 +38,6 @@ const validationSchema = Yup.object().shape({
     is: 9,
     then: Yup.string().required().label("Add other evacuation"),
   }), //adjust this if there is item added to evacuation area library
-  */
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
@@ -329,55 +327,36 @@ function ProfilerScreen({ navigation }) {
             data.coordinates != null ? data.coordinates.latitude : "",
             data.coordinates != null ? data.coordinates.longitude : "",
             parseYear(data.yearconstract),
-
             data.cost,
-
             data.beadroom,
-
             data.storeys,
-
             data.aelectricity ? 1 : 0,
-
             data.internet ? 1 : 0,
-
             user.idtbl_enumerator,
-
             data.brgy.id,
             data.mun.id,
             data.prov.id,
-
             data.typebuilding.id ? data.typebuilding.id : 0,
-
             data.tenuralstatus.id ? data.tenuralstatus.id : 0,
-
             data.roofmaterial.id ? data.roofmaterial.id : 0,
-
             data.wallmaterial.id ? data.wallmaterial.id : 0,
-
             data.awater ? 1 : 0,
-
             data.wpotable ? 1 : 0,
-
             data.wtenuralstatus.id ? data.wtenuralstatus.id : 0,
-
             data.wlvlsystem.id ? data.wlvlsystem.id : 0,
-
             data.evacuationarea.id ? data.evacuationarea.id : 0,
-
             data.accessmedfacility ? 1 : 0,
-
             data.accesstelecommunication ? 1 : 0,
-
             data.accessdrillsimulation ? 1 : 0,
-
             data.purok,
-
             filename ? filename : "",
-
             data.respondentname,
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
+              if (data.evacuationarea.id == 9) {
+              }
+
               Alert.alert("Success", "Household information save.", [
                 {
                   text: "OK",
