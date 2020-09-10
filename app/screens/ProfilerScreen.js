@@ -355,6 +355,38 @@ function ProfilerScreen({ navigation }) {
           (tx, results) => {
             if (results.rowsAffected > 0) {
               if (data.evacuationarea.id == 9) {
+                db.transaction((tx) => {
+                  tx.executeSql(
+                    "INSERT INTO tbl_addOtherEvacuation (" +
+                      "tbl_addOtherEvacuationLocation," +
+                      "created_at," +
+                      "created_by," +
+                      "updated_at," +
+                      "updated_by," +
+                      "tbl_household_id" +
+                      ") values (?,?,?,?,?,?)",
+                    [
+                      data.otherevacuation,
+                      String(date),
+                      user.idtbl_enumerator,
+                      String(date),
+                      user.idtbl_enumerator,
+                      user.idtbl_enumerator,
+                    ],
+                    (tx, results) => {
+                      Alert.alert(
+                        "Success",
+                        "Household information save, Add evacuation location success",
+                        [
+                          {
+                            text: "OK",
+                            onPress: () => navigation.navigate("Profiler"),
+                          },
+                        ]
+                      );
+                    }
+                  );
+                });
               }
 
               Alert.alert("Success", "Household information save.", [
