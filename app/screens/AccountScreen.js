@@ -14,6 +14,7 @@ const menuItems = [
       name: "format-list-bulleted",
       backgroundColor: colors.primary,
     },
+    route: "AnimatedMap",
   },
   {
     title: "Add Respondent",
@@ -21,6 +22,7 @@ const menuItems = [
       name: "account-plus",
       backgroundColor: colors.sblack,
     },
+    route: "Profiler",
   },
 ];
 
@@ -64,7 +66,7 @@ function AccountScreen({ navigation }) {
                   backgroundColor={item.icon.backgroundColor}
                 />
               }
-              onPress={() => navigation.navigate("Profiler")}
+              onPress={() => navigation.navigate(item.route)}
             />
           )}
         />
