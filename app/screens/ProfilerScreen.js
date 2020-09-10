@@ -3,6 +3,7 @@ import { StyleSheet, ScrollView, Alert } from "react-native";
 import * as Random from "expo-random";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
+import Constants from "expo-constants";
 
 import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
@@ -22,6 +23,7 @@ import useAuth from "../auth/useAuth";
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const validationSchema = Yup.object().shape({
+  /*
   respondentname: Yup.string().required().label("Respondent Name"),
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
@@ -38,6 +40,7 @@ const validationSchema = Yup.object().shape({
     is: 9,
     then: Yup.string().required().label("Add other evacuation"),
   }), //adjust this if there is item added to evacuation area library
+  */
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
@@ -57,6 +60,9 @@ function ProfilerScreen({ navigation }) {
   const [randomBtyes, setRandomBtyes] = useState();
   const [filename, setFilename] = useState();
   const [date, setDate] = useState();
+  const [uuid, setUuid] = useState(
+    Constants.installationId + "-" + new Date().getTime()
+  );
   const { user } = useAuth();
 
   useEffect(() => {
@@ -322,7 +328,7 @@ function ProfilerScreen({ navigation }) {
             "tbl_respondent" +
             ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
-            "yeah",
+            uuid,
             String(date),
             data.coordinates != null ? data.coordinates.latitude : "",
             data.coordinates != null ? data.coordinates.longitude : "",
@@ -354,6 +360,8 @@ function ProfilerScreen({ navigation }) {
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
+              const insertId = results.insertId; //set newly inserted id
+
               if (data.evacuationarea.id == 9) {
                 db.transaction((tx) => {
                   tx.executeSql(
@@ -380,7 +388,10 @@ function ProfilerScreen({ navigation }) {
                         [
                           {
                             text: "OK",
-                            onPress: () => navigation.navigate("Profiler"),
+                            onPress: () =>
+                              navigation.navigate("Household", {
+                                id: insertId,
+                              }),
                           },
                         ]
                       );
@@ -392,7 +403,8 @@ function ProfilerScreen({ navigation }) {
               Alert.alert("Success", "Household information save.", [
                 {
                   text: "OK",
-                  onPress: () => navigation.navigate("Profiler"),
+                  onPress: () =>
+                    navigation.navigate("Household", { id: insertId }),
                 },
               ]);
             } else alert("Adding household information Failed");

@@ -11,6 +11,7 @@ import AccountScreen from "./app/screens/AccountScreen";
 import WelcomeScreen from "./app/screens/WelcomeScreen";
 import LoginScreen from "./app/screens/LoginScreen";
 import ProfilerScreen from "./app/screens/ProfilerScreen";
+import Household from "./app/screens/HouseholdScreen";
 import CameraInput from "./app/components/CameraInput";
 import LocationInput from "./app/components/LocationInput";
 import DateInput from "./app/components/DateInput";
@@ -118,6 +119,6 @@ export default function App() {
       //datevalue
       year
     />*/
-    /*<ProfilerScreen />*/
+    /*<Household />*/
   );
 }

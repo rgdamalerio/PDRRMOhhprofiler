@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import AccountScreen from "../screens/AccountScreen";
 import Profiler from "../screens/ProfilerScreen";
+import Household from "../screens/HouseholdScreen";
 
 const Stack = createStackNavigator();
 
@@ -13,6 +14,11 @@ const AppNavigator = () => (
       name="Profiler"
       options={{ title: "Add Household profile" }}
       component={Profiler}
+    />
+    <Stack.Screen
+      name="Household"
+      options={{ headerShown: false }}
+      component={Household}
     />
   </Stack.Navigator>
 );
