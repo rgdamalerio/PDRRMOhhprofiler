@@ -25,7 +25,7 @@ const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = height / 4;
 const CARD_WIDTH = CARD_HEIGHT - 50;
 
-export default class screens extends Component {
+export default class AnimatedScreen extends Component {
   state = {
     markers: [
       {
@@ -264,4 +264,4 @@ const styles = StyleSheet.create({
   },
 });
 
-AppRegistry.registerComponent("mapfocus", () => screens);
+AppRegistry.registerComponent("AnimatedMap", () => AnimatedScreen);
