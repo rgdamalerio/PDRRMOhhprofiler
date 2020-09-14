@@ -13,30 +13,25 @@ import {
 } from "react-native";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
-import { AppLoading } from "expo";
+import * as SQLite from "expo-sqlite";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTheme } from "@react-navigation/native";
 
-import {
-  markers,
-  mapDarkStyle,
-  mapStandardStyle,
-  data,
-} from "../model/mapData";
+import { mapDarkStyle, mapStandardStyle } from "../model/mapData";
 
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
 const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
+const db = SQLite.openDatabase("hhprofiler.db");
+
 function AnimatedScreen(props) {
   const theme = useTheme();
 
   const initialMapState = {
-    data,
-    markers,
     categories: [
       {
         name: "Fastfood Center",
@@ -84,16 +79,17 @@ function AnimatedScreen(props) {
   };
 
   const [state, setState] = React.useState(initialMapState);
+  const [markers, setMarkers] = React.useState([]);
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
 
   useEffect(() => {
-    console.log(markers);
+    fetchHousehold();
     mapAnimation.addListener(({ value }) => {
       let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
-      if (index >= state.markers.length) {
-        index = state.markers.length - 1;
+      if (index >= markers.length) {
+        index = markers.length - 1;
       }
       if (index <= 0) {
         index = 0;
@@ -104,7 +100,37 @@ function AnimatedScreen(props) {
       const regionTimeout = setTimeout(() => {
         if (mapIndex !== index) {
           mapIndex = index;
-          const { tbl_hhlatitude, tbl_hhlongitude } = state.markers[index];
+          const { tbl_hhlatitude, tbl_hhlongitude } = markers[index];
+          _map.current.animateToRegion(
+            {
+              latitude: parseFloat(tbl_hhlatitude),
+              longitude: parseFloat(tbl_hhlongitude),
+              latitudeDelta: state.region.latitudeDelta,
+              longitudeDelta: state.region.longitudeDelta,
+            },
+            350
+          );
+        }
+      }, 10);
+    });
+  }, []);
+
+  useEffect(() => {
+    mapAnimation.addListener(({ value }) => {
+      let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
+      if (index >= markers.length) {
+        index = markers.length - 1;
+      }
+      if (index <= 0) {
+        index = 0;
+      }
+
+      clearTimeout(regionTimeout);
+
+      const regionTimeout = setTimeout(() => {
+        if (mapIndex !== index) {
+          mapIndex = index;
+          const { tbl_hhlatitude, tbl_hhlongitude } = markers[index];
           _map.current.animateToRegion(
             {
               latitude: parseFloat(tbl_hhlatitude),
@@ -119,7 +145,19 @@ function AnimatedScreen(props) {
     });
   });
 
-  const interpolations = state.markers.map((marker, index) => {
+  const fetchHousehold = () => {
+    var temp = [];
+    db.transaction((tx) => {
+      tx.executeSql("SELECT * FROM tbl_household", [], (tx, results) => {
+        for (let i = 0; i < results.rows.length; ++i) {
+          temp.push(results.rows.item(i));
+        }
+        setMarkers(temp);
+      });
+    });
+  };
+
+  const interpolations = markers.map((marker, index) => {
     const inputRange = [
       (index - 1) * CARD_WIDTH,
       index * CARD_WIDTH,
@@ -158,7 +196,7 @@ function AnimatedScreen(props) {
         provider={PROVIDER_GOOGLE}
         customMapStyle={theme.dark ? mapDarkStyle : mapStandardStyle}
       >
-        {state.markers.map((marker, index) => {
+        {markers.map((marker, index) => {
           const scaleStyle = {
             transform: [
               {
@@ -251,7 +289,7 @@ function AnimatedScreen(props) {
           { useNativeDriver: true }
         )}
       >
-        {state.markers.map((marker, index) => (
+        {markers.map((marker, index) => (
           <View style={styles.card} key={index}>
             <Image
               source={
