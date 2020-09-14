@@ -13,12 +13,18 @@ import {
 } from "react-native";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import { AppLoading } from "expo";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTheme } from "@react-navigation/native";
 
-import { markers, mapDarkStyle, mapStandardStyle } from "../model/mapData";
+import {
+  markers,
+  mapDarkStyle,
+  mapStandardStyle,
+  data,
+} from "../model/mapData";
 
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
@@ -29,6 +35,7 @@ function AnimatedScreen(props) {
   const theme = useTheme();
 
   const initialMapState = {
+    data,
     markers,
     categories: [
       {
@@ -69,8 +76,8 @@ function AnimatedScreen(props) {
       },
     ],
     region: {
-      latitude: 22.62938671242907,
-      longitude: 88.4354486029795,
+      latitude: 9.190489360418237,
+      longitude: 125.57549066841602,
       latitudeDelta: 0.04864195044303443,
       longitudeDelta: 0.040142817690068,
     },
@@ -82,6 +89,7 @@ function AnimatedScreen(props) {
   let mapAnimation = new Animated.Value(0);
 
   useEffect(() => {
+    console.log(markers);
     mapAnimation.addListener(({ value }) => {
       let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
       if (index >= state.markers.length) {
@@ -96,10 +104,11 @@ function AnimatedScreen(props) {
       const regionTimeout = setTimeout(() => {
         if (mapIndex !== index) {
           mapIndex = index;
-          const { coordinate } = state.markers[index];
+          const { tbl_hhlatitude, tbl_hhlongitude } = state.markers[index];
           _map.current.animateToRegion(
             {
-              ...coordinate,
+              latitude: parseFloat(tbl_hhlatitude),
+              longitude: parseFloat(tbl_hhlongitude),
               latitudeDelta: state.region.latitudeDelta,
               longitudeDelta: state.region.longitudeDelta,
             },
@@ -160,7 +169,10 @@ function AnimatedScreen(props) {
           return (
             <MapView.Marker
               key={index}
-              coordinate={marker.coordinate}
+              coordinate={{
+                latitude: parseFloat(marker.tbl_hhlatitude),
+                longitude: parseFloat(marker.tbl_hhlongitude),
+              }}
               onPress={(e) => onMarkerPress(e)}
             >
               <Animated.View style={[styles.markerWrap]}>
@@ -197,15 +209,15 @@ function AnimatedScreen(props) {
           right: 20,
         }}
         contentContainerStyle={{
-          paddingRight: Platform.OS === "android" ? 20 : 0,
+          paddingRight: Platform.OS === "android" ? 30 : 0,
         }}
       >
-        {state.categories.map((category, index) => (
+        {/*state.categories.map((category, index) => (
           <TouchableOpacity key={index} style={styles.chipsItem}>
             {category.icon}
             <Text>{category.name}</Text>
           </TouchableOpacity>
-        ))}
+        ))*/}
       </ScrollView>
       <Animated.ScrollView
         ref={_scrollView}
@@ -242,16 +254,27 @@ function AnimatedScreen(props) {
         {state.markers.map((marker, index) => (
           <View style={styles.card} key={index}>
             <Image
-              source={marker.image}
+              source={
+                marker.tbl_hhimage === ""
+                  ? require("../assets/no-image.jpg")
+                  : {
+                      uri:
+                        "file:///storage/emulated/0/PDRRMOProfiler/" +
+                        marker.tbl_hhimage,
+                    }
+              }
               style={styles.cardImage}
               resizeMode="cover"
             />
             <View style={styles.textContent}>
               <Text numberOfLines={1} style={styles.cardtitle}>
-                {marker.title}
+                {marker.tbl_respondent}
               </Text>
               <Text numberOfLines={1} style={styles.cardDescription}>
-                {marker.description}
+                {marker.tbl_hhcontrolnumber}
+              </Text>
+              <Text numberOfLines={1} style={styles.cardDescription}>
+                {marker.tbl_hhimage}
               </Text>
               <View style={styles.button}>
                 <TouchableOpacity
@@ -272,7 +295,7 @@ function AnimatedScreen(props) {
                       },
                     ]}
                   >
-                    Order Now
+                    More Details
                   </Text>
                 </TouchableOpacity>
               </View>

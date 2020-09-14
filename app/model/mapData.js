@@ -1,3 +1,15 @@
+import * as SQLite from "expo-sqlite";
+const db = SQLite.openDatabase("hhprofiler.db");
+
+var temp = [];
+db.transaction((tx) => {
+  tx.executeSql("SELECT * FROM tbl_household", [], (tx, results) => {
+    for (let i = 0; i < results.rows.length; ++i) {
+      temp.push(results.rows.item(i));
+    }
+  });
+});
+
 const Images = [
   { image: require("../assets/house1.jpg") },
   { image: require("../assets/house2.jpg") },
@@ -5,14 +17,16 @@ const Images = [
   { image: require("../assets/rgd.jpg") },
 ];
 
-export const markers = [
+export const markers = temp;
+
+export const markerss = [
   {
     coordinate: {
       latitude: 22.6293867,
       longitude: 88.4354486,
     },
-    title: "Amazing Food Place",
-    description: "This is the best food place",
+    title: "Item 1 Title",
+    description: "Item 1 description",
     image: Images[0].image,
     rating: 4,
     reviews: 99,

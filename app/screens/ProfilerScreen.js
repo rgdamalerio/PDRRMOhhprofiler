@@ -4,6 +4,7 @@ import * as Random from "expo-random";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 import Constants from "expo-constants";
+import * as MediaLibrary from "expo-media-library";
 
 import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
@@ -58,7 +59,6 @@ function ProfilerScreen({ navigation }) {
   const [evacuationarea, setEvacuationarea] = useState();
   const [otherEvacuation, setOtherEvacuation] = useState(false);
   const [randomBtyes, setRandomBtyes] = useState();
-  const [filename, setFilename] = useState();
   const [date, setDate] = useState();
   const [uuid, setUuid] = useState(
     Constants.installationId + "-" + new Date().getTime()
@@ -288,10 +288,12 @@ function ProfilerScreen({ navigation }) {
   };
 
   const handleSubmit = (data) => {
+    let filename = null;
+
     if (data.image != null) {
       const res = data.image.split("/");
-      setFilename(res[res.length - 1]);
-    } else setFilename("");
+      filename = res[res.length - 1];
+    }
 
     db.transaction(
       (tx) => {
@@ -355,7 +357,7 @@ function ProfilerScreen({ navigation }) {
             data.accesstelecommunication ? 1 : 0,
             data.accessdrillsimulation ? 1 : 0,
             data.purok,
-            filename ? filename : "",
+            filename,
             data.respondentname,
           ],
           (tx, results) => {
@@ -388,10 +390,12 @@ function ProfilerScreen({ navigation }) {
                         [
                           {
                             text: "OK",
-                            onPress: () =>
+                            onPress: () => {
+                              if (data.image != null) createAlbum(data.image);
                               navigation.navigate("Household", {
                                 id: insertId,
-                              }),
+                              });
+                            },
                           },
                         ]
                       );
@@ -403,8 +407,12 @@ function ProfilerScreen({ navigation }) {
               Alert.alert("Success", "Household information save.", [
                 {
                   text: "OK",
-                  onPress: () =>
-                    navigation.navigate("Household", { id: insertId }),
+                  onPress: () => {
+                    if (data.image != null) createAlbum(data.image);
+                    navigation.navigate("Household", {
+                      id: insertId,
+                    });
+                  },
                 },
               ]);
             } else alert("Adding household information Failed");
@@ -421,6 +429,18 @@ function ProfilerScreen({ navigation }) {
         }
       }
     );
+  };
+
+  const createAlbum = async (uri) => {
+    const asset = await MediaLibrary.createAssetAsync(uri);
+    MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
+      .then(() => {
+        return asset.uri;
+      })
+      .catch((error) => {
+        alert("Error saving image, Error details: " + error);
+        return null;
+      });
   };
 
   return (

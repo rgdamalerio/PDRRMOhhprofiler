@@ -22,7 +22,7 @@ function HouseholdScreen({ navigation, route }) {
         tx.executeSql(
           `select idtbl_psgc_prov AS id, tbl_psgc_provname AS label from tbl_psgc_prov`,
           [],
-          (_, { rows: { _array } }) => setPro(_array)
+          (_, { rows: { _array } }) => console.log(_array)
         );
       },
       (error) => {
