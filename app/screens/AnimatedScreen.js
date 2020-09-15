@@ -170,7 +170,7 @@ function AnimatedScreen(props) {
 
     const scale = mapAnimation.interpolate({
       inputRange,
-      outputRange: [1, 1.5, 1],
+      outputRange: [1, 1.6, 1],
       extrapolate: "clamp",
     });
 
@@ -249,7 +249,7 @@ function AnimatedScreen(props) {
           right: 20,
         }}
         contentContainerStyle={{
-          paddingRight: Platform.OS === "android" ? 30 : 0,
+          paddingRight: Platform.OS === "android" ? 20 : 0,
         }}
       >
         {/*state.categories.map((category, index) => (
