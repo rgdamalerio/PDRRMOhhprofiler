@@ -84,6 +84,9 @@ function AnimatedScreen(props) {
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
 
+  const _map = React.useRef(null);
+  const _scrollView = React.useRef(null);
+
   useEffect(() => {
     fetchHousehold();
     mapAnimation.addListener(({ value }) => {
@@ -131,12 +134,13 @@ function AnimatedScreen(props) {
         if (mapIndex !== index) {
           mapIndex = index;
           const { tbl_hhlatitude, tbl_hhlongitude } = markers[index];
+          const { longitudeDelta, latitudeDelta } = _map.current.__lastRegion;
           _map.current.animateToRegion(
             {
               latitude: parseFloat(tbl_hhlatitude),
               longitude: parseFloat(tbl_hhlongitude),
-              latitudeDelta: state.region.latitudeDelta,
-              longitudeDelta: state.region.longitudeDelta,
+              latitudeDelta: latitudeDelta, //state.region.latitudeDelta,
+              longitudeDelta: longitudeDelta, //state.region.longitudeDelta,
             },
             350
           );
@@ -184,9 +188,6 @@ function AnimatedScreen(props) {
     _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
   };
 
-  const _map = React.useRef(null);
-  const _scrollView = React.useRef(null);
-
   return (
     <View style={styles.container}>
       <MapView
@@ -194,6 +195,7 @@ function AnimatedScreen(props) {
         initialRegion={state.region}
         style={styles.container}
         provider={PROVIDER_GOOGLE}
+        mapType="satellite"
         customMapStyle={theme.dark ? mapDarkStyle : mapStandardStyle}
       >
         {markers.map((marker, index) => {
