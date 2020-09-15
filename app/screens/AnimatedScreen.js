@@ -72,9 +72,9 @@ function AnimatedScreen(props) {
     ],
     region: {
       latitude: 9.190489360418237,
+      latitudeDelta: 2.239664674768459,
       longitude: 125.57549066841602,
-      latitudeDelta: 0.04864195044303443,
-      longitudeDelta: 0.040142817690068,
+      longitudeDelta: 1.365918293595314,
     },
   };
 
@@ -197,6 +197,12 @@ function AnimatedScreen(props) {
         provider={PROVIDER_GOOGLE}
         mapType="satellite"
         customMapStyle={theme.dark ? mapDarkStyle : mapStandardStyle}
+        onMapReady={() => {
+          _map.current.fitToSuppliedMarkers(["mk1"], {
+            edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
+            animated: false,
+          });
+        }}
       >
         {markers.map((marker, index) => {
           const scaleStyle = {
@@ -214,6 +220,7 @@ function AnimatedScreen(props) {
                 longitude: parseFloat(marker.tbl_hhlongitude),
               }}
               onPress={(e) => onMarkerPress(e)}
+              identifier={"mk1"}
             >
               <Animated.View style={[styles.markerWrap]}>
                 <Animated.Image
