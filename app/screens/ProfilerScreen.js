@@ -24,7 +24,6 @@ import useAuth from "../auth/useAuth";
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
 const validationSchema = Yup.object().shape({
-  /*
   respondentname: Yup.string().required().label("Respondent Name"),
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
@@ -41,7 +40,6 @@ const validationSchema = Yup.object().shape({
     is: 9,
     then: Yup.string().required().label("Add other evacuation"),
   }), //adjust this if there is item added to evacuation area library
-  */
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
