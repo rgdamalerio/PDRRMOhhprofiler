@@ -17,6 +17,13 @@ import MapView from "react-native-maps";
 import defaultStyles from "../config/styles";
 import Text from "./Text";
 
+const intialRegion = {
+  latitude: 9.190489360418237,
+  latitudeDelta: 2.239664674768459,
+  longitude: 125.57549066841602,
+  longitudeDelta: 1.365918293595314,
+};
+
 function LocationInput({
   coordinates,
   onChangeCoordinates,
@@ -26,17 +33,8 @@ function LocationInput({
 }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
-  const [region, setRegion] = useState();
+  const [region, setRegion] = useState(intialRegion);
   const mapRef = useRef(null);
-
-  useEffect(() => {
-    setRegion({
-      latitude: 9.190489360418237,
-      latitudeDelta: 2.239664674768459,
-      longitude: 125.57549066841602,
-      longitudeDelta: 1.365918293595314,
-    });
-  }, []);
 
   const onChangeCoord = () => {
     onChangeCoordinates(region);
@@ -70,12 +68,35 @@ function LocationInput({
             style={styles.mapStyle}
             mapType="satellite"
             region={region}
-            showsUserLocation={true}
-            followsUserLocation={true}
-            onRegionChangeComplete={(region) => setRegion(region)}
-          ></MapView>
+            //showsUserLocation={true}
+            //followsUserLocation={true}
+            onRegionChangeComplete={(region) => {
+              setRegion(region);
+            }}
+          >
+            <MapView.Marker
+              draggable
+              coordinate={{
+                latitude: region.latitude,
+                longitude: region.longitude,
+              }}
+              //onDragStart={() => this.setMarkerPosition()}
+              onDragEnd={(e) => {
+                const {
+                  latitudeDelta,
+                  longitudeDelta,
+                } = mapRef.current.__lastRegion;
+                setRegion({
+                  latitude: e.nativeEvent.coordinate.latitude,
+                  longitude: e.nativeEvent.coordinate.longitude,
+                  latitudeDelta: latitudeDelta,
+                  longitudeDelta: longitudeDelta,
+                });
+              }}
+            />
+          </MapView>
 
-          <FontAwesome
+          {/*<FontAwesome
             name="dot-circle-o"
             style={{
               zIndex: 3,
@@ -87,7 +108,7 @@ function LocationInput({
             }}
             size={10}
             color={defaultStyles.colors.green}
-          />
+          />*/}
 
           <View
             style={{
