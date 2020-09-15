@@ -89,33 +89,6 @@ function AnimatedScreen(props) {
 
   useEffect(() => {
     fetchHousehold();
-    mapAnimation.addListener(({ value }) => {
-      let index = Math.floor(value / CARD_WIDTH + 0.3); // animate 30% away from landing on the next item
-      if (index >= markers.length) {
-        index = markers.length - 1;
-      }
-      if (index <= 0) {
-        index = 0;
-      }
-
-      clearTimeout(regionTimeout);
-
-      const regionTimeout = setTimeout(() => {
-        if (mapIndex !== index) {
-          mapIndex = index;
-          const { tbl_hhlatitude, tbl_hhlongitude } = markers[index];
-          _map.current.animateToRegion(
-            {
-              latitude: parseFloat(tbl_hhlatitude),
-              longitude: parseFloat(tbl_hhlongitude),
-              latitudeDelta: state.region.latitudeDelta,
-              longitudeDelta: state.region.longitudeDelta,
-            },
-            350
-          );
-        }
-      }, 10);
-    });
   }, []);
 
   useEffect(() => {
