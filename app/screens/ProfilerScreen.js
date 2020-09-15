@@ -287,7 +287,7 @@ function ProfilerScreen({ navigation }) {
     }
   };
 
-  const handleSubmit = (data) => {
+  const handleSubmit = (data, resetForm) => {
     let filename = null;
 
     if (data.image != null) {
@@ -386,15 +386,23 @@ function ProfilerScreen({ navigation }) {
                     (tx, results) => {
                       Alert.alert(
                         "Success",
-                        "Household information save, Add evacuation location success",
+                        "Household and evacuation location information save, do you want to add more household?",
                         [
                           {
-                            text: "OK",
+                            text: "No",
                             onPress: () => {
                               if (data.image != null) createAlbum(data.image);
-                              navigation.navigate("Household", {
+                              resetForm({ data: "" });
+                              navigation.navigate("AnimatedMap", {
                                 id: insertId,
                               });
+                            },
+                          },
+                          {
+                            text: "Yes",
+                            onPress: () => {
+                              if (data.image != null) createAlbum(data.image);
+                              resetForm({ data: "" });
                             },
                           },
                         ]
@@ -404,29 +412,35 @@ function ProfilerScreen({ navigation }) {
                 });
               }
 
-              Alert.alert("Success", "Household information save.", [
-                {
-                  text: "OK",
-                  onPress: () => {
-                    if (data.image != null) createAlbum(data.image);
-                    navigation.navigate("Household", {
-                      id: insertId,
-                    });
+              Alert.alert(
+                "Success",
+                "Household information save. do you want to add more household?",
+                [
+                  {
+                    text: "No",
+                    onPress: () => {
+                      if (data.image != null) createAlbum(data.image);
+                      resetForm({ data: "" });
+                      navigation.navigate("AnimatedMap", {
+                        id: insertId,
+                      });
+                    },
                   },
-                },
-              ]);
+                  {
+                    text: "Yes",
+                    onPress: () => {
+                      if (data.image != null) createAlbum(data.image);
+                      resetForm({ data: "" });
+                    },
+                  },
+                ]
+              );
             } else alert("Adding household information Failed");
           }
         );
       },
       (error) => {
-        console.log("MALI: " + error.message);
-        if (
-          error.message ==
-          "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"
-        ) {
-          alert("Email address already exist! Please try to use another email");
-        }
+        console.log("Error: " + error.message);
       }
     );
   };
@@ -475,7 +489,9 @@ function ProfilerScreen({ navigation }) {
             accessdrillsimulation: false,
             tenuralstatus: 0,
           }}
-          onSubmit={handleSubmit}
+          onSubmit={(values, { resetForm }) => {
+            handleSubmit(values, resetForm);
+          }}
           validationSchema={validationSchema}
         >
           <FormField
