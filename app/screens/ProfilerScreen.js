@@ -27,7 +27,7 @@ const validationSchema = Yup.object().shape({
   respondentname: Yup.string().required().label("Respondent Name"),
   prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
-  brgy: Yup.number().required().label("Barangay"),
+  brgy: Yup.string().required().label("Barangay"),
   image: Yup.string().required().nullable().label("Image"),
   coordinates: Yup.string().required().nullable().label("Coordinates"),
   typebuilding: Yup.string().required().label("Type of building"),
@@ -389,7 +389,7 @@ function ProfilerScreen({ navigation }) {
                           {
                             text: "No",
                             onPress: () => {
-                              if (data.image != null) createAlbum(data.image);
+                              createAlbum(data.image);
                               resetForm({ data: "" });
                               navigation.navigate("AnimatedMap", {
                                 id: insertId,
@@ -399,7 +399,7 @@ function ProfilerScreen({ navigation }) {
                           {
                             text: "Yes",
                             onPress: () => {
-                              if (data.image != null) createAlbum(data.image);
+                              createAlbum(data.image);
                               resetForm({ data: "" });
                             },
                           },
@@ -417,7 +417,7 @@ function ProfilerScreen({ navigation }) {
                   {
                     text: "No",
                     onPress: () => {
-                      if (data.image != null) createAlbum(data.image);
+                      createAlbum(data.image);
                       resetForm({ data: "" });
                       navigation.navigate("AnimatedMap", {
                         id: insertId,
@@ -427,7 +427,7 @@ function ProfilerScreen({ navigation }) {
                   {
                     text: "Yes",
                     onPress: () => {
-                      if (data.image != null) createAlbum(data.image);
+                      createAlbum(data.image);
                       resetForm({ data: "" });
                     },
                   },
@@ -444,15 +444,17 @@ function ProfilerScreen({ navigation }) {
   };
 
   const createAlbum = async (uri) => {
-    const asset = await MediaLibrary.createAssetAsync(uri);
-    MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
-      .then(() => {
-        return asset.uri;
-      })
-      .catch((error) => {
-        alert("Error saving image, Error details: " + error);
-        return null;
-      });
+    try {
+      const asset = await MediaLibrary.createAssetAsync(uri);
+      MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
+        .then(() => {
+          return asset.uri;
+        })
+        .catch((error) => {
+          alert("Error saving image, Error details: " + error);
+          return null;
+        });
+    } catch (error) {}
   };
 
   return (
