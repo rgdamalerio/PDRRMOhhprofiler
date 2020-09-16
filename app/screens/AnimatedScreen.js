@@ -10,6 +10,9 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
+  Alert,
+  Modal,
+  TouchableHighlight,
 } from "react-native";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
@@ -20,6 +23,7 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { useTheme } from "@react-navigation/native";
 
 import { mapDarkStyle, mapStandardStyle } from "../model/mapData";
+import useAuth from "../auth/useAuth";
 
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
@@ -80,12 +84,15 @@ function AnimatedScreen(props) {
 
   const [state, setState] = React.useState(initialMapState);
   const [markers, setMarkers] = React.useState([]);
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [moreinfo, setMoreinfo] = React.useState();
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
 
   const _map = React.useRef(null);
   const _scrollView = React.useRef(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchHousehold();
@@ -123,15 +130,111 @@ function AnimatedScreen(props) {
   });
 
   const fetchHousehold = () => {
-    var temp = [];
-    db.transaction((tx) => {
-      tx.executeSql("SELECT * FROM tbl_household", [], (tx, results) => {
-        for (let i = 0; i < results.rows.length; ++i) {
-          temp.push(results.rows.item(i));
-        }
-        setMarkers(temp);
-      });
-    });
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "SELECT tbl_household_id," +
+            "tbl_hhissethead," +
+            "tbl_hhcontrolnumber," +
+            "tbl_hhdateinterview," +
+            "tbl_hhlatitude," +
+            "tbl_hhlongitude," +
+            "tbl_hhfield_editor," +
+            "tbl_hhyearconstruct," +
+            "tbl_hhyearconstruct," +
+            "tbl_hhyearconstruct," +
+            "tbl_hhnobedroms," +
+            "tbl_hhnobedroms," +
+            "tbl_hhaelectricity," +
+            "tbl_hhainternet," +
+            "tbl_hhainternet," +
+            "tbl_enumerator_id_fk," +
+            "tbl_psgc_brgy_id," +
+            "tbl_psgc_mun_id," +
+            "tbl_psgc_pro_id," +
+            "lib_typeofbuilding_id," +
+            "tbl_tenuralstatus_id," +
+            "tbl_typeofconmaterials_id," +
+            "tbl_wallconmaterials_id," +
+            "tbl_hhaccesswater," +
+            "tbl_hhwaterpotable," +
+            "tbl_watertenuralstatus_id," +
+            "tbl_evacuation_areas_id," +
+            "tbl_hhhasaccesshealtmedicalfacility," +
+            "tbl_hhhasaccesshealtmedicalfacility," +
+            "tbl_hhhasaccesstelecom," +
+            "tbl_hasaccessdrillsandsimulations," +
+            "tbl_household.created_at," +
+            "tbl_household.updated_at," +
+            "tbl_household.created_by," +
+            "tbl_household.updatedy_by," +
+            "tbl_householdpuroksittio," +
+            "tbl_hhimage," +
+            "tbl_respondent," +
+            "idtbl_psgc_brgy," + //tbl_psgc_brgy
+            "tbl_psgc_brgyname," +
+            "tbl_psgc_mun_id_fk," +
+            "idtbl_psgc_mun," + //tbl_psgc_municipality
+            "tbl_psgc_munname," +
+            "tbl_psgc_prov_id_fk," +
+            "idtbl_psgc_prov," + //tbl_psgc_prov
+            "tbl_psgc_provname," +
+            "tbl_psgc_region_id_fk," +
+            "idtbl_enumerator," + //tbl_enumerator
+            "tbl_enumeratorfname," +
+            "tbl_enumeratorlname," +
+            "tbl_enumeratormname," +
+            "tbl_enumeratoremail," +
+            "tbl_enumeratorcontact," +
+            "tbl_enumeratorprov," +
+            "tbl_enumeratormun," +
+            "tbl_enumeratorbrgy," +
+            "tbl_imagepath," +
+            "lib_buildingtypedesc," + //lib_hhtypeofbuilding
+            "lib_tenuralstatusdesc," + //lib_hhtenuralstatus
+            "lib_roofmaterialsdesc," + //lib_hhroofmaterials
+            "lib_wallmaterialsdesc," + //lib_hhwallconmaterials
+            "lib_wtdesc," + //lib_hhwatertenuralstatus
+            "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
+            "lib_hhlvldesc," +
+            "lib_heaname " + //lib_hhevacuationarea
+            "lib_hhlvldesc " +
+            "FROM tbl_household " +
+            "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
+            "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
+            "LEFT JOIN tbl_psgc_prov ON tbl_household.tbl_psgc_pro_id=tbl_psgc_prov.idtbl_psgc_prov " + //tbl_psgc_prov
+            "LEFT JOIN tbl_enumerator ON tbl_household.tbl_enumerator_id_fk=tbl_enumerator.idtbl_enumerator " + //tbl_enumerator
+            "LEFT JOIN lib_hhtypeofbuilding ON tbl_household.lib_typeofbuilding_id=lib_hhtypeofbuilding.id " + //lib_hhtypeofbuilding
+            "LEFT JOIN lib_hhtenuralstatus ON tbl_household.tbl_tenuralstatus_id=lib_hhtenuralstatus.id " + //lib_hhtenuralstatus
+            "LEFT JOIN lib_hhroofmaterials ON tbl_household.tbl_typeofconmaterials_id=lib_hhroofmaterials.id " + //lib_hhroofmaterials
+            "LEFT JOIN lib_hhwallconmaterials ON tbl_household.tbl_wallconmaterials_id=lib_hhwallconmaterials.id " + //lib_hhwallconmaterials
+            "LEFT JOIN lib_hhwatertenuralstatus ON tbl_household.tbl_watertenuralstatus_id=lib_hhwatertenuralstatus.id " + //lib_hhwatertenuralstatus
+            "LEFT JOIN lib_hhlvlwatersystem ON tbl_household.tbl_hhlvlwatersystem_id=lib_hhlvlwatersystem.id " + //lib_hhlvlwatersystem
+            "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
+            "where tbl_enumerator_id_fk = ?",
+          [user.idtbl_enumerator],
+          (_, { rows: { _array } }) => setMarkers(_array)
+        );
+      },
+      (error) => {
+        console.log(error);
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Household data, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const moreInformation = (marker) => {
+    console.log(marker);
+    setMoreinfo(marker);
+    setModalVisible(true);
   };
 
   const interpolations = markers.map((marker, index) => {
@@ -291,14 +394,17 @@ function AnimatedScreen(props) {
                 {marker.tbl_respondent}
               </Text>
               <Text numberOfLines={1} style={styles.cardDescription}>
-                {marker.tbl_hhcontrolnumber}
-              </Text>
-              <Text numberOfLines={1} style={styles.cardDescription}>
-                {marker.tbl_hhimage}
+                {marker.tbl_psgc_brgyname +
+                  " " +
+                  marker.tbl_psgc_munname +
+                  " " +
+                  marker.tbl_psgc_provname}
               </Text>
               <View style={styles.button}>
                 <TouchableOpacity
-                  onPress={() => {}}
+                  onPress={() => {
+                    moreInformation(marker);
+                  }}
                   style={[
                     styles.signIn,
                     {
@@ -323,6 +429,49 @@ function AnimatedScreen(props) {
           </View>
         ))}
       </Animated.ScrollView>
+
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={styles.modalView}>
+          <ScrollView>
+            <View style={{ flexDirection: "row", width: "100%" }}>
+              <View
+                style={{
+                  backgroundColor: "#FF6347",
+                  alignContent: "stretch",
+                  width: "40%",
+                  padding: 5,
+                }}
+              >
+                <Text>Respondent</Text>
+              </View>
+              <View
+                style={{
+                  backgroundColor: "#2196F3",
+                  alignContent: "stretch",
+                  width: "60%",
+                  padding: 5,
+                }}
+              >
+                <Text>
+                  {moreinfo.tbl_respondent ? moreinfo.tbl_respondent : ""}
+                </Text>
+              </View>
+            </View>
+            <TouchableHighlight
+              style={{
+                ...styles.openButton,
+                backgroundColor: "#2196F3",
+                marginTop: 15,
+              }}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </TouchableHighlight>
+          </ScrollView>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -436,6 +585,33 @@ const styles = StyleSheet.create({
   textSign: {
     fontSize: 14,
     fontWeight: "bold",
+  },
+  modalView: {
+    //margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingVertical: 30,
+    paddingHorizontal: 5,
+    //alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
