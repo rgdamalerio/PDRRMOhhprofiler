@@ -85,7 +85,7 @@ function AnimatedScreen(props) {
   const [state, setState] = React.useState(initialMapState);
   const [markers, setMarkers] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [moreinfo, setMoreinfo] = React.useState();
+  const [moreinfo, setMoreinfo] = React.useState([]);
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -153,6 +153,7 @@ function AnimatedScreen(props) {
             "tbl_psgc_mun_id," +
             "tbl_psgc_pro_id," +
             "lib_typeofbuilding_id," +
+            "tbl_hhecost," +
             "tbl_tenuralstatus_id," +
             "tbl_typeofconmaterials_id," +
             "tbl_wallconmaterials_id," +
@@ -433,27 +434,144 @@ function AnimatedScreen(props) {
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalView}>
           <ScrollView>
-            <View style={{ flexDirection: "row", width: "100%" }}>
-              <View
-                style={{
-                  backgroundColor: "#FF6347",
-                  alignContent: "stretch",
-                  width: "40%",
-                  padding: 5,
-                }}
-              >
-                <Text>Respondent</Text>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={{ fontWeight: "bold" }}>Respondent</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_respondent ? moreinfo.tbl_respondent : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Address</Text>
               </View>
               <View
-                style={{
-                  backgroundColor: "#2196F3",
-                  alignContent: "stretch",
-                  width: "60%",
-                  padding: 5,
-                }}
+                style={
+                  (styles.moreInforData,
+                  { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                }
               >
-                <Text>
-                  {moreinfo.tbl_respondent ? moreinfo.tbl_respondent : ""}
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_psgc_brgyname ? moreinfo.tbl_psgc_brgyname : ""}{" "}
+                  {moreinfo.tbl_psgc_munname ? moreinfo.tbl_psgc_munname : ""}{" "}
+                  {moreinfo.tbl_psgc_provname ? moreinfo.tbl_psgc_provname : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Control Number</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhcontrolnumber
+                    ? moreinfo.tbl_hhcontrolnumber
+                    : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Coordinates</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {"Lat: "}
+                  {moreinfo.tbl_hhlatitude ? moreinfo.tbl_hhlatitude : ""}
+                  {"\n"}
+                  {"Lng: "}
+                  {moreinfo.tbl_hhlongitude ? moreinfo.tbl_hhlongitude : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Date of Interview</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhdateinterview
+                    ? moreinfo.tbl_hhdateinterview
+                    : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Enumarator</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_enumeratorlname
+                    ? moreinfo.tbl_enumeratorlname
+                    : ""}{" "}
+                  {moreinfo.tbl_enumeratorfname
+                    ? moreinfo.tbl_enumeratorfname
+                    : ""}{" "}
+                  {moreinfo.tbl_enumeratormname
+                    ? moreinfo.tbl_enumeratormname
+                    : ""}{" "}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Type of Building</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.lib_buildingtypedesc
+                    ? moreinfo.lib_buildingtypedesc
+                    : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Tenural status</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.lib_tenuralstatusdesc
+                    ? moreinfo.lib_tenuralstatusdesc
+                    : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Year constructed</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhyearconstruct
+                    ? moreinfo.tbl_hhyearconstruct
+                    : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>
+                  Estimated construction cost
+                </Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhecost ? moreinfo.tbl_hhecost : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Number of bedrooms</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhnobedroms ? moreinfo.tbl_hhnobedroms : ""}
                 </Text>
               </View>
             </View>
@@ -467,7 +585,7 @@ function AnimatedScreen(props) {
                 setModalVisible(!modalVisible);
               }}
             >
-              <Text style={styles.textStyle}>Hide Modal</Text>
+              <Text style={styles.textStyle}>Close Information</Text>
             </TouchableHighlight>
           </ScrollView>
         </View>
@@ -591,7 +709,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 20,
     paddingVertical: 30,
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
     //alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -612,6 +730,30 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  moreInfoTable: {
+    flexDirection: "row",
+    width: "100%",
+  },
+  moreInfolabel: {
+    alignContent: "stretch",
+    width: "40%",
+    padding: 5,
+  },
+  moreInfolabeltxt: {
+    fontWeight: "bold",
+  },
+  moreInfoData: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignContent: "stretch",
+    width: "60%",
+    padding: 5,
+    backgroundColor: "#F194FF",
+  },
+  moreInforDataTxt: {
+    //color: "red",
   },
 });
 
