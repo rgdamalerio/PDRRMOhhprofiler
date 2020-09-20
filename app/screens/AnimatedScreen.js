@@ -144,7 +144,7 @@ function AnimatedScreen(props) {
             "tbl_hhyearconstruct," +
             "tbl_hhyearconstruct," +
             "tbl_hhnobedroms," +
-            "tbl_hhnobedroms," +
+            "tbl_hhnostorey," +
             "tbl_hhaelectricity," +
             "tbl_hhainternet," +
             "tbl_hhainternet," +
@@ -575,6 +575,158 @@ function AnimatedScreen(props) {
                 </Text>
               </View>
             </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Number of storeys</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhnostorey ? moreinfo.tbl_hhnostorey : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>
+                  Access to electricity
+                </Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhaelectricity == 1 ? "Yes" : "No"}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Access to Internet</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhainternet == 1 ? "Yes" : "No"}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Roof materials</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.lib_roofmaterialsdesc
+                    ? moreinfo.lib_roofmaterialsdesc
+                    : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Wall materials</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.lib_wallmaterialsdesc
+                    ? moreinfo.lib_wallmaterialsdesc
+                    : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>
+                  Access to water supply
+                </Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhaccesswater == 1 ? "Yes" : "No"}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Water is potable</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhwaterpotable == 1 ? "Yes" : "No"}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>
+                  Tenural status of water
+                </Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.lib_wtdesc ? moreinfo.lib_wtdesc : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Level of water</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.lib_hhlvldesc ? moreinfo.lib_hhlvldesc : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>
+                  Location of evacuation area
+                </Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.lib_heaname ? moreinfo.lib_heaname : ""}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>
+                  Acces to health and medical facilities?
+                </Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhhasaccesshealtmedicalfacility == 1
+                    ? "Yes"
+                    : "No"}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>
+                  Acces to telecommunications?
+                </Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hhhasaccesstelecom == 1 ? "Yes" : "No"}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>
+                  Acces to drills and simulations?
+                </Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <Text style={styles.moreInforDataTxt}>
+                  {moreinfo.tbl_hasaccessdrillsandsimulations == 1
+                    ? "Yes"
+                    : "No"}
+                </Text>
+              </View>
+            </View>
             <TouchableHighlight
               style={{
                 ...styles.openButton,
@@ -745,9 +897,9 @@ const styles = StyleSheet.create({
   },
   moreInfoData: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignContent: "stretch",
+    //flexDirection: "row",
+    //justifyContent: "flex-end",
+    //alignContent: "stretch",
     width: "60%",
     padding: 5,
     backgroundColor: "#F194FF",
