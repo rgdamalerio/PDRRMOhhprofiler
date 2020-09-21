@@ -166,7 +166,9 @@ function AddProgramScreen({ navigation, route }) {
                 marginBottom: 15,
               }}
               onPress={() => {
-                setModalVisible(!modalVisible);
+                navigation.navigate("Demography", {
+                  id: householdid,
+                });
               }}
             >
               <Text style={styles.textStyle}>Skip</Text>
