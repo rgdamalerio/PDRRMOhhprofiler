@@ -5,6 +5,8 @@ import AccountScreen from "../screens/AccountScreen";
 import Profiler from "../screens/ProfilerScreen";
 import Household from "../screens/HouseholdScreen";
 import Animated from "../screens/AnimatedScreen";
+import Program from "../screens/AddProgramScreen";
+import Demography from "../screens/AddDemographyScreen";
 
 const Stack = createStackNavigator();
 
@@ -25,6 +27,16 @@ const AppNavigator = () => (
       name="AnimatedMap"
       options={{ headerShown: false }}
       component={Animated}
+    />
+    <Stack.Screen
+      name="Program"
+      options={{ title: "Add avail program's" }}
+      component={Program}
+    />
+    <Stack.Screen
+      name="Demography"
+      options={{ title: "Add Demography" }}
+      component={Demography}
     />
   </Stack.Navigator>
 );
