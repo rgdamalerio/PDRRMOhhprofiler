@@ -36,6 +36,9 @@ function AddDemographyScreen({ navigation, route }) {
   const [belongsTo, setBelongsTo] = useState([]);
   const [gender, setGender] = useState([]);
   const [relationship, setRelationship] = useState([]);
+  const [maritalStatus, setMaritalStatus] = useState([]);
+  const [religion, setReligion] = useState([]);
+  const [nutrituonal, setNutrituonal] = useState([]);
   const [date, setDate] = useState(new Date());
   const { user } = useAuth();
 
@@ -43,6 +46,9 @@ function AddDemographyScreen({ navigation, route }) {
     _setRelationship();
     _belongsTo();
     _gender();
+    _setMaritalStatus();
+    _religion();
+    _nutrituanal();
   }, []);
 
   const _setRelationship = () => {
@@ -106,6 +112,77 @@ function AddDemographyScreen({ navigation, route }) {
         Alert.alert(
           "SQLITE ERROR",
           "Error loading Gender Library, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const _setMaritalStatus = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id AS id, lib_msname AS label from lib_maritalstatus`,
+          [],
+          (_, { rows: { _array } }) => setMaritalStatus(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Marital status Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const _religion = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id AS id, lib_rname AS label from lib_religion`,
+          [],
+          (_, { rows: { _array } }) => setReligion(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Religion Library, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const _nutrituanal = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id AS id, lib_nsname AS label from lib_nutritioanalstatus`,
+          [],
+          (_, { rows: { _array } }) => setNutrituonal(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Nutrituonal status Library, Please contact developer, " +
+            error,
           [
             {
               text: "OK",
@@ -210,7 +287,7 @@ function AddDemographyScreen({ navigation, route }) {
               tbl_relationshiphead_id: 0,
               tbl_datebirth: 0,
               lib_maritalstatus_id: 0,
-              lib_ethnicity_id: 0,
+              lib_ethnicity_id: "",
               lib_religion_id: 0,
               tbl_isofw: 0,
               tbl_is3yrsinlocation: 0,
@@ -289,7 +366,7 @@ function AddDemographyScreen({ navigation, route }) {
 
             <Picker
               icon="account-group-outline"
-              items={setRelationship}
+              items={relationship}
               name="tbl_relationshiphead_id"
               PickerItemComponent={PickerItem}
               placeholder="Relationship to the head"
@@ -304,7 +381,50 @@ function AddDemographyScreen({ navigation, route }) {
               mode="date"
             />
 
-            <SubmitButton title="Add Program" />
+            <Picker
+              icon="alpha-m-box"
+              items={maritalStatus}
+              name="lib_maritalstatus_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Marital status"
+            />
+
+            <FormField
+              autoCorrect={false}
+              icon="account-outline"
+              name="lib_ethnicity_id"
+              placeholder="Ethnicity/Tribe"
+            />
+
+            <Picker
+              icon="alpha-r-box"
+              items={religion}
+              name="lib_religion_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Religion"
+            />
+
+            <SwitchInput
+              icon="bag-personal"
+              name="tbl_isofw"
+              placeholder="Is an OFW?"
+            />
+
+            <Picker
+              icon="nutrition"
+              items={nutrituonal}
+              name="lib_nutritioanalstatus_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Nutrituanal Status"
+            />
+
+            <SwitchInput
+              icon="school"
+              name="tbl_iscurattschool"
+              placeholder="Is currently in school?"
+            />
+
+            <SubmitButton title="Save Demography" />
           </Form>
         </ScrollView>
       )}
