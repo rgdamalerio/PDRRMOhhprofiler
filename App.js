@@ -4,6 +4,7 @@ import { View, Text } from "react-native";
 import { Asset } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
 import { AppLoading } from "expo";
+import * as SQLite from "expo-sqlite";
 
 import RegisterScreens from "./app/screens/RegisterScreen";
 import RespondentScreen from "./app/screens/RespondentScreen";
@@ -12,6 +13,7 @@ import WelcomeScreen from "./app/screens/WelcomeScreen";
 import LoginScreen from "./app/screens/LoginScreen";
 import ProfilerScreen from "./app/screens/ProfilerScreen";
 import Household from "./app/screens/HouseholdScreen";
+import AddDemographyScreen from "./app/screens/AddDemographyScreen";
 import CameraInput from "./app/components/CameraInput";
 import LocationInput from "./app/components/LocationInput";
 import DateInput from "./app/components/DateInput";
@@ -71,12 +73,14 @@ export default function App() {
     const internalDbName = "hhprofiler.db"; // Call whatever you want
     if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
       await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
-      const asset = Asset.fromModule(
-        require("./app/assets/database/hhprofiler.db")
-      ).uri;
+
+      //const asset = Asset.fromModule(
+      //  require("./app/assets/database/hhprofiler.db")
+      //).uri;
+
       await FileSystem.downloadAsync(
-        //"https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/RefactorProfiler/app/assets/database/hhprofiler.db",
-        asset,
+        "http://github.com/rgdamalerio/PDRRMOhhprofiler/raw/AddPrograms/app/assets/database/hhprofiler.db",
+        //asset,
         sqlDir + internalDbName
       )
         .then(({ uri }) => {
@@ -96,12 +100,13 @@ export default function App() {
   //checkDatabaseExist();
 
   return (
+    /*
     <AuthContext.Provider value={{ user, setUser }}>
       <NavigationContainer theme={navigationTheme}>
         {user ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>
     </AuthContext.Provider>
-
+    */
     /*
     <LocationInput
       name="coordinates"
@@ -119,6 +124,6 @@ export default function App() {
       //datevalue
       year
     />*/
-    /*<Household />*/
+    <AddDemographyScreen />
   );
 }
