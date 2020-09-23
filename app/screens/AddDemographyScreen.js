@@ -21,34 +21,51 @@ import {
   SubmitButton,
 } from "../components/forms";
 
+import SwitchInput from "../components/SwitchInput";
+
 const validationSchema = Yup.object().shape({
-  typeProgram: Yup.string().required().label("Type of Program"),
-  programname: Yup.string().required().label("Program name"),
-  numberBenificiaries: Yup.number().required().label("Number of Benificiaries"),
-  programEmplementer: Yup.string().required().label("Program emplementer"),
+  tbl_fname: Yup.string().required().label("First Name"),
+  tbl_lname: Yup.string().required().label("Middle Name"),
+  lib_disability_id: Yup.string().when("tbl_withspecialneeds", {
+    is: true,
+    then: Yup.string().required(
+      'Type of Disability is required when person with special needs is "Yes"'
+    ),
+  }),
+  lib_gradelvl_id: Yup.string().when("tbl_iscurattschool", {
+    is: true,
+    then: Yup.string().required(
+      'Year/Grade currently attending is required when crrently in school is "Yes"'
+    ),
+  }),
 });
 
 const db = SQLite.openDatabase("hhprofiler.db");
 
 function AddDemographyScreen({ navigation, route }) {
-  const [householdid, sethouseholdid] = useState(route.params.id);
+  //const [householdid, sethouseholdid] = useState(route.params.id);
+  const [householdid, sethouseholdid] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [belongsTo, setBelongsTo] = useState([]);
   const [gender, setGender] = useState([]);
   const [relationship, setRelationship] = useState([]);
   const [maritalStatus, setMaritalStatus] = useState([]);
-  const [religion, setReligion] = useState([]);
+  const [disability, setDisability] = useState([]);
   const [nutrituonal, setNutrituonal] = useState([]);
+  const [gradelvl, setGradelvl] = useState([]);
+  const [tscshvc, setTscshvc] = useState([]);
+  const [income, setIncome] = useState([]);
   const [date, setDate] = useState(new Date());
-  const { user } = useAuth();
+  //const { user } = useAuth();
 
   useEffect(() => {
     _setRelationship();
-    _belongsTo();
     _gender();
     _setMaritalStatus();
-    _religion();
+    _setDisabilities();
     _nutrituanal();
+    _gradelvl();
+    _tscshvc();
+    _income();
   }, []);
 
   const _setRelationship = () => {
@@ -64,30 +81,6 @@ function AddDemographyScreen({ navigation, route }) {
         Alert.alert(
           "SQLITE ERROR",
           "Error loading Relationship to head Library, Please contact developer, " +
-            error,
-          [
-            {
-              text: "OK",
-            },
-          ]
-        );
-      }
-    );
-  };
-
-  const _belongsTo = () => {
-    db.transaction(
-      (tx) => {
-        tx.executeSql(
-          `select id AS id, lib_fbname AS label from lib_familybelongs`,
-          [],
-          (_, { rows: { _array } }) => setBelongsTo(_array)
-        );
-      },
-      (error) => {
-        Alert.alert(
-          "SQLITE ERROR",
-          "Error loading Nuclear family belongs Library, Please contact developer, " +
             error,
           [
             {
@@ -146,19 +139,20 @@ function AddDemographyScreen({ navigation, route }) {
     );
   };
 
-  const _religion = () => {
+  const _setDisabilities = () => {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          `select id AS id, lib_rname AS label from lib_religion`,
+          `select id AS id, lib_dname AS label from lib_disability`,
           [],
-          (_, { rows: { _array } }) => setReligion(_array)
+          (_, { rows: { _array } }) => setDisability(_array)
         );
       },
       (error) => {
         Alert.alert(
           "SQLITE ERROR",
-          "Error loading Religion Library, Please contact developer, " + error,
+          "Error loading Marital status Library, Please contact developer, " +
+            error,
           [
             {
               text: "OK",
@@ -193,7 +187,80 @@ function AddDemographyScreen({ navigation, route }) {
     );
   };
 
+  const _gradelvl = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id AS id, lib_glname AS label from lib_gradelvl`,
+          [],
+          (_, { rows: { _array } }) => setGradelvl(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Grade level Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const _tscshvc = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id AS id, lib_tscshvcname AS label from lib_tscshvc`,
+          [],
+          (_, { rows: { _array } }) => setTscshvc(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Track Strand and course completed Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const _income = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id AS id, lib_miname AS label from lib_monthlyincome`,
+          [],
+          (_, { rows: { _array } }) => setIncome(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Income Library, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
   const handleSubmit = (data, resetForm) => {
+    console.log(data);
+    /*
     setLoading(true);
     let filename = null;
 
@@ -264,6 +331,7 @@ function AddDemographyScreen({ navigation, route }) {
         alert("Database Error: " + error.message);
       }
     );
+    */
   };
 
   return (
@@ -289,18 +357,22 @@ function AddDemographyScreen({ navigation, route }) {
               lib_maritalstatus_id: 0,
               lib_ethnicity_id: "",
               lib_religion_id: 0,
+              tbl_withspecialneeds: false,
+              lib_disability_id: "",
+              lib_nutritioanalstatus_id: 0,
               tbl_isofw: 0,
               tbl_is3yrsinlocation: 0,
-              lib_nutritioanalstatus_id: 0,
-              tbl_iscurattschool: 0,
+              tbl_iscurattschool: false,
+              lib_gradelvl_id: "",
               tbl_canreadwriteorhighschoolgrade: 0,
-              tbl_primary_occupation: 0,
               lib_hea_id: 0,
+              tbl_primary_occupation: 0,
               lib_tscshvc_id: 0,
               lib_monthlyincome_id: 0,
               tbl_ismembersss: 0,
               tbl_ismembergsis: 0,
               tbl_ismemberphilhealth: 0,
+              tbl_adependentofaphilhealthmember: 0,
             }}
             onSubmit={(values, { resetForm }) => {
               handleSubmit(values, resetForm);
@@ -346,22 +418,15 @@ function AddDemographyScreen({ navigation, route }) {
               autoCorrect={false}
               icon="account-outline"
               name="tbl_extension"
-              placeholder="Extension"
+              placeholder="Name extension"
             />
 
-            <Picker
+            <FormField
+              autoCorrect={false}
               icon="account-group"
-              items={belongsTo}
               name="lib_familybelongs_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Nuclear family belong"
-            />
-            <Picker
-              icon="gender-male-female"
-              items={gender}
-              name="lib_gender_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Gender"
+              placeholder="Nuclear family belongs to"
+              keyboardType="number-pad"
             />
 
             <Picker
@@ -372,12 +437,21 @@ function AddDemographyScreen({ navigation, route }) {
               placeholder="Relationship to the head"
             />
 
+            <Picker
+              icon="gender-male-female"
+              items={gender}
+              name="lib_gender_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Gender"
+            />
+
             <FormDatePicker
               name="tbl_datebirth"
               icon="date"
               placeholder="Date of birth"
               width="50%"
               display="spinner"
+              fullDate
               mode="date"
             />
 
@@ -396,18 +470,37 @@ function AddDemographyScreen({ navigation, route }) {
               placeholder="Ethnicity/Tribe"
             />
 
-            <Picker
+            <FormField
+              autoCorrect={false}
               icon="alpha-r-box"
-              items={religion}
               name="lib_religion_id"
-              PickerItemComponent={PickerItem}
               placeholder="Religion"
+            />
+
+            <SwitchInput
+              icon="doctor"
+              name="tbl_withspecialneeds"
+              placeholder="Is person with special needs"
+            />
+
+            <Picker
+              icon="alpha-d-box"
+              items={disability}
+              name="lib_disability_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Type of Disability"
             />
 
             <SwitchInput
               icon="bag-personal"
               name="tbl_isofw"
               placeholder="Is an OFW?"
+            />
+
+            <SwitchInput
+              icon="home-floor-3"
+              name="tbl_is3yrsinlocation"
+              placeholder="Residence 3 years ago?"
             />
 
             <Picker
@@ -422,6 +515,75 @@ function AddDemographyScreen({ navigation, route }) {
               icon="school"
               name="tbl_iscurattschool"
               placeholder="Is currently in school?"
+            />
+
+            <Picker
+              icon="alpha-r-box"
+              items={gradelvl}
+              name="lib_gradelvl_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Year/Grade currently attending"
+            />
+
+            <Picker
+              icon="alpha-r-box"
+              items={gradelvl}
+              name="lib_hea_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Highest educational attainment"
+            />
+
+            <Picker
+              icon="account-tie"
+              items={tscshvc}
+              name="lib_tscshvc_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Track/strand/course Completed"
+            />
+
+            <SwitchInput
+              icon="read"
+              name="tbl_canreadwriteorhighschoolgrade"
+              placeholder="Can read and write"
+            />
+
+            <FormField
+              autoCorrect={false}
+              icon="worker"
+              name="tbl_primary_occupation"
+              placeholder="Primary occupation"
+            />
+
+            <Picker
+              icon="cash"
+              items={income}
+              name="lib_monthlyincome_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Monthly income"
+            />
+
+            <SwitchInput
+              icon="alpha-s-box"
+              name="tbl_ismembersss"
+              placeholder="Member of SSS"
+            />
+
+            <SwitchInput
+              icon="alpha-g-box"
+              name="tbl_ismembergsis"
+              placeholder="Member of GSIS"
+            />
+
+            <SwitchInput
+              icon="alpha-p-box"
+              name="tbl_ismemberphilhealth"
+              placeholder="Member of PHIL-health"
+            />
+
+            <SwitchInput
+              icon="alpha-p-box"
+              name="tbl_adependentofaphilhealthmember"
+              placeholder="Dependent of Phil-health member"
             />
 
             <SubmitButton title="Save Demography" />
