@@ -58,6 +58,7 @@ export default function App() {
   const [isReady, setIsReady] = useState(false);
 
   const startup = () => {
+    //removeDatabase();
     openDatabaseIShipWithApp();
     restoreUser();
   };
@@ -70,17 +71,17 @@ export default function App() {
 
   const openDatabaseIShipWithApp = async () => {
     const sqlDir = FileSystem.documentDirectory + "SQLite/";
-    const internalDbName = "hhprofiler.db"; // Call whatever you want
+    const internalDbName = "hhprofiler.sqlite"; // Call whatever you want
     if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
       await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
 
-      //const asset = Asset.fromModule(
-      //  require("./app/assets/database/hhprofiler.db")
-      //).uri;
+      const asset = Asset.fromModule(
+        require("./app/assets/database/hhprofiler.sqlite")
+      ).uri;
 
       await FileSystem.downloadAsync(
-        "http://github.com/rgdamalerio/PDRRMOhhprofiler/raw/AddPrograms/app/assets/database/hhprofiler.db",
-        //asset,
+        //"http://github.com/rgdamalerio/PDRRMOhhprofiler/raw/AddPrograms/app/assets/database/hhprofiler.db",
+        asset,
         sqlDir + internalDbName
       )
         .then(({ uri }) => {

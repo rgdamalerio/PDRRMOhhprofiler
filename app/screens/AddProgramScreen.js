@@ -27,7 +27,7 @@ const validationSchema = Yup.object().shape({
   programEmplementer: Yup.string().required().label("Program emplementer"),
 });
 
-const db = SQLite.openDatabase("hhprofiler.db");
+const db = SQLite.openDatabase("hhprofiler.sqlite");
 
 function AddProgramScreen({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);

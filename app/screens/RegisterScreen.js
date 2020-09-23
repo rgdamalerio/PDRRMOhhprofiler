@@ -30,7 +30,7 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required().min(4).label("Password"),
   */
 });
-const db = SQLite.openDatabase("hhprofiler.db");
+const db = SQLite.openDatabase("hhprofiler.sqlite");
 
 function RegisterScreen({ navigation }) {
   const [pro, setPro] = useState();
@@ -47,7 +47,6 @@ function RegisterScreen({ navigation }) {
         );
       },
       (error) => {
-        console.log(error);
         Alert.alert(
           "SQLITE ERROR",
           "Error loading Address Library, Please contact developer, " + error,

@@ -40,7 +40,7 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler.db");
+const db = SQLite.openDatabase("hhprofiler.sqlite");
 
 function AddDemographyScreen({ navigation, route }) {
   //const [householdid, sethouseholdid] = useState(route.params.id);
@@ -260,7 +260,7 @@ function AddDemographyScreen({ navigation, route }) {
 
   const handleSubmit = (data, resetForm) => {
     console.log(data);
-    /*
+
     setLoading(true);
     let filename = null;
 
@@ -272,27 +272,65 @@ function AddDemographyScreen({ navigation, route }) {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          "INSERT INTO tbl_programs (" +
+          "INSERT INTO tbl_hhdemography (" +
             "tbl_household_id," +
-            "lib_typeofprogram_id," +
-            "lib_pname," +
-            "lib_pnumbeni," +
-            "lib_pimplementor," +
-            "created_at," +
-            "updated_at," +
-            "created_by," +
-            "updated_by" +
-            ") values (?,?,?,?,?,?,?,?,?)",
+            "tbl_fname," +
+            "tbl_lname," +
+            "tbl_mname," +
+            "tbl_extension," +
+            "lib_familybelongs_id," +
+            "lib_gender_id," +
+            "tbl_relationshiphead_id," +
+            "tbl_datebirth," +
+            "lib_maritalstatus_id," +
+            "lib_ethnicity_id," +
+            "lib_religion_id," +
+            "tbl_withspecialneeds," +
+            "lib_disability_id," +
+            "lib_nutritioanalstatus_id," +
+            "tbl_isofw," +
+            "tbl_is3yrsinlocation," +
+            "tbl_iscurattschool," +
+            "lib_gradelvl_id," +
+            "tbl_canreadwriteorhighschoolgrade," +
+            "lib_hea_id," +
+            "tbl_primary_occupation," +
+            "lib_tscshvc_id," +
+            "lib_monthlyincome_id," +
+            "tbl_ismembersss," +
+            "tbl_ismembergsis," +
+            "tbl_ismemberphilhealth," +
+            "tbl_adependentofaphilhealthmember" +
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             householdid,
-            data.typeProgram.id,
-            data.programname,
-            data.numberBenificiaries,
-            data.programEmplementer,
-            String(date),
-            String(date),
-            user.idtbl_enumerator,
-            user.idtbl_enumerator,
+            data.tbl_fname,
+            data.tbl_lname,
+            data.tbl_mname,
+            data.tbl_extension,
+            data.lib_familybelongs_id,
+            data.lib_gender_id.id,
+            data.tbl_relationshiphead_id.id,
+            data.tbl_datebirth,
+            data.lib_maritalstatus_id.id,
+            data.lib_ethnicity_id,
+            data.lib_religion_id,
+            data.tbl_withspecialneeds ? 1 : 0,
+            data.lib_disability_id.id,
+            data.lib_nutritioanalstatus_id.id,
+            data.tbl_isofw ? 1 : 0,
+            data.tbl_is3yrsinlocation ? 1 : 0,
+            data.tbl_iscurattschool ? 1 : 0,
+            data.lib_gradelvl_id.id,
+            data.tbl_canreadwriteorhighschoolgrade ? 1 : 0,
+            data.lib_hea_id.id,
+            data.tbl_primary_occupation,
+            data.lib_tscshvc_id.id,
+            data.lib_monthlyincome_id.id,
+            data.tbl_ismembersss ? 1 : 0,
+            data.tbl_ismembergsis ? 1 : 0,
+            data.tbl_ismemberphilhealth ? 1 : 0,
+            data.tbl_adependentofaphilhealthmember ? 1 : 0,
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
@@ -331,7 +369,6 @@ function AddDemographyScreen({ navigation, route }) {
         alert("Database Error: " + error.message);
       }
     );
-    */
   };
 
   return (

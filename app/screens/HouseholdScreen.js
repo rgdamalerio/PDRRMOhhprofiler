@@ -5,7 +5,7 @@ import * as SQLite from "expo-sqlite";
 
 import Screen from "../components/Screen";
 
-const db = SQLite.openDatabase("hhprofiler.db");
+const db = SQLite.openDatabase("hhprofiler.sqlite");
 
 function HouseholdScreen({ navigation, route }) {
   const mapRef = useRef(null);
