@@ -483,7 +483,7 @@ function ProfilerScreen({ navigation }) {
               name="prov"
               PickerItemComponent={PickerItem}
               placeholder="Province"
-              searchable
+              //searchable
               setMun={setMun}
             />
             <AddressPicker
@@ -492,7 +492,7 @@ function ProfilerScreen({ navigation }) {
               name="mun"
               PickerItemComponent={PickerItem}
               placeholder="Municipality"
-              searchable
+              //searchable
               setBrgy={setBrgy}
             />
             <AddressPicker
@@ -501,7 +501,7 @@ function ProfilerScreen({ navigation }) {
               name="brgy"
               PickerItemComponent={PickerItem}
               placeholder="Barangay"
-              searchable
+              //searchable
               setbrgyValue
             />
 
