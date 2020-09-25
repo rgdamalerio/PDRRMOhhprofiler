@@ -37,6 +37,16 @@ async function removeDatabase() {
       console.error(error);
     });
 
+  await FileSystem.deleteAsync(sqlDir + "database.db-journal", {
+    idempotent: true,
+  })
+    .then(() => {
+      console.log("Finished deleting ");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
   const internalDbName = "hhprofiler.db"; // Call whatever you want
   if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
     console.log("Wala najud ha. pa abtan nato 5mins");
@@ -71,13 +81,15 @@ export default function App() {
 
   const openDatabaseIShipWithApp = async () => {
     const sqlDir = FileSystem.documentDirectory + "SQLite/";
-    const internalDbName = "hhprofiler.sqlite"; // Call whatever you want
+    const internalDbName = "hhprofiler.db"; // Call whatever you want
     if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
       await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
 
       const asset = Asset.fromModule(
-        require("./app/assets/database/hhprofiler.sqlite")
+        require("./app/assets/database/hhprofiler.db")
       ).uri;
+
+      console.log(asset);
 
       await FileSystem.downloadAsync(
         //"http://github.com/rgdamalerio/PDRRMOhhprofiler/raw/AddPrograms/app/assets/database/hhprofiler.db",
@@ -86,6 +98,8 @@ export default function App() {
       )
         .then(({ uri }) => {
           console.log("Finished downloading to " + uri);
+          const db = SQLite.openDatabase("hhprofiler.db");
+          console.log(db);
         })
         .catch((error) => {
           console.error(error);
@@ -126,5 +140,8 @@ export default function App() {
       year
     />*/
     <AddDemographyScreen />
+    /*<View>
+      <Text>Test</Text>
+    </View>*/
   );
 }

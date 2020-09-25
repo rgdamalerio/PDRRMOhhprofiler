@@ -38,9 +38,13 @@ const validationSchema = Yup.object().shape({
       'Year/Grade currently attending is required when crrently in school is "Yes"'
     ),
   }),
+  otherRelationship: Yup.string().when("tbl_relationshiphead_id.id", {
+    is: 9,
+    then: Yup.string().required().label("Add other relationship"),
+  }),
 });
 
-const db = SQLite.openDatabase("hhprofiler.sqlite");
+const db = SQLite.openDatabase("hhprofiler.db");
 
 function AddDemographyScreen({ navigation, route }) {
   //const [householdid, sethouseholdid] = useState(route.params.id);
@@ -54,6 +58,7 @@ function AddDemographyScreen({ navigation, route }) {
   const [gradelvl, setGradelvl] = useState([]);
   const [tscshvc, setTscshvc] = useState([]);
   const [income, setIncome] = useState([]);
+  const [otherRelationship, setOtherRelationship] = useState(false);
   const [date, setDate] = useState(new Date());
   //const { user } = useAuth();
 
@@ -259,21 +264,14 @@ function AddDemographyScreen({ navigation, route }) {
   };
 
   const handleSubmit = (data, resetForm) => {
-    console.log(data);
-
     setLoading(true);
-    let filename = null;
-
-    if (data.image != null) {
-      const res = data.image.split("/");
-      filename = res[res.length - 1];
-    }
 
     db.transaction(
       (tx) => {
         tx.executeSql(
           "INSERT INTO tbl_hhdemography (" +
-            "tbl_household_id," +
+            "tbl_household_id" +
+            /*        
             "tbl_fname," +
             "tbl_lname," +
             "tbl_mname," +
@@ -302,8 +300,11 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_ismemberphilhealth," +
             "tbl_adependentofaphilhealthmember" +
             ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            */
+            ")values(?)",
           [
             householdid,
+            /*
             data.tbl_fname,
             data.tbl_lname,
             data.tbl_mname,
@@ -331,9 +332,76 @@ function AddDemographyScreen({ navigation, route }) {
             data.tbl_ismembergsis ? 1 : 0,
             data.tbl_ismemberphilhealth ? 1 : 0,
             data.tbl_adependentofaphilhealthmember ? 1 : 0,
+            */
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
+              /*
+              if (data.tbl_relationshiphead_id.id == relationship.length) {
+                const dbupdate = SQLite.openDatabase("hhprofiler.sqlite");
+
+                dbupdate.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE libl_relationshiphead SET lib_rhname = ?",
+                      [data.otherRelationship],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          
+                          console.log(
+                            "Success update last item in relationship library"
+                          );
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO libl_relationshiphead (" +
+                                  "lib_rhname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?)",
+                                [
+                                  "Other, Please specify",
+                                  String(date),
+                                  1,
+                                  String(date),
+                                  1,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    console.log(
+                                      "Success adding new item in relationship library"
+                                    );
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new relationship item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
+                            },
+                            (error) => {
+                              console.log(error);
+                            }
+                          );
+                          
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in relationship failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    console.log("Error: " + error);
+                  }
+                );
+              }
+
               Alert.alert(
                 "Success",
                 "Program successfully save, do you want to add more program?",
@@ -356,6 +424,8 @@ function AddDemographyScreen({ navigation, route }) {
                   },
                 ]
               );
+              */
+              alert("OK");
             } else {
               setLoading(false);
               alert("Adding Program information Failed");
@@ -366,7 +436,7 @@ function AddDemographyScreen({ navigation, route }) {
       (error) => {
         console.log(error.message);
         setLoading(false);
-        alert("Database Error: " + error.message);
+        alert("Adding Demography Database Error: " + error.message);
       }
     );
   };
@@ -390,6 +460,7 @@ function AddDemographyScreen({ navigation, route }) {
               lib_familybelongs_id: 0,
               lib_gender_id: 0,
               tbl_relationshiphead_id: 0,
+              otherRelationship: "",
               tbl_datebirth: 0,
               lib_maritalstatus_id: 0,
               lib_ethnicity_id: "",
@@ -472,7 +543,17 @@ function AddDemographyScreen({ navigation, route }) {
               name="tbl_relationshiphead_id"
               PickerItemComponent={PickerItem}
               placeholder="Relationship to the head"
+              setOther={setOtherRelationship}
             />
+
+            {otherRelationship && (
+              <FormField
+                autoCorrect={false}
+                icon="bank-plus"
+                name="otherRelationship"
+                placeholder="Add other Relationship to head"
+              />
+            )}
 
             <Picker
               icon="gender-male-female"

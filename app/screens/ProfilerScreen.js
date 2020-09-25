@@ -381,7 +381,7 @@ function ProfilerScreen({ navigation }) {
                       user.idtbl_enumerator,
                       String(date),
                       user.idtbl_enumerator,
-                      user.idtbl_enumerator,
+                      insertId,
                     ],
                     (tx, results) => {
                       createAlbum(data.image);
