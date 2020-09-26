@@ -267,7 +267,7 @@ function AddDemographyScreen({ navigation, route }) {
     //console.log(relationship.length);
     //console.log(data);
     //return;
-    setLoading(true);
+    //setLoading(true);
 
     db.transaction(
       (tx) => {
@@ -366,7 +366,8 @@ function AddDemographyScreen({ navigation, route }) {
                                 ],
                                 (tx, results) => {
                                   if (results.rowsAffected > 0) {
-                                    //setRefreshing(!refreshing);
+                                    _setRelationship();
+                                    setOtherRelationship(false);
                                     console.log(
                                       "Success adding new item in relationship library"
                                     );
@@ -405,7 +406,7 @@ function AddDemographyScreen({ navigation, route }) {
                   {
                     text: "No",
                     onPress: () => {
-                      setLoading(false);
+                      //setLoading(false);
                       navigation.navigate("Demography", {
                         id: householdid,
                       });
@@ -415,13 +416,13 @@ function AddDemographyScreen({ navigation, route }) {
                     text: "Yes",
                     onPress: () => {
                       resetForm({ data: "" });
-                      setLoading(false);
+                      //setLoading(false);
                     },
                   },
                 ]
               );
             } else {
-              setLoading(false);
+              //setLoading(false);
               alert("Adding Program information Failed");
             }
           }
@@ -429,7 +430,7 @@ function AddDemographyScreen({ navigation, route }) {
       },
       (error) => {
         console.log(error.message);
-        setLoading(false);
+        //setLoading(false);
         alert("Adding Demography Database Error: " + error.message);
       }
     );
