@@ -38,8 +38,8 @@ const validationSchema = Yup.object().shape({
       'Year/Grade currently attending is required when crrently in school is "Yes"'
     ),
   }),
-  otherRelationship: Yup.string().when("tbl_relationshiphead_id.id", {
-    is: 9,
+  otherRelationship: Yup.string().when("tbl_relationshiphead_id.label", {
+    is: "Other, Please specify",
     then: Yup.string().required().label("Add other relationship"),
   }),
 });
@@ -265,8 +265,8 @@ function AddDemographyScreen({ navigation, route }) {
 
   const handleSubmit = (data, resetForm) => {
     //console.log(relationship.length);
-    //console.log(data);
-    //return;
+    console.log(data);
+    return;
     //setLoading(true);
 
     db.transaction(
