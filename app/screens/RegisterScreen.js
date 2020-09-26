@@ -30,7 +30,7 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required().min(4).label("Password"),
   */
 });
-const db = SQLite.openDatabase("hhprofiler.sqlite");
+const db = SQLite.openDatabase("hhprofiler2.db");
 
 function RegisterScreen({ navigation }) {
   const [pro, setPro] = useState();

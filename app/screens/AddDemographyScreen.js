@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Text,
   StyleSheet,
@@ -44,7 +44,7 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler.db");
+const db = SQLite.openDatabase("hhprofiler9.db");
 
 function AddDemographyScreen({ navigation, route }) {
   //const [householdid, sethouseholdid] = useState(route.params.id);
@@ -264,14 +264,16 @@ function AddDemographyScreen({ navigation, route }) {
   };
 
   const handleSubmit = (data, resetForm) => {
+    //console.log(relationship.length);
+    //console.log(data);
+    //return;
     setLoading(true);
 
     db.transaction(
       (tx) => {
         tx.executeSql(
           "INSERT INTO tbl_hhdemography (" +
-            "tbl_household_id" +
-            /*        
+            "tbl_household_id," +
             "tbl_fname," +
             "tbl_lname," +
             "tbl_mname," +
@@ -300,11 +302,8 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_ismemberphilhealth," +
             "tbl_adependentofaphilhealthmember" +
             ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            */
-            ")values(?)",
           [
             householdid,
-            /*
             data.tbl_fname,
             data.tbl_lname,
             data.tbl_mname,
@@ -332,22 +331,17 @@ function AddDemographyScreen({ navigation, route }) {
             data.tbl_ismembergsis ? 1 : 0,
             data.tbl_ismemberphilhealth ? 1 : 0,
             data.tbl_adependentofaphilhealthmember ? 1 : 0,
-            */
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
-              /*
               if (data.tbl_relationshiphead_id.id == relationship.length) {
-                const dbupdate = SQLite.openDatabase("hhprofiler.sqlite");
-
-                dbupdate.transaction(
+                db.transaction(
                   (tx) => {
                     tx.executeSql(
-                      "UPDATE libl_relationshiphead SET lib_rhname = ?",
-                      [data.otherRelationship],
+                      "UPDATE libl_relationshiphead SET lib_rhname = ? where id = ?",
+                      [data.otherRelationship, relationship.length],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
-                          
                           console.log(
                             "Success update last item in relationship library"
                           );
@@ -355,13 +349,15 @@ function AddDemographyScreen({ navigation, route }) {
                             (tx) => {
                               tx.executeSql(
                                 "INSERT INTO libl_relationshiphead (" +
+                                  "id," +
                                   "lib_rhname," +
                                   "created_at," +
                                   "created_by," +
                                   "updated_at," +
                                   "updated_by" +
-                                  ") values (?,?,?,?,?)",
+                                  ") values (?,?,?,?,?,?)",
                                 [
+                                  relationship.length + 1,
                                   "Other, Please specify",
                                   String(date),
                                   1,
@@ -370,6 +366,7 @@ function AddDemographyScreen({ navigation, route }) {
                                 ],
                                 (tx, results) => {
                                   if (results.rowsAffected > 0) {
+                                    //setRefreshing(!refreshing);
                                     console.log(
                                       "Success adding new item in relationship library"
                                     );
@@ -386,7 +383,6 @@ function AddDemographyScreen({ navigation, route }) {
                               console.log(error);
                             }
                           );
-                          
                         } else {
                           Alert.alert(
                             "Error",
@@ -404,7 +400,7 @@ function AddDemographyScreen({ navigation, route }) {
 
               Alert.alert(
                 "Success",
-                "Program successfully save, do you want to add more program?",
+                "Demography details successfully save, do you want to add more?",
                 [
                   {
                     text: "No",
@@ -424,8 +420,6 @@ function AddDemographyScreen({ navigation, route }) {
                   },
                 ]
               );
-              */
-              alert("OK");
             } else {
               setLoading(false);
               alert("Adding Program information Failed");

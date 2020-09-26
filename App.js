@@ -24,9 +24,10 @@ import AppNavigator from "./app/navigation/AppNavigator";
 import AuthNavigator from "./app/navigation/AuthNavigator";
 import AuthContext from "./app/auth/context";
 import authStorage from "./app/auth/storage";
+const databaseName = "hhprofiler.db";
 
 async function removeDatabase() {
-  const sqlDir = FileSystem.documentDirectory + "SQLite/";
+  const sqlDir = `${FileSystem.documentDirectory}SQLite/`;
   await FileSystem.deleteAsync(sqlDir + "hhprofiler.db", {
     idempotent: true,
   })
@@ -68,8 +69,9 @@ export default function App() {
   const [isReady, setIsReady] = useState(false);
 
   const startup = () => {
-    //removeDatabase();
-    openDatabaseIShipWithApp();
+    // removeDatabase();
+    //penDatabaseIShipWithApp();
+    openDatabase();
     restoreUser();
   };
 
@@ -107,6 +109,37 @@ export default function App() {
     } else console.log("human na download");
   };
 
+  const openDatabase = async () => {
+    try {
+      await FileSystem.makeDirectoryAsync(
+        `${FileSystem.documentDirectory}SQLite`,
+        {
+          intermediates: true,
+        }
+      );
+      const localDatabase = await FileSystem.getInfoAsync(
+        `${FileSystem.documentDirectory}SQLite/hhprofiler9.db`
+      );
+      if (!localDatabase.exists) {
+        FileSystem.downloadAsync(
+          Asset.fromModule(require("./app/assets/database/" + databaseName))
+            .uri,
+          `${FileSystem.documentDirectory}SQLite/hhprofiler9.db`
+        )
+          .then(({ uri }) => {
+            console.log("Database copy to : " + uri);
+          })
+          .catch((error) => {
+            console.log("Database copy error : " + error);
+          });
+      } else {
+        console.log("Database exist");
+      }
+    } catch (error) {
+      console.log("Error : " + error);
+    }
+  };
+
   if (!isReady)
     return (
       <AppLoading startAsync={startup} onFinish={() => setIsReady(true)} />
@@ -115,13 +148,12 @@ export default function App() {
   //checkDatabaseExist();
 
   return (
-    /*
-    <AuthContext.Provider value={{ user, setUser }}>
+    /*<AuthContext.Provider value={{ user, setUser }}>
       <NavigationContainer theme={navigationTheme}>
         {user ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>
-    </AuthContext.Provider>
-    */
+    </AuthContext.Provider>*/
+
     /*
     <LocationInput
       name="coordinates"
