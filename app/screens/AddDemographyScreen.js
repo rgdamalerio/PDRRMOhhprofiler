@@ -5,7 +5,6 @@ import {
   ScrollView,
   Alert,
   TouchableHighlight,
-  ActivityIndicator,
 } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
@@ -13,6 +12,7 @@ import * as SQLite from "expo-sqlite";
 import useAuth from "../auth/useAuth";
 import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
+import ActivityIndicator from "../components/ActivityIndicator";
 import {
   AppForm as Form,
   AppFormField as FormField,
@@ -44,12 +44,12 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler9.db");
+const db = SQLite.openDatabase("hhprofiler10.db");
 
 function AddDemographyScreen({ navigation, route }) {
   //const [householdid, sethouseholdid] = useState(route.params.id);
   const [householdid, sethouseholdid] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [gender, setGender] = useState([]);
   const [relationship, setRelationship] = useState([]);
   const [maritalStatus, setMaritalStatus] = useState([]);
@@ -437,14 +437,9 @@ function AddDemographyScreen({ navigation, route }) {
   };
 
   return (
-    <Screen style={styles.container}>
-      {loading ? (
-        <ActivityIndicator
-          visible={loading}
-          size="large"
-          textStyle={styles.spinnerTextStyle}
-        />
-      ) : (
+    <>
+      <ActivityIndicator visible={loading} />
+      <Screen style={styles.container}>
         <ScrollView>
           <Form
             initialValues={{
@@ -702,8 +697,8 @@ function AddDemographyScreen({ navigation, route }) {
             <SubmitButton title="Save Demography" />
           </Form>
         </ScrollView>
-      )}
-    </Screen>
+      </Screen>
+    </>
   );
 }
 
