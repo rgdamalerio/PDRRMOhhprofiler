@@ -23,7 +23,14 @@ function DateInput({
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    setDate(new Date(1598051730000));
+    let current_datetime = new Date();
+    let formatted_date =
+      current_datetime.getFullYear() +
+      "-" +
+      (current_datetime.getMonth() + 1) +
+      "-" +
+      current_datetime.getDate();
+    setDate(formatted_date);
   }, []);
 
   const onChange = (event, selectedDate) => {

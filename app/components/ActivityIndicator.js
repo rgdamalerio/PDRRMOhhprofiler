@@ -18,7 +18,7 @@ function ActivityIndicator({ visible = false }) {
 
 const styles = StyleSheet.create({
   overlay: {
-    position: "absolute",
+    //position: "absolute",
     backgroundColor: "white",
     height: "100%",
     opacity: 0.8,

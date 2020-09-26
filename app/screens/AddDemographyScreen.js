@@ -49,7 +49,7 @@ const db = SQLite.openDatabase("hhprofiler10.db");
 function AddDemographyScreen({ navigation, route }) {
   //const [householdid, sethouseholdid] = useState(route.params.id);
   const [householdid, sethouseholdid] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState([]);
   const [relationship, setRelationship] = useState([]);
   const [maritalStatus, setMaritalStatus] = useState([]);
@@ -59,7 +59,7 @@ function AddDemographyScreen({ navigation, route }) {
   const [tscshvc, setTscshvc] = useState([]);
   const [income, setIncome] = useState([]);
   const [otherRelationship, setOtherRelationship] = useState(false);
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date(1598051730000));
   //const { user } = useAuth();
 
   useEffect(() => {
@@ -267,7 +267,7 @@ function AddDemographyScreen({ navigation, route }) {
     //console.log(relationship.length);
     console.log(data);
     return;
-    //setLoading(true);
+    setLoading(true);
 
     db.transaction(
       (tx) => {
@@ -406,7 +406,7 @@ function AddDemographyScreen({ navigation, route }) {
                   {
                     text: "No",
                     onPress: () => {
-                      //setLoading(false);
+                      setLoading(false);
                       navigation.navigate("Demography", {
                         id: householdid,
                       });
@@ -416,13 +416,13 @@ function AddDemographyScreen({ navigation, route }) {
                     text: "Yes",
                     onPress: () => {
                       resetForm({ data: "" });
-                      //setLoading(false);
+                      setLoading(false);
                     },
                   },
                 ]
               );
             } else {
-              //setLoading(false);
+              setLoading(false);
               alert("Adding Program information Failed");
             }
           }
@@ -430,7 +430,7 @@ function AddDemographyScreen({ navigation, route }) {
       },
       (error) => {
         console.log(error.message);
-        //setLoading(false);
+        setLoading(false);
         alert("Adding Demography Database Error: " + error.message);
       }
     );
@@ -705,6 +705,7 @@ function AddDemographyScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    // backgroundColor: "#f8f4f4",
   },
   openButton: {
     backgroundColor: "#F194FF",
