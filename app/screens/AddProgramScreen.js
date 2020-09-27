@@ -5,7 +5,6 @@ import {
   ScrollView,
   Alert,
   TouchableHighlight,
-  ActivityIndicator,
 } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
@@ -13,6 +12,7 @@ import * as SQLite from "expo-sqlite";
 import useAuth from "../auth/useAuth";
 import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
+import ActivityIndicator from "../components/ActivityIndicator";
 import {
   AppForm as Form,
   AppFormField as FormField,
@@ -27,7 +27,7 @@ const validationSchema = Yup.object().shape({
   programEmplementer: Yup.string().required().label("Program emplementer"),
 });
 
-const db = SQLite.openDatabase("hhprofiler.db");
+const db = SQLite.openDatabase("hhprofiler14.db");
 
 function AddProgramScreen({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
@@ -134,14 +134,9 @@ function AddProgramScreen({ navigation, route }) {
   };
 
   return (
-    <Screen style={styles.container}>
-      {loading ? (
-        <ActivityIndicator
-          visible={loading}
-          size="large"
-          textStyle={styles.spinnerTextStyle}
-        />
-      ) : (
+    <>
+      <ActivityIndicator visible={loading} />
+      <Screen style={styles.container}>
         <ScrollView>
           <Form
             initialValues={{
@@ -193,7 +188,7 @@ function AddProgramScreen({ navigation, route }) {
               autoCorrect={false}
               icon="cash"
               name="numberBenificiaries"
-              placeholder="numberBenificiaries"
+              placeholder="Num of benificiaries"
               width="75%"
               keyboardType="number-pad"
             />
@@ -208,8 +203,8 @@ function AddProgramScreen({ navigation, route }) {
             <SubmitButton title="Add Program" />
           </Form>
         </ScrollView>
-      )}
-    </Screen>
+      </Screen>
+    </>
   );
 }
 

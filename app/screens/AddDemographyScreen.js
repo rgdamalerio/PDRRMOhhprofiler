@@ -38,13 +38,20 @@ const validationSchema = Yup.object().shape({
       'Year/Grade currently attending is required when crrently in school is "Yes"'
     ),
   }),
+  tbl_relationshiphead_id: Yup.object().nullable(),
   otherRelationship: Yup.string().when("tbl_relationshiphead_id.label", {
     is: "Other, Please specify",
     then: Yup.string().required().label("Add other relationship"),
   }),
+
+  lib_disability_id: Yup.object().nullable(),
+  otherDisabilityval: Yup.string().when("lib_disability_id.label", {
+    is: "Other, Please specify",
+    then: Yup.string().required().label("Add other type of disability"),
+  }),
 });
 
-const db = SQLite.openDatabase("hhprofiler10.db");
+const db = SQLite.openDatabase("hhprofiler14.db");
 
 function AddDemographyScreen({ navigation, route }) {
   //const [householdid, sethouseholdid] = useState(route.params.id);
@@ -52,15 +59,16 @@ function AddDemographyScreen({ navigation, route }) {
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState([]);
   const [relationship, setRelationship] = useState([]);
+  const [otherRelationship, setOtherRelationship] = useState(false);
   const [maritalStatus, setMaritalStatus] = useState([]);
   const [disability, setDisability] = useState([]);
+  const [otherDisability, setOtherDisability] = useState(false);
   const [nutrituonal, setNutrituonal] = useState([]);
   const [gradelvl, setGradelvl] = useState([]);
   const [tscshvc, setTscshvc] = useState([]);
   const [income, setIncome] = useState([]);
-  const [otherRelationship, setOtherRelationship] = useState(false);
   const [date, setDate] = useState(new Date(1598051730000));
-  //const { user } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     _setRelationship();
@@ -266,7 +274,7 @@ function AddDemographyScreen({ navigation, route }) {
   const handleSubmit = (data, resetForm) => {
     //console.log(relationship.length);
     console.log(data);
-    return;
+    //return;
     setLoading(true);
 
     db.transaction(
@@ -311,7 +319,7 @@ function AddDemographyScreen({ navigation, route }) {
             data.lib_familybelongs_id,
             data.lib_gender_id.id,
             data.tbl_relationshiphead_id.id,
-            data.tbl_datebirth,
+            String(data.tbl_datebirth),
             data.lib_maritalstatus_id.id,
             data.lib_ethnicity_id,
             data.lib_religion_id,
@@ -360,9 +368,9 @@ function AddDemographyScreen({ navigation, route }) {
                                   relationship.length + 1,
                                   "Other, Please specify",
                                   String(date),
-                                  1,
+                                  user.idtbl_enumerator,
                                   String(date),
-                                  1,
+                                  user.idtbl_enumerator,
                                 ],
                                 (tx, results) => {
                                   if (results.rowsAffected > 0) {
@@ -382,6 +390,72 @@ function AddDemographyScreen({ navigation, route }) {
                             },
                             (error) => {
                               console.log(error);
+                            }
+                          );
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in relationship failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    console.log("Error: " + error);
+                  }
+                );
+              }
+              if (data.lib_disability_id.id == disability.length) {
+                db.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE lib_disability SET lib_dname = ? where id = ?",
+                      [data.otherDisabilityval, disability.length],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          console.log(
+                            "Success update last item in disability library"
+                          );
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO lib_disability (" +
+                                  "id," +
+                                  "lib_dname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?,?)",
+                                [
+                                  disability.length + 1,
+                                  "Other, Please specify",
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    _setDisabilities();
+                                    setOtherDisability(false);
+                                    console.log(
+                                      "Success adding new item in disability library"
+                                    );
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new relationship item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
+                            },
+                            (error) => {
+                              console.log(
+                                "Error in INSERT INTO lib_disability" + error
+                              );
                             }
                           );
                         } else {
@@ -439,272 +513,281 @@ function AddDemographyScreen({ navigation, route }) {
   return (
     <>
       <ActivityIndicator visible={loading} />
-      <Screen style={styles.container}>
-        <ScrollView>
-          <Form
-            initialValues={{
-              tbl_fname: "",
-              tbl_lname: "",
-              tbl_mname: "",
-              tbl_extension: "",
-              lib_familybelongs_id: 0,
-              lib_gender_id: 0,
-              tbl_relationshiphead_id: 0,
-              otherRelationship: "",
-              tbl_datebirth: 0,
-              lib_maritalstatus_id: 0,
-              lib_ethnicity_id: "",
-              lib_religion_id: 0,
-              tbl_withspecialneeds: false,
-              lib_disability_id: "",
-              lib_nutritioanalstatus_id: 0,
-              tbl_isofw: 0,
-              tbl_is3yrsinlocation: 0,
-              tbl_iscurattschool: false,
-              lib_gradelvl_id: "",
-              tbl_canreadwriteorhighschoolgrade: 0,
-              lib_hea_id: 0,
-              tbl_primary_occupation: 0,
-              lib_tscshvc_id: 0,
-              lib_monthlyincome_id: 0,
-              tbl_ismembersss: 0,
-              tbl_ismembergsis: 0,
-              tbl_ismemberphilhealth: 0,
-              tbl_adependentofaphilhealthmember: 0,
+      <ScrollView style={styles.container}>
+        <Form
+          initialValues={{
+            tbl_fname: "",
+            tbl_lname: "",
+            tbl_mname: "",
+            tbl_extension: "",
+            lib_familybelongs_id: 0,
+            lib_gender_id: 0,
+            tbl_relationshiphead_id: 0,
+            otherRelationship: "",
+            tbl_datebirth: 0,
+            lib_maritalstatus_id: 0,
+            lib_ethnicity_id: "",
+            lib_religion_id: 0,
+            tbl_withspecialneeds: false,
+            lib_disability_id: 0,
+            otherDisabilityval: "",
+            lib_nutritioanalstatus_id: 0,
+            tbl_isofw: 0,
+            tbl_is3yrsinlocation: 0,
+            tbl_iscurattschool: false,
+            lib_gradelvl_id: "",
+            tbl_canreadwriteorhighschoolgrade: 0,
+            lib_hea_id: 0,
+            tbl_primary_occupation: 0,
+            lib_tscshvc_id: 0,
+            lib_monthlyincome_id: 0,
+            tbl_ismembersss: 0,
+            tbl_ismembergsis: 0,
+            tbl_ismemberphilhealth: 0,
+            tbl_adependentofaphilhealthmember: 0,
+          }}
+          onSubmit={(values, { resetForm }) => {
+            handleSubmit(values, resetForm);
+          }}
+          validationSchema={validationSchema}
+        >
+          <TouchableHighlight
+            style={{
+              //flex: 1,
+              //flexDirection: "row",
+              ...styles.openButton,
+              alignSelf: "flex-start",
+              backgroundColor: "#ff5252",
+              marginTop: 15,
+              marginBottom: 15,
             }}
-            onSubmit={(values, { resetForm }) => {
-              handleSubmit(values, resetForm);
+            onPress={() => {
+              setModalVisible(!modalVisible);
             }}
-            validationSchema={validationSchema}
           >
-            <TouchableHighlight
-              style={{
-                //flex: 1,
-                //flexDirection: "row",
-                ...styles.openButton,
-                alignSelf: "flex-start",
-                backgroundColor: "#ff5252",
-                marginTop: 15,
-                marginBottom: 15,
-              }}
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}
-            >
-              <Text style={styles.textStyle}>Skip</Text>
-            </TouchableHighlight>
+            <Text style={styles.textStyle}>Skip</Text>
+          </TouchableHighlight>
 
+          <FormField
+            autoCorrect={false}
+            icon="account-outline"
+            name="tbl_fname"
+            placeholder="Firstname"
+          />
+          <FormField
+            autoCorrect={false}
+            icon="account-outline"
+            name="tbl_lname"
+            placeholder="Lastname"
+          />
+          <FormField
+            autoCorrect={false}
+            icon="account-outline"
+            name="tbl_mname"
+            placeholder="Middlename"
+          />
+          <FormField
+            autoCorrect={false}
+            icon="account-outline"
+            name="tbl_extension"
+            placeholder="Name extension"
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="account-group"
+            name="lib_familybelongs_id"
+            placeholder="Nuclear family belongs to"
+          />
+
+          <Picker
+            icon="account-group-outline"
+            items={relationship}
+            name="tbl_relationshiphead_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Relationship to the head"
+            setOther={setOtherRelationship}
+          />
+
+          {otherRelationship && (
             <FormField
               autoCorrect={false}
-              icon="account-outline"
-              name="tbl_fname"
-              placeholder="Firstname"
+              icon="account-child"
+              name="otherRelationship"
+              placeholder="Add other Relationship to head"
             />
+          )}
+
+          <Picker
+            icon="gender-male-female"
+            items={gender}
+            name="lib_gender_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Gender"
+          />
+
+          <FormDatePicker
+            name="tbl_datebirth"
+            icon="date"
+            placeholder="Date of birth"
+            width="50%"
+            display="spinner"
+            fullDate
+            mode="date"
+          />
+
+          <Picker
+            icon="alpha-m-box"
+            items={maritalStatus}
+            name="lib_maritalstatus_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Marital status"
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="account-outline"
+            name="lib_ethnicity_id"
+            placeholder="Ethnicity/Tribe"
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="alpha-r-box"
+            name="lib_religion_id"
+            placeholder="Religion"
+          />
+
+          <SwitchInput
+            icon="doctor"
+            name="tbl_withspecialneeds"
+            placeholder="Is person with special needs"
+          />
+
+          <Picker
+            icon="alpha-d-box"
+            items={disability}
+            name="lib_disability_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Type of Disability"
+            setOther={setOtherDisability}
+          />
+
+          {otherDisability && (
             <FormField
               autoCorrect={false}
-              icon="account-outline"
-              name="tbl_lname"
-              placeholder="Lastname"
+              icon="shield-account"
+              name="otherDisabilityval"
+              placeholder="Add other type of Disability"
             />
-            <FormField
-              autoCorrect={false}
-              icon="account-outline"
-              name="tbl_mname"
-              placeholder="Middlename"
-            />
-            <FormField
-              autoCorrect={false}
-              icon="account-outline"
-              name="tbl_extension"
-              placeholder="Name extension"
-            />
+          )}
 
-            <FormField
-              autoCorrect={false}
-              icon="account-group"
-              name="lib_familybelongs_id"
-              placeholder="Nuclear family belongs to"
-              keyboardType="number-pad"
-            />
+          <SwitchInput
+            icon="bag-personal"
+            name="tbl_isofw"
+            placeholder="Is an OFW?"
+          />
 
-            <Picker
-              icon="account-group-outline"
-              items={relationship}
-              name="tbl_relationshiphead_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Relationship to the head"
-              setOther={setOtherRelationship}
-            />
+          <SwitchInput
+            icon="home-floor-3"
+            name="tbl_is3yrsinlocation"
+            placeholder="Residence 3 years ago?"
+          />
 
-            {otherRelationship && (
-              <FormField
-                autoCorrect={false}
-                icon="bank-plus"
-                name="otherRelationship"
-                placeholder="Add other Relationship to head"
-              />
-            )}
+          <Picker
+            icon="nutrition"
+            items={nutrituonal}
+            name="lib_nutritioanalstatus_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Nutrituanal Status"
+          />
 
-            <Picker
-              icon="gender-male-female"
-              items={gender}
-              name="lib_gender_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Gender"
-            />
+          <SwitchInput
+            icon="school"
+            name="tbl_iscurattschool"
+            placeholder="Is currently in school?"
+          />
 
-            <FormDatePicker
-              name="tbl_datebirth"
-              icon="date"
-              placeholder="Date of birth"
-              width="50%"
-              display="spinner"
-              fullDate
-              mode="date"
-            />
+          <Picker
+            icon="alpha-r-box"
+            items={gradelvl}
+            name="lib_gradelvl_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Year/Grade currently attending"
+          />
 
-            <Picker
-              icon="alpha-m-box"
-              items={maritalStatus}
-              name="lib_maritalstatus_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Marital status"
-            />
+          <Picker
+            icon="alpha-r-box"
+            items={gradelvl}
+            name="lib_hea_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Highest educational attainment"
+          />
 
-            <FormField
-              autoCorrect={false}
-              icon="account-outline"
-              name="lib_ethnicity_id"
-              placeholder="Ethnicity/Tribe"
-            />
+          <Picker
+            icon="account-tie"
+            items={tscshvc}
+            name="lib_tscshvc_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Track/strand/course Completed"
+          />
 
-            <FormField
-              autoCorrect={false}
-              icon="alpha-r-box"
-              name="lib_religion_id"
-              placeholder="Religion"
-            />
+          <SwitchInput
+            icon="read"
+            name="tbl_canreadwriteorhighschoolgrade"
+            placeholder="Can read and write (If not at least high school graduate)"
+          />
 
-            <SwitchInput
-              icon="doctor"
-              name="tbl_withspecialneeds"
-              placeholder="Is person with special needs"
-            />
+          <FormField
+            autoCorrect={false}
+            icon="worker"
+            name="tbl_primary_occupation"
+            placeholder="Primary occupation"
+          />
 
-            <Picker
-              icon="alpha-d-box"
-              items={disability}
-              name="lib_disability_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Type of Disability"
-            />
+          <Picker
+            icon="cash"
+            items={income}
+            name="lib_monthlyincome_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Monthly income"
+          />
 
-            <SwitchInput
-              icon="bag-personal"
-              name="tbl_isofw"
-              placeholder="Is an OFW?"
-            />
+          <SwitchInput
+            icon="alpha-s-box"
+            name="tbl_ismembersss"
+            placeholder="Member of SSS"
+          />
 
-            <SwitchInput
-              icon="home-floor-3"
-              name="tbl_is3yrsinlocation"
-              placeholder="Residence 3 years ago?"
-            />
+          <SwitchInput
+            icon="alpha-g-box"
+            name="tbl_ismembergsis"
+            placeholder="Member of GSIS"
+          />
 
-            <Picker
-              icon="nutrition"
-              items={nutrituonal}
-              name="lib_nutritioanalstatus_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Nutrituanal Status"
-            />
+          <SwitchInput
+            icon="alpha-p-box"
+            name="tbl_ismemberphilhealth"
+            placeholder="Member of PHIL-health"
+          />
 
-            <SwitchInput
-              icon="school"
-              name="tbl_iscurattschool"
-              placeholder="Is currently in school?"
-            />
+          <SwitchInput
+            icon="alpha-p-box"
+            name="tbl_adependentofaphilhealthmember"
+            placeholder="Dependent of Phil-health member"
+          />
 
-            <Picker
-              icon="alpha-r-box"
-              items={gradelvl}
-              name="lib_gradelvl_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Year/Grade currently attending"
-            />
-
-            <Picker
-              icon="alpha-r-box"
-              items={gradelvl}
-              name="lib_hea_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Highest educational attainment"
-            />
-
-            <Picker
-              icon="account-tie"
-              items={tscshvc}
-              name="lib_tscshvc_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Track/strand/course Completed"
-            />
-
-            <SwitchInput
-              icon="read"
-              name="tbl_canreadwriteorhighschoolgrade"
-              placeholder="Can read and write"
-            />
-
-            <FormField
-              autoCorrect={false}
-              icon="worker"
-              name="tbl_primary_occupation"
-              placeholder="Primary occupation"
-            />
-
-            <Picker
-              icon="cash"
-              items={income}
-              name="lib_monthlyincome_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Monthly income"
-            />
-
-            <SwitchInput
-              icon="alpha-s-box"
-              name="tbl_ismembersss"
-              placeholder="Member of SSS"
-            />
-
-            <SwitchInput
-              icon="alpha-g-box"
-              name="tbl_ismembergsis"
-              placeholder="Member of GSIS"
-            />
-
-            <SwitchInput
-              icon="alpha-p-box"
-              name="tbl_ismemberphilhealth"
-              placeholder="Member of PHIL-health"
-            />
-
-            <SwitchInput
-              icon="alpha-p-box"
-              name="tbl_adependentofaphilhealthmember"
-              placeholder="Dependent of Phil-health member"
-            />
-
-            <SubmitButton title="Save Demography" />
-          </Form>
-        </ScrollView>
-      </Screen>
+          <SubmitButton title="Save Demography" />
+        </Form>
+      </ScrollView>
     </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    //padding: 10,
+    paddingHorizontal: 10,
     // backgroundColor: "#f8f4f4",
   },
   openButton: {

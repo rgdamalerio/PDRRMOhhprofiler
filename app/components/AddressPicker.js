@@ -118,7 +118,7 @@ function AddressPicker({
               numColumns={numberOfColumns}
               ListEmptyComponent={
                 <EmptyFlatlist style={styles.textEmpty}>
-                  Select Province first to display available municipality
+                  Select Province firsts to display available municipality
                 </EmptyFlatlist>
               }
               renderItem={({ item }) => (

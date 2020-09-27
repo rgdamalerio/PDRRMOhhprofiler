@@ -24,6 +24,7 @@ import AppNavigator from "./app/navigation/AppNavigator";
 import AuthNavigator from "./app/navigation/AuthNavigator";
 import AuthContext from "./app/auth/context";
 import authStorage from "./app/auth/storage";
+import ActivityIndicator from "./app/components/ActivityIndicator";
 const databaseName = "hhprofiler.db";
 
 async function removeDatabase() {
@@ -67,9 +68,10 @@ const checkDatabaseExist = async () => {
 export default function App() {
   const [user, setUser] = useState();
   const [isReady, setIsReady] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const startup = () => {
-    // removeDatabase();
+    //removeDatabase();
     //penDatabaseIShipWithApp();
     openDatabase();
     restoreUser();
@@ -81,34 +83,6 @@ export default function App() {
     setUser(user);
   };
 
-  const openDatabaseIShipWithApp = async () => {
-    const sqlDir = FileSystem.documentDirectory + "SQLite/";
-    const internalDbName = "hhprofiler.db"; // Call whatever you want
-    if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
-      await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
-
-      const asset = Asset.fromModule(
-        require("./app/assets/database/hhprofiler.db")
-      ).uri;
-
-      console.log(asset);
-
-      await FileSystem.downloadAsync(
-        //"http://github.com/rgdamalerio/PDRRMOhhprofiler/raw/AddPrograms/app/assets/database/hhprofiler.db",
-        asset,
-        sqlDir + internalDbName
-      )
-        .then(({ uri }) => {
-          console.log("Finished downloading to " + uri);
-          const db = SQLite.openDatabase("hhprofiler.db");
-          console.log(db);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    } else console.log("human na download");
-  };
-
   const openDatabase = async () => {
     try {
       await FileSystem.makeDirectoryAsync(
@@ -118,25 +92,28 @@ export default function App() {
         }
       );
       const localDatabase = await FileSystem.getInfoAsync(
-        `${FileSystem.documentDirectory}SQLite/hhprofiler10.db`
+        `${FileSystem.documentDirectory}SQLite/hhprofiler14.db`
       );
       if (!localDatabase.exists) {
         FileSystem.downloadAsync(
           Asset.fromModule(require("./app/assets/database/" + databaseName))
             .uri,
-          `${FileSystem.documentDirectory}SQLite/hhprofiler10.db`
+          `${FileSystem.documentDirectory}SQLite/hhprofiler14.db`
         )
           .then(({ uri }) => {
             console.log("Database copy to : " + uri);
+            setLoading(true);
           })
           .catch((error) => {
             console.log("Database copy error : " + error);
           });
       } else {
         console.log("Database exist");
+        setLoading(true);
       }
     } catch (error) {
       console.log("Error : " + error);
+      setLoading(true);
     }
   };
 
@@ -147,21 +124,33 @@ export default function App() {
 
   //checkDatabaseExist();
 
-  return (
-    /*<AuthContext.Provider value={{ user, setUser }}>
+  {
+    if (!loading) return <ActivityIndicator visible={true} />;
+    return (
+      <AuthContext.Provider value={{ user, setUser }}>
+        <NavigationContainer theme={navigationTheme}>
+          {user ? <AppNavigator /> : <AuthNavigator />}
+        </NavigationContainer>
+      </AuthContext.Provider>
+    );
+  }
+
+  //return (
+
+  /*<AuthContext.Provider value={{ user, setUser }}>
       <NavigationContainer theme={navigationTheme}>
         {user ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>
     </AuthContext.Provider>*/
 
-    /*
+  /*
     <LocationInput
       name="coordinates"
       icon="add-location"
       placeholder="coordinates"
       width="50%"
     />*/
-    /*<DateInput
+  /*<DateInput
       name="yearconstract"
       icon="date"
       placeholder="Year construct"
@@ -171,9 +160,10 @@ export default function App() {
       //datevalue
       year
     />*/
-    <AddDemographyScreen />
-    /*<View>
+
+  /*return (
+    <View>
       <Text>Test</Text>
-    </View>*/
-  );
+    </View>
+  );*/
 }

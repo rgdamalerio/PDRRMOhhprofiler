@@ -6,6 +6,7 @@ import * as MediaLibrary from "expo-media-library";
 
 import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
+import ActivityIndicator from "../components/ActivityIndicator";
 import {
   AppForm as Form,
   AppFormField as FormField,
@@ -30,9 +31,10 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required().min(4).label("Password"),
   */
 });
-const db = SQLite.openDatabase("hhprofiler2.db");
+const db = SQLite.openDatabase("hhprofiler14.db");
 
 function RegisterScreen({ navigation }) {
+  const [loading, setLoading] = useState(false);
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
@@ -61,6 +63,7 @@ function RegisterScreen({ navigation }) {
   }, []);
 
   const handleSubmit = (data) => {
+    setLoading(true);
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -103,7 +106,11 @@ function RegisterScreen({ navigation }) {
                   },
                 ]
               );
-            } else alert("Registration Failed");
+              setLoading(false);
+            } else {
+              alert("Registration Failed");
+              setLoading(false);
+            }
           }
         );
       },
@@ -114,6 +121,7 @@ function RegisterScreen({ navigation }) {
         ) {
           alert("Email address already exist! Please try to use another email");
         }
+        setLoading(false);
       }
     );
   };
@@ -131,100 +139,100 @@ function RegisterScreen({ navigation }) {
   };
 
   return (
-    <Screen style={styles.container}>
-      <ScrollView>
-        <Form
-          initialValues={{
-            image: null,
-            fname: "",
-            lname: "",
-            mname: "",
-            phoneNumber: "",
-            prov: "",
-            mun: "",
-            brgy: "",
-            email: "",
-            password: "",
-          }}
-          onSubmit={handleSubmit}
-          validationSchema={validationSchema}
-        >
-          <FormCameraPicker name="image" />
-          <FormField
-            autoCorrect={false}
-            icon="account"
-            name="fname"
-            placeholder="First Name"
-          />
-          <FormField
-            autoCorrect={false}
-            icon="account"
-            name="lname"
-            placeholder="Last Name"
-          />
-          <FormField
-            autoCorrect={false}
-            icon="account"
-            name="mname"
-            placeholder="Middle Name"
-          />
-          <FormField
-            autoCorrect={false}
-            icon="phone"
-            name="phoneNumber"
-            placeholder="Phone number"
-            width={320}
-            keyboardType="number-pad"
-          />
-          <AddressPicker
-            icon="earth"
-            items={pro}
-            name="prov"
-            PickerItemComponent={PickerItem}
-            placeholder="Province"
-            searchable
-            setMun={setMun}
-          />
-          <AddressPicker
-            icon="earth"
-            items={mun}
-            name="mun"
-            PickerItemComponent={PickerItem}
-            placeholder="Municipality"
-            searchable
-            setBrgy={setBrgy}
-          />
-          <AddressPicker
-            icon="earth"
-            items={brgy}
-            name="brgy"
-            PickerItemComponent={PickerItem}
-            placeholder="Barangay"
-            searchable
-            setbrgyValue
-          />
-          <FormField
-            autoCapitalize="none"
-            autoCorrect={false}
-            icon="email"
-            keyboardType="email-address"
-            name="email"
-            placeholder="Email"
-            textContentType="emailAddress"
-          />
-          <FormField
-            autoCapitalize="none"
-            autoCorrect={false}
-            icon="lock"
-            name="password"
-            placeholder="Password"
-            secureTextEntry
-            textContentType="password"
-          />
-          <SubmitButton title="Register" />
-        </Form>
-      </ScrollView>
-    </Screen>
+    <>
+      <ActivityIndicator visible={loading} />
+      <Screen style={styles.container}>
+        <ScrollView>
+          <Form
+            initialValues={{
+              image: null,
+              fname: "",
+              lname: "",
+              mname: "",
+              phoneNumber: "",
+              prov: "",
+              mun: "",
+              brgy: "",
+              email: "",
+              password: "",
+            }}
+            onSubmit={handleSubmit}
+            validationSchema={validationSchema}
+          >
+            <FormCameraPicker name="image" />
+            <FormField
+              autoCorrect={false}
+              icon="account"
+              name="fname"
+              placeholder="First Name"
+            />
+            <FormField
+              autoCorrect={false}
+              icon="account"
+              name="lname"
+              placeholder="Last Name"
+            />
+            <FormField
+              autoCorrect={false}
+              icon="account"
+              name="mname"
+              placeholder="Middle Name"
+            />
+            <FormField
+              autoCorrect={false}
+              icon="phone"
+              name="phoneNumber"
+              placeholder="Phone number"
+              width={320}
+              keyboardType="number-pad"
+            />
+            <AddressPicker
+              icon="earth"
+              items={pro}
+              name="prov"
+              PickerItemComponent={PickerItem}
+              placeholder="Province"
+              setMun={setMun}
+            />
+            <AddressPicker
+              icon="earth"
+              items={mun}
+              name="mun"
+              PickerItemComponent={PickerItem}
+              placeholder="Municipality"
+              setBrgy={setBrgy}
+            />
+            <AddressPicker
+              icon="earth"
+              items={brgy}
+              name="brgy"
+              PickerItemComponent={PickerItem}
+              placeholder="Barangay"
+              setbrgyValue
+            />
+            <FormField
+              autoCapitalize="none"
+              autoCorrect={false}
+              icon="email"
+              keyboardType="email-address"
+              name="email"
+              placeholder="Email"
+              textContentType="emailAddress"
+            />
+            <FormField
+              autoCapitalize="none"
+              autoCorrect={false}
+              icon="lock"
+              name="password"
+              placeholder="Password"
+              secureTextEntry
+              textContentType="password"
+            />
+            <SubmitButton title="Register" />
+          </Form>
+        </ScrollView>
+      </Screen>
+    </>
   );
 }
 

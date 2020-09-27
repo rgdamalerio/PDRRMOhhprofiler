@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, ScrollView, Alert, ActivityIndicator } from "react-native";
+import { StyleSheet, ScrollView, Alert } from "react-native";
 import * as Random from "expo-random";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
@@ -19,6 +19,7 @@ import {
   SubmitButton,
 } from "../components/forms";
 import SwitchInput from "../components/SwitchInput";
+import ActivityIndicator from "../components/ActivityIndicator";
 import useAuth from "../auth/useAuth";
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
@@ -36,13 +37,14 @@ const validationSchema = Yup.object().shape({
   beadroom: Yup.number().label("Number of bedrooms"),
   storeys: Yup.number().required().label("Number of Storey"),
   wallmaterial: Yup.string().required().label("Wall material"),
-  otherevacuation: Yup.string().when("evacuationarea.id", {
-    is: 9,
+  evacuationarea: Yup.object().nullable(),
+  otherevacuation: Yup.string().when("evacuationarea.label", {
+    is: "Other, Please specify",
     then: Yup.string().required().label("Add other evacuation"),
   }), //adjust this if there is item added to evacuation area library
 });
 
-const db = SQLite.openDatabase("hhprofiler2.db");
+const db = SQLite.openDatabase("hhprofiler14.db");
 
 function ProfilerScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -364,34 +366,69 @@ function ProfilerScreen({ navigation }) {
             if (results.rowsAffected > 0) {
               const insertId = results.insertId; //set newly inserted id
 
-              if (data.evacuationarea.id == 9) {
-                db.transaction((tx) => {
-                  tx.executeSql(
-                    "INSERT INTO tbl_addOtherEvacuation (" +
-                      "tbl_addOtherEvacuationLocation," +
-                      "created_at," +
-                      "created_by," +
-                      "updated_at," +
-                      "updated_by," +
-                      "tbl_household_id" +
-                      ") values (?,?,?,?,?,?)",
-                    [
-                      data.otherevacuation,
-                      String(date),
-                      user.idtbl_enumerator,
-                      String(date),
-                      user.idtbl_enumerator,
-                      insertId,
-                    ],
-                    (tx, results) => {
-                      createAlbum(data.image);
-                      setLoading(false);
-                      navigation.navigate("Program", {
-                        id: insertId,
-                      });
-                    }
-                  );
-                });
+              if (data.evacuationarea.id == evacuationarea.length) {
+                db.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE lib_hhevacuationarea SET lib_heaname = ? where id = ?",
+                      [data.otherevacuation, evacuationarea.length],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          console.log(
+                            "Success update last item in evacuation area library"
+                          );
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO lib_hhevacuationarea (" +
+                                  "id," +
+                                  "lib_heaname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?,?)",
+                                [
+                                  evacuationarea.length + 1,
+                                  "Other, Please specify",
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    getEvacuationareas();
+                                    setOtherEvacuation(false);
+                                    console.log(
+                                      "Success adding new item in evacuation area library"
+                                    );
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new evacuation area item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
+                            },
+                            (error) => {
+                              console.log(error);
+                            }
+                          );
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in evacuation area failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    console.log("Error: " + error);
+                  }
+                );
               }
 
               createAlbum(data.image);
@@ -428,14 +465,9 @@ function ProfilerScreen({ navigation }) {
   };
 
   return (
-    <Screen style={styles.container}>
-      {loading ? (
-        <ActivityIndicator
-          visible={loading}
-          size="large"
-          textStyle={styles.spinnerTextStyle}
-        />
-      ) : (
+    <>
+      <ActivityIndicator visible={loading} />
+      <Screen style={styles.container}>
         <ScrollView>
           <Form
             initialValues={{
@@ -667,8 +699,8 @@ function ProfilerScreen({ navigation }) {
             <SubmitButton title="Save" />
           </Form>
         </ScrollView>
-      )}
-    </Screen>
+      </Screen>
+    </>
   );
 }
 
