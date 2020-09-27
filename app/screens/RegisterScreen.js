@@ -17,7 +17,6 @@ import {
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 const validationSchema = Yup.object().shape({
-  /*
   fname: Yup.string().required().label("First Name"),
   lname: Yup.string().required().label("Last Name"),
   phoneNumber: Yup.string()
@@ -29,12 +28,12 @@ const validationSchema = Yup.object().shape({
   brgy: Yup.string().required().label("Barangay"),
   email: Yup.string().required().email().label("Email"),
   password: Yup.string().required().min(4).label("Password"),
-  */
 });
 const db = SQLite.openDatabase("hhprofiler16.db");
 
 function RegisterScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
+  const [asset, setAsset] = useState();
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
@@ -75,11 +74,7 @@ function RegisterScreen({ navigation }) {
   };
 
   const handleSubmit = (data) => {
-    createAlbum(data.image);
-
-    //console.log(data);
-    return;
-    //setLoading(true);
+    setLoading(true);
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -144,20 +139,18 @@ function RegisterScreen({ navigation }) {
   };
 
   const createAlbum = async (uri) => {
-    try {
-      const asset = await MediaLibrary.createAssetAsync(uri);
-
-      MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
-        .then(() => {
-          return asset.uri;
-        })
-        .catch((error) => {
-          alert("Error saving image, Error details: " + error);
-          return null;
-        });
-    } catch (error) {
-      console.log("Error" + error);
-    }
+    //const asset = await MediaLibrary.createAssetAsync(uri);
+    //console.log(asset);
+    const asset = await MediaLibrary.createAssetAsync(uri);
+    //console.log("Asset: " + asset);
+    MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
+      .then(() => {
+        console.log("Album created!");
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("Error saving image, Error details: " + error);
+      });
   };
 
   return (

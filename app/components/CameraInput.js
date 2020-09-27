@@ -49,7 +49,6 @@ function CameraInput({ imageUri, onChangeImage }) {
   const takePicture = async () => {
     if (cameraRef) {
       let photo = await cameraRef.takePictureAsync();
-      //const asset = await MediaLibrary.createAssetAsync(photo.uri);
       onChangeImage(photo.uri);
       setModalVisible(false);
     }
