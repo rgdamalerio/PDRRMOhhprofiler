@@ -44,7 +44,7 @@ const validationSchema = Yup.object().shape({
   }), //adjust this if there is item added to evacuation area library
 });
 
-const db = SQLite.openDatabase("hhprofiler14.db");
+const db = SQLite.openDatabase("hhprofiler16.db");
 
 function ProfilerScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -100,6 +100,14 @@ function ProfilerScreen({ navigation }) {
         );
       }
     );
+  };
+
+  const handleProvChange = (munvalue) => {
+    setMun(munvalue);
+  };
+
+  const handleMunChange = (brgyvalue) => {
+    setBrgy(brgyvalue);
   };
 
   const gettypeBuilding = () => {
@@ -461,245 +469,243 @@ function ProfilerScreen({ navigation }) {
           alert("Error saving image, Error details: " + error);
           return null;
         });
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
     <>
       <ActivityIndicator visible={loading} />
-      <Screen style={styles.container}>
-        <ScrollView>
-          <Form
-            initialValues={{
-              respondentname: "",
-              prov: "",
-              mun: "",
-              brgy: "",
-              purok: "",
-              coordinates: null,
-              image: null,
-              typebuilding: "",
-              yearconstract: 0,
-              cost: 0,
-              beadroom: 0,
-              storeys: 0,
-              aelectricity: false,
-              internet: false,
-              roofmaterial: 0,
-              wallmaterial: 0,
-              awater: false,
-              wpotable: false,
-              wtenuralstatus: 0,
-              wlvlsystem: 0,
-              evacuationarea: 0,
-              otherevacuation: "",
-              accessmedfacility: false,
-              accesstelecommunication: false,
-              accessdrillsimulation: false,
-              tenuralstatus: 0,
-            }}
-            onSubmit={(values, { resetForm }) => {
-              handleSubmit(values, resetForm);
-            }}
-            validationSchema={validationSchema}
-          >
+      <ScrollView style={styles.container}>
+        <Form
+          initialValues={{
+            respondentname: "",
+            prov: "",
+            mun: "",
+            brgy: "",
+            purok: "",
+            coordinates: null,
+            image: null,
+            typebuilding: "",
+            yearconstract: 0,
+            cost: 0,
+            beadroom: 0,
+            storeys: 0,
+            aelectricity: false,
+            internet: false,
+            roofmaterial: 0,
+            wallmaterial: 0,
+            awater: false,
+            wpotable: false,
+            wtenuralstatus: 0,
+            wlvlsystem: 0,
+            evacuationarea: 0,
+            otherevacuation: "",
+            accessmedfacility: false,
+            accesstelecommunication: false,
+            accessdrillsimulation: false,
+            tenuralstatus: 0,
+          }}
+          onSubmit={(values, { resetForm }) => {
+            handleSubmit(values, resetForm);
+          }}
+          validationSchema={validationSchema}
+        >
+          <FormField
+            autoCorrect={false}
+            icon="account"
+            name="respondentname"
+            placeholder="Respondent Name"
+          />
+          <AddressPicker
+            icon="earth"
+            items={pro}
+            name="prov"
+            PickerItemComponent={PickerItem}
+            placeholder="Province"
+            setMun={handleProvChange}
+          />
+          <AddressPicker
+            icon="earth"
+            items={mun}
+            name="mun"
+            PickerItemComponent={PickerItem}
+            placeholder="Municipality"
+            setBrgy={handleMunChange}
+          />
+          <AddressPicker
+            icon="earth"
+            items={brgy}
+            name="brgy"
+            PickerItemComponent={PickerItem}
+            placeholder="Barangay"
+            //searchable
+            setbrgyValue
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="earth"
+            name="purok"
+            placeholder="Purok/Sitio"
+            width="70%"
+          />
+
+          <FormLocationPicker
+            name="coordinates"
+            icon="add-location"
+            placeholder="coordinates"
+            width="50%"
+          />
+          <FormCameraPicker name="image" />
+
+          <Picker
+            icon="warehouse"
+            items={typebuilding}
+            name="typebuilding"
+            PickerItemComponent={PickerItem}
+            placeholder="Type of building"
+          />
+          <Picker
+            icon="alpha-t-box"
+            items={tenuralStatus}
+            name="tenuralstatus"
+            PickerItemComponent={PickerItem}
+            placeholder="Tenural Status"
+          />
+
+          <FormDatePicker
+            name="yearconstract"
+            icon="date"
+            placeholder="Year construct"
+            width="50%"
+            display="spinner"
+            mode="date"
+            year
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="cash"
+            name="cost"
+            placeholder="Estimated cost"
+            width="75%"
+            keyboardType="number-pad"
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="bed-empty"
+            name="beadroom"
+            placeholder="Number of bedrooms"
+            width="75%"
+            keyboardType="number-pad"
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="office-building"
+            name="storeys"
+            placeholder="Number of storeys"
+            width="75%"
+            keyboardType="number-pad"
+          />
+
+          <SwitchInput
+            icon="electric-switch"
+            name="aelectricity"
+            placeholder="Access to electricity"
+          />
+
+          <SwitchInput
+            icon="internet-explorer"
+            name="internet"
+            placeholder="Access to internet"
+          />
+
+          <Picker
+            icon="material-ui"
+            items={roofmaterials}
+            name="roofmaterial"
+            PickerItemComponent={PickerItem}
+            placeholder="Roof material"
+          />
+          <Picker
+            icon="wall"
+            items={wallmaterials}
+            name="wallmaterial"
+            PickerItemComponent={PickerItem}
+            placeholder="Wall material"
+          />
+
+          <SwitchInput
+            icon="water-pump"
+            name="awater"
+            placeholder="Access to Water"
+          />
+
+          <SwitchInput
+            icon="water"
+            name="wpotable"
+            placeholder="Water is potable"
+          />
+
+          <Picker
+            icon="infinity"
+            items={watertenuralstatus}
+            name="wtenuralstatus"
+            PickerItemComponent={PickerItem}
+            placeholder="Water tenural status"
+          />
+
+          <Picker
+            icon="cup-water"
+            items={lvlwatersystem}
+            name="wlvlsystem"
+            PickerItemComponent={PickerItem}
+            placeholder="Level of water"
+          />
+
+          <Picker
+            icon="home-flood"
+            items={evacuationarea}
+            name="evacuationarea"
+            PickerItemComponent={PickerItem}
+            placeholder="Evacuation center location"
+            setOther={setOtherEvacuation}
+          />
+
+          {otherEvacuation && (
             <FormField
               autoCorrect={false}
-              icon="account"
-              name="respondentname"
-              placeholder="Respondent Name"
+              icon="bank-plus"
+              name="otherevacuation"
+              placeholder="Add other evacuation center"
             />
-            <AddressPicker
-              icon="earth"
-              items={pro}
-              name="prov"
-              PickerItemComponent={PickerItem}
-              placeholder="Province"
-              //searchable
-              setMun={setMun}
-            />
-            <AddressPicker
-              icon="earth"
-              items={mun}
-              name="mun"
-              PickerItemComponent={PickerItem}
-              placeholder="Municipality"
-              //searchable
-              setBrgy={setBrgy}
-            />
-            <AddressPicker
-              icon="earth"
-              items={brgy}
-              name="brgy"
-              PickerItemComponent={PickerItem}
-              placeholder="Barangay"
-              //searchable
-              setbrgyValue
-            />
+          )}
 
-            <FormField
-              autoCorrect={false}
-              icon="earth"
-              name="purok"
-              placeholder="Purok/Sitio"
-              width="70%"
-            />
+          <SwitchInput
+            icon="medical-bag"
+            name="accessmedfacility"
+            placeholder="Access to health/medical Fac"
+          />
 
-            <FormLocationPicker
-              name="coordinates"
-              icon="add-location"
-              placeholder="coordinates"
-              width="50%"
-            />
-            <FormCameraPicker name="image" />
+          <SwitchInput
+            icon="access-point-network"
+            name="accesstelecommunication"
+            placeholder="Access to Telecomunications"
+          />
 
-            <Picker
-              icon="warehouse"
-              items={typebuilding}
-              name="typebuilding"
-              PickerItemComponent={PickerItem}
-              placeholder="Type of building"
-            />
-            <Picker
-              icon="alpha-t-box"
-              items={tenuralStatus}
-              name="tenuralstatus"
-              PickerItemComponent={PickerItem}
-              placeholder="Tenural Status"
-            />
+          <SwitchInput
+            icon="bag-personal"
+            name="accessdrillsimulation"
+            placeholder="Access to drill/simulation"
+          />
 
-            <FormDatePicker
-              name="yearconstract"
-              icon="date"
-              placeholder="Year construct"
-              width="50%"
-              display="spinner"
-              mode="date"
-              year
-            />
-
-            <FormField
-              autoCorrect={false}
-              icon="cash"
-              name="cost"
-              placeholder="Estimated cost"
-              width="75%"
-              keyboardType="number-pad"
-            />
-
-            <FormField
-              autoCorrect={false}
-              icon="bed-empty"
-              name="beadroom"
-              placeholder="Number of bedrooms"
-              width="75%"
-              keyboardType="number-pad"
-            />
-
-            <FormField
-              autoCorrect={false}
-              icon="office-building"
-              name="storeys"
-              placeholder="Number of storeys"
-              width="75%"
-              keyboardType="number-pad"
-            />
-
-            <SwitchInput
-              icon="electric-switch"
-              name="aelectricity"
-              placeholder="Access to electricity"
-            />
-
-            <SwitchInput
-              icon="internet-explorer"
-              name="internet"
-              placeholder="Access to internet"
-            />
-
-            <Picker
-              icon="material-ui"
-              items={roofmaterials}
-              name="roofmaterial"
-              PickerItemComponent={PickerItem}
-              placeholder="Roof material"
-            />
-            <Picker
-              icon="wall"
-              items={wallmaterials}
-              name="wallmaterial"
-              PickerItemComponent={PickerItem}
-              placeholder="Wall material"
-            />
-
-            <SwitchInput
-              icon="water-pump"
-              name="awater"
-              placeholder="Access to Water"
-            />
-
-            <SwitchInput
-              icon="water"
-              name="wpotable"
-              placeholder="Water is potable"
-            />
-
-            <Picker
-              icon="infinity"
-              items={watertenuralstatus}
-              name="wtenuralstatus"
-              PickerItemComponent={PickerItem}
-              placeholder="Water tenural status"
-            />
-
-            <Picker
-              icon="cup-water"
-              items={lvlwatersystem}
-              name="wlvlsystem"
-              PickerItemComponent={PickerItem}
-              placeholder="Level of water"
-            />
-
-            <Picker
-              icon="home-flood"
-              items={evacuationarea}
-              name="evacuationarea"
-              PickerItemComponent={PickerItem}
-              placeholder="Evacuation center location"
-              setOther={setOtherEvacuation}
-            />
-
-            {otherEvacuation && (
-              <FormField
-                autoCorrect={false}
-                icon="bank-plus"
-                name="otherevacuation"
-                placeholder="Add other evacuation center"
-              />
-            )}
-
-            <SwitchInput
-              icon="medical-bag"
-              name="accessmedfacility"
-              placeholder="Access to health/medical Fac"
-            />
-
-            <SwitchInput
-              icon="access-point-network"
-              name="accesstelecommunication"
-              placeholder="Access to Telecomunications"
-            />
-
-            <SwitchInput
-              icon="bag-personal"
-              name="accessdrillsimulation"
-              placeholder="Access to drill/simulation"
-            />
-
-            <SubmitButton title="Save" />
-          </Form>
-        </ScrollView>
-      </Screen>
+          <SubmitButton title="Save" />
+        </Form>
+      </ScrollView>
     </>
   );
 }
@@ -707,7 +713,7 @@ function ProfilerScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    //justifyContent: "center",
     textAlign: "center",
     padding: 10,
   },

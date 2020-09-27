@@ -92,13 +92,13 @@ export default function App() {
         }
       );
       const localDatabase = await FileSystem.getInfoAsync(
-        `${FileSystem.documentDirectory}SQLite/hhprofiler14.db`
+        `${FileSystem.documentDirectory}SQLite/hhprofiler16.db`
       );
       if (!localDatabase.exists) {
         FileSystem.downloadAsync(
           Asset.fromModule(require("./app/assets/database/" + databaseName))
             .uri,
-          `${FileSystem.documentDirectory}SQLite/hhprofiler14.db`
+          `${FileSystem.documentDirectory}SQLite/hhprofiler16.db`
         )
           .then(({ uri }) => {
             console.log("Database copy to : " + uri);

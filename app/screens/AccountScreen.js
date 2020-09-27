@@ -35,6 +35,7 @@ function AccountScreen({ navigation }) {
       const res = user.tbl_imagepath.split("/");
       setFilename(res[res.length - 1]);
     } else setFilename("");
+    console.log(user);
   }, []);
 
   return (

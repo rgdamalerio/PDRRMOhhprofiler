@@ -17,7 +17,7 @@ import defaultStyles from "../config/styles";
 import PickerItem from "./PickerItem";
 import Screen from "./Screen";
 
-const db = SQLite.openDatabase("hhprofiler.db");
+const db = SQLite.openDatabase("hhprofiler16.db");
 
 function AddressPicker({
   icon,
@@ -36,6 +36,14 @@ function AddressPicker({
   const [modalVisible, setModalVisible] = useState(false);
   const [itemsearch, setItemsearch] = useState(items);
   const [search, setSearch] = useState("");
+
+  const handleProvChange = (value) => {
+    setMun(value);
+  };
+
+  const handleMunChange = (value) => {
+    setBrgy(value);
+  };
 
   return (
     <>
@@ -99,13 +107,18 @@ function AddressPicker({
                   onPress={() => {
                     setModalVisible(false);
                     onSelectItem(item);
-                    db.transaction((tx) => {
-                      tx.executeSql(
-                        `select idtbl_psgc_mun AS id, tbl_psgc_munname AS label from tbl_psgc_mun where tbl_psgc_prov_id_fk = ?;`,
-                        [item.id],
-                        (_, { rows: { _array } }) => setMun(_array)
-                      );
-                    });
+                    db.transaction(
+                      (tx) => {
+                        tx.executeSql(
+                          `select idtbl_psgc_mun AS id, tbl_psgc_munname AS label from tbl_psgc_mun where tbl_psgc_prov_id_fk = ?;`,
+                          [item.id],
+                          (_, { rows: { _array } }) => handleProvChange(_array)
+                        );
+                      },
+                      (error) => {
+                        console.log(error);
+                      }
+                    );
                   }}
                 />
               )}
@@ -132,7 +145,7 @@ function AddressPicker({
                       tx.executeSql(
                         `select idtbl_psgc_brgy AS id, tbl_psgc_brgyname AS label from tbl_psgc_brgy where tbl_psgc_mun_id_fk = ?;`,
                         [item.id],
-                        (_, { rows: { _array } }) => setBrgy(_array)
+                        (_, { rows: { _array } }) => handleMunChange(_array)
                       );
                     });
                   }}
