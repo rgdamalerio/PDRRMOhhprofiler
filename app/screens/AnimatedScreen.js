@@ -30,7 +30,7 @@ const CARD_HEIGHT = 220;
 const CARD_WIDTH = width * 0.8;
 const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
-const db = SQLite.openDatabase("hhprofiler16.db");
+const db = SQLite.openDatabase("hhprofiler17.db");
 
 function AnimatedScreen(props) {
   const theme = useTheme();
@@ -382,9 +382,7 @@ function AnimatedScreen(props) {
                 marker.tbl_hhimage === ""
                   ? require("../assets/no-image.jpg")
                   : {
-                      uri:
-                        "file:///storage/emulated/0/PDRRMOProfiler/" +
-                        marker.tbl_hhimage,
+                      uri: marker.tbl_hhimage,
                     }
               }
               style={styles.cardImage}

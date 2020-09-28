@@ -21,22 +21,31 @@ import {
 } from "../components/forms";
 
 const validationSchema = Yup.object().shape({
-  typeProgram: Yup.string().required().label("Type of Program"),
+  typeProgram: Yup.object().required().label("Type of Program"),
+  otherTypeprogramval: Yup.string().when("typeProgram.label", {
+    is: "Other, Please specify",
+    then: Yup.string().required().label("Add other type of program"),
+  }),
   programname: Yup.string().required().label("Program name"),
   numberBenificiaries: Yup.number().required().label("Number of Benificiaries"),
   programEmplementer: Yup.string().required().label("Program emplementer"),
 });
 
-const db = SQLite.openDatabase("hhprofiler16.db");
+const db = SQLite.openDatabase("hhprofiler17.db");
 
 function AddProgramScreen({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
   const [loading, setLoading] = useState(false);
   const [typeprogram, setTypeprogram] = useState([]);
+  const [otherTypeprogram, setOtherTypeprogram] = useState(false);
   const [date, setDate] = useState(new Date());
   const { user } = useAuth();
 
   useEffect(() => {
+    getTypeProgram();
+  }, []);
+
+  const getTypeProgram = () => {
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -58,17 +67,10 @@ function AddProgramScreen({ navigation, route }) {
         );
       }
     );
-  }, []);
+  };
 
   const handleSubmit = (data, resetForm) => {
     setLoading(true);
-    let filename = null;
-
-    if (data.image != null) {
-      const res = data.image.split("/");
-      filename = res[res.length - 1];
-    }
-
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -96,6 +98,65 @@ function AddProgramScreen({ navigation, route }) {
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
+              if (data.typeProgram.id == typeprogram.length) {
+                db.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE lib_typeofprogram SET lib_topname = ? where id = ?",
+                      [data.otherTypeprogramval, typeprogram.length],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO lib_typeofprogram (" +
+                                  "id," +
+                                  "lib_topname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?,?)",
+                                [
+                                  typeprogram.length + 1,
+                                  "Other, Please specify",
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    getTypeProgram();
+                                    setOtherTypeprogram(false);
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new evacuation area item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
+                            },
+                            (error) => {
+                              Alert.alert("Error", error);
+                            }
+                          );
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in evacuation area failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    Alert.alert("Error", error);
+                  }
+                );
+              }
+
               Alert.alert(
                 "Success",
                 "Program successfully save, do you want to add more program?",
@@ -104,6 +165,7 @@ function AddProgramScreen({ navigation, route }) {
                     text: "No",
                     onPress: () => {
                       setLoading(false);
+                      resetForm({ data: "" });
                       navigation.navigate("Demography", {
                         id: householdid,
                       });
@@ -126,7 +188,6 @@ function AddProgramScreen({ navigation, route }) {
         );
       },
       (error) => {
-        console.log(error.message);
         setLoading(false);
         alert("Database Error: " + error.message);
       }
@@ -140,7 +201,8 @@ function AddProgramScreen({ navigation, route }) {
         <ScrollView>
           <Form
             initialValues={{
-              typeProgram: "",
+              typeProgram: 0,
+              otherTypeprogramval: "",
               programname: "",
               numberBenificiaries: 0,
               programEmplementer: "",
@@ -152,8 +214,6 @@ function AddProgramScreen({ navigation, route }) {
           >
             <TouchableHighlight
               style={{
-                //flex: 1,
-                //flexDirection: "row",
                 ...styles.openButton,
                 alignSelf: "flex-start",
                 backgroundColor: "#ff5252",
@@ -175,7 +235,17 @@ function AddProgramScreen({ navigation, route }) {
               name="typeProgram"
               PickerItemComponent={PickerItem}
               placeholder="Type of Program"
+              setOther={setOtherTypeprogram}
             />
+
+            {otherTypeprogram && (
+              <FormField
+                autoCorrect={false}
+                icon="playlist-edit"
+                name="otherTypeprogramval"
+                placeholder="Add other type of program"
+              />
+            )}
 
             <FormField
               autoCorrect={false}

@@ -44,7 +44,7 @@ const validationSchema = Yup.object().shape({
   }), //adjust this if there is item added to evacuation area library
 });
 
-const db = SQLite.openDatabase("hhprofiler16.db");
+const db = SQLite.openDatabase("hhprofiler17.db");
 
 function ProfilerScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -288,23 +288,8 @@ function ProfilerScreen({ navigation }) {
     setDate(d);
   };
 
-  const parseYear = (date) => {
-    try {
-      return date.getFullYear();
-    } catch (error) {
-      return "";
-    }
-  };
-
   const handleSubmit = (data, resetForm) => {
     setLoading(true);
-    let filename = null;
-
-    if (data.image != null) {
-      const res = data.image.split("/");
-      filename = res[res.length - 1];
-    }
-
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -344,7 +329,7 @@ function ProfilerScreen({ navigation }) {
             String(date),
             data.coordinates != null ? data.coordinates.latitude : "",
             data.coordinates != null ? data.coordinates.longitude : "",
-            parseYear(data.yearconstract),
+            data.yearconstract,
             data.cost,
             data.beadroom,
             data.storeys,
@@ -367,7 +352,7 @@ function ProfilerScreen({ navigation }) {
             data.accesstelecommunication ? 1 : 0,
             data.accessdrillsimulation ? 1 : 0,
             data.purok,
-            filename,
+            data.image,
             data.respondentname,
           ],
           (tx, results) => {
@@ -382,9 +367,6 @@ function ProfilerScreen({ navigation }) {
                       [data.otherevacuation, evacuationarea.length],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
-                          console.log(
-                            "Success update last item in evacuation area library"
-                          );
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
@@ -408,9 +390,6 @@ function ProfilerScreen({ navigation }) {
                                   if (results.rowsAffected > 0) {
                                     getEvacuationareas();
                                     setOtherEvacuation(false);
-                                    console.log(
-                                      "Success adding new item in evacuation area library"
-                                    );
                                   } else {
                                     Alert.alert(
                                       "Error",
@@ -421,7 +400,7 @@ function ProfilerScreen({ navigation }) {
                               );
                             },
                             (error) => {
-                              console.log(error);
+                              Alert.alert("Error", error);
                             }
                           );
                         } else {
@@ -434,13 +413,14 @@ function ProfilerScreen({ navigation }) {
                     );
                   },
                   (error) => {
-                    console.log("Error: " + error);
+                    Alert.alert("Error", error);
                   }
                 );
               }
 
               createAlbum(data.image);
               setLoading(false);
+              resetForm({ data: "" });
               navigation.navigate("Program", {
                 id: insertId,
               });
@@ -469,9 +449,7 @@ function ProfilerScreen({ navigation }) {
           alert("Error saving image, Error details: " + error);
           return null;
         });
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   return (
@@ -575,14 +553,13 @@ function ProfilerScreen({ navigation }) {
             placeholder="Tenural Status"
           />
 
-          <FormDatePicker
+          <FormField
+            autoCorrect={false}
             name="yearconstract"
-            icon="date"
+            icon="calendar"
             placeholder="Year construct"
-            width="50%"
-            display="spinner"
-            mode="date"
-            year
+            width="75%"
+            keyboardType="number-pad"
           />
 
           <FormField

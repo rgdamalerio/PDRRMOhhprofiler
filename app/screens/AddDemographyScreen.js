@@ -51,7 +51,7 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler16.db");
+const db = SQLite.openDatabase("hhprofiler17.db");
 
 function AddDemographyScreen({ navigation, route }) {
   //const [householdid, sethouseholdid] = useState(route.params.id);
@@ -272,11 +272,7 @@ function AddDemographyScreen({ navigation, route }) {
   };
 
   const handleSubmit = (data, resetForm) => {
-    //console.log(relationship.length);
-    console.log(data);
-    //return;
     setLoading(true);
-
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -350,9 +346,6 @@ function AddDemographyScreen({ navigation, route }) {
                       [data.otherRelationship, relationship.length],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
-                          console.log(
-                            "Success update last item in relationship library"
-                          );
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
@@ -376,9 +369,6 @@ function AddDemographyScreen({ navigation, route }) {
                                   if (results.rowsAffected > 0) {
                                     _setRelationship();
                                     setOtherRelationship(false);
-                                    console.log(
-                                      "Success adding new item in relationship library"
-                                    );
                                   } else {
                                     Alert.alert(
                                       "Error",
@@ -389,7 +379,7 @@ function AddDemographyScreen({ navigation, route }) {
                               );
                             },
                             (error) => {
-                              console.log(error);
+                              Alert.alert("Error", error);
                             }
                           );
                         } else {
@@ -402,7 +392,7 @@ function AddDemographyScreen({ navigation, route }) {
                     );
                   },
                   (error) => {
-                    console.log("Error: " + error);
+                    Alert.alert("Error", error);
                   }
                 );
               }
@@ -414,9 +404,6 @@ function AddDemographyScreen({ navigation, route }) {
                       [data.otherDisabilityval, disability.length],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
-                          console.log(
-                            "Success update last item in disability library"
-                          );
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
@@ -440,9 +427,6 @@ function AddDemographyScreen({ navigation, route }) {
                                   if (results.rowsAffected > 0) {
                                     _setDisabilities();
                                     setOtherDisability(false);
-                                    console.log(
-                                      "Success adding new item in disability library"
-                                    );
                                   } else {
                                     Alert.alert(
                                       "Error",
@@ -468,7 +452,7 @@ function AddDemographyScreen({ navigation, route }) {
                     );
                   },
                   (error) => {
-                    console.log("Error: " + error);
+                    Alert.alert("Error", error);
                   }
                 );
               }
@@ -503,7 +487,6 @@ function AddDemographyScreen({ navigation, route }) {
         );
       },
       (error) => {
-        console.log(error.message);
         setLoading(false);
         alert("Adding Demography Database Error: " + error.message);
       }

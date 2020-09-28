@@ -68,7 +68,7 @@ function AppPicker({
                   onSelectItem(item);
 
                   if (setOther) {
-                    item.label == "Other, Please specify"
+                    item.label == "Other, Please specify" //
                       ? setOther(true)
                       : setOther(false);
                   }
