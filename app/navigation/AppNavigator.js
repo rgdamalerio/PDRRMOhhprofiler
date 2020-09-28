@@ -7,6 +7,7 @@ import Household from "../screens/HouseholdScreen";
 import Animated from "../screens/AnimatedScreen";
 import Program from "../screens/AddProgramScreen";
 import Demography from "../screens/AddDemographyScreen";
+import Livelihood from "../screens/AddLivelihood";
 
 const Stack = createStackNavigator();
 
@@ -37,6 +38,11 @@ const AppNavigator = () => (
       name="Demography"
       options={{ title: "Add Demography" }}
       component={Demography}
+    />
+    <Stack.Screen
+      name="Livelihood"
+      options={{ title: "Add Livelihood" }}
+      component={Livelihood}
     />
   </Stack.Navigator>
 );

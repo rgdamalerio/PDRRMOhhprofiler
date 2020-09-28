@@ -20,44 +20,60 @@ import {
   SubmitButton,
 } from "../components/forms";
 
-const validationSchema = Yup.object().shape({
-  typeProgram: Yup.object().required().label("Type of Program"),
-  otherTypeprogramval: Yup.string().when("typeProgram.label", {
-    is: "Other, Please specify",
-    then: Yup.string().required().label("Add other type of program"),
-  }),
-  programname: Yup.string().required().label("Program name"),
-  numberBenificiaries: Yup.number().required().label("Number of Benificiaries"),
-  programEmplementer: Yup.string().required().label("Program emplementer"),
-});
+const validationSchema = Yup.object().shape({});
 
 const db = SQLite.openDatabase("hhprofiler18.db");
 
-function AddProgramScreen({ navigation, route }) {
+function AddLivelihood({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
   const [loading, setLoading] = useState(false);
-  const [typeprogram, setTypeprogram] = useState([]);
-  const [otherTypeprogram, setOtherTypeprogram] = useState(false);
-  const [date, setDate] = useState(new Date());
+  const [typelivelihood, setTypelivelihood] = useState([]);
+  const [tenuralStatus, setTenuralStatus] = useState([]);
+  const [otherTenuralStatus, setOtherTenuralStatus] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
-    getTypeProgram();
+    getTypeLivelihood();
+    getTenuralStatus();
   }, []);
 
-  const getTypeProgram = () => {
+  const getTypeLivelihood = () => {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          `select id AS id, lib_topname AS label from lib_typeofprogram`,
+          `select id AS id, lib_desc AS label from lib_livelihood`,
           [],
-          (_, { rows: { _array } }) => setTypeprogram(_array)
+          (_, { rows: { _array } }) => setTypelivelihood(_array)
         );
       },
       (error) => {
         Alert.alert(
           "SQLITE ERROR",
-          "Error loading Type of Program Library, Please contact developer, " +
+          "Error loading Type of Livelihood Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const getTenuralStatus = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id AS id, tbl_tsname AS label from libl_tenuralstatus`,
+          [],
+          (_, { rows: { _array } }) => setTenuralStatus(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Type of Tenural Status Library, Please contact developer, " +
             error,
           [
             {
@@ -74,23 +90,27 @@ function AddProgramScreen({ navigation, route }) {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          "INSERT INTO tbl_programs (" +
+          "INSERT INTO tbl_livelihood (" +
+            "lib_typeoflivelihood," +
             "tbl_household_id," +
-            "lib_typeofprogram_id," +
-            "lib_pname," +
-            "lib_pnumbeni," +
-            "lib_pimplementor," +
+            "tbl_livelihoodmarketvalue," +
+            "tbl_livelihoodtotalarea," +
+            "tbl_livelihoodproducts," +
+            "lib_tenuralstatus_id," +
+            "tbl_livelihoodiswithinsurance," +
             "created_at," +
             "updated_at," +
             "created_by," +
             "updated_by" +
-            ") values (?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?,?)",
           [
-            householdid,
-            data.typeProgram.id,
-            data.programname,
-            data.numberBenificiaries,
-            data.programEmplementer,
+            data.lib_typeoflivelihood,
+            route.params.id,
+            data.tbl_livelihoodmarketvalue,
+            data.tbl_livelihoodtotalarea,
+            data.tbl_livelihoodproducts,
+            data.lib_tenuralstatus_id,
+            data.tbl_livelihoodiswithinsurance,
             String(date),
             String(date),
             user.idtbl_enumerator,
@@ -98,27 +118,27 @@ function AddProgramScreen({ navigation, route }) {
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
-              if (data.typeProgram.id == typeprogram.length) {
+              if (data.lib_tenuralstatus_id.id == tenuralStatus.length) {
                 db.transaction(
                   (tx) => {
                     tx.executeSql(
                       "UPDATE lib_typeofprogram SET lib_topname = ? where id = ?",
-                      [data.otherTypeprogramval, typeprogram.length],
+                      [data.otherTenuralStatusval, tenuralStatus.length],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
-                                "INSERT INTO lib_typeofprogram (" +
+                                "INSERT INTO lib_livelihood (" +
                                   "id," +
-                                  "lib_topname," +
+                                  "lib_desc," +
                                   "created_at," +
                                   "created_by," +
                                   "updated_at," +
                                   "updated_by" +
                                   ") values (?,?,?,?,?,?)",
                                 [
-                                  typeprogram.length + 1,
+                                  tenuralStatus.length + 1,
                                   "Other, Please specify",
                                   String(date),
                                   user.idtbl_enumerator,
@@ -127,12 +147,12 @@ function AddProgramScreen({ navigation, route }) {
                                 ],
                                 (tx, results) => {
                                   if (results.rowsAffected > 0) {
-                                    getTypeProgram();
-                                    setOtherTypeprogram(false);
+                                    getTenuralStatus();
+                                    setOtherTenuralStatus(false);
                                   } else {
                                     Alert.alert(
                                       "Error",
-                                      "Adding new type of program item failed, Please update data or contact administrator"
+                                      "Adding new Tenural status item failed, Please update data or contact administrator"
                                     );
                                   }
                                 }
@@ -145,7 +165,7 @@ function AddProgramScreen({ navigation, route }) {
                         } else {
                           Alert.alert(
                             "Error",
-                            "Update last item in type of program failed, Please update data or contact administrator"
+                            "Update last item in evacuation area failed, Please update data or contact administrator"
                           );
                         }
                       }
@@ -201,11 +221,18 @@ function AddProgramScreen({ navigation, route }) {
         <ScrollView>
           <Form
             initialValues={{
-              typeProgram: 0,
-              otherTypeprogramval: "",
-              programname: "",
-              numberBenificiaries: 0,
-              programEmplementer: "",
+              lib_typeoflivelihood: 0,
+              tbl_household_id: route.params.id,
+              tbl_livelihoodmarketvalue: 0,
+              tbl_livelihoodtotalarea: 0,
+              tbl_livelihoodproducts: "",
+              lib_tenuralstatus_id: 0,
+              otherTenuralStatusval: "",
+              tbl_livelihoodiswithinsurance: 0,
+              created_at: String(new Date()),
+              updated_at: String(new Date()),
+              created_by: user.idtbl_enumerator,
+              updated_by: user.idtbl_enumerator,
             }}
             onSubmit={(values, { resetForm }) => {
               handleSubmit(values, resetForm);
@@ -221,9 +248,7 @@ function AddProgramScreen({ navigation, route }) {
                 marginBottom: 15,
               }}
               onPress={() => {
-                navigation.navigate("Demography", {
-                  id: householdid,
-                });
+                navigation.navigate("Profiler");
               }}
             >
               <Text style={styles.textStyle}>Skip</Text>
@@ -231,34 +256,26 @@ function AddProgramScreen({ navigation, route }) {
 
             <Picker
               icon="format-list-bulleted-type"
-              items={typeprogram}
-              name="typeProgram"
+              items={typelivelihood}
+              name="lib_typeoflivelihood"
               PickerItemComponent={PickerItem}
-              placeholder="Type of Program"
-              setOther={setOtherTypeprogram}
-            />
-
-            {otherTypeprogram && (
-              <FormField
-                autoCorrect={false}
-                icon="playlist-edit"
-                name="otherTypeprogramval"
-                placeholder="Add other type of program"
-              />
-            )}
-
-            <FormField
-              autoCorrect={false}
-              icon="alpha-p"
-              name="programname"
-              placeholder="Name of Program"
+              placeholder="Type of Livelihood"
             />
 
             <FormField
               autoCorrect={false}
               icon="cash"
-              name="numberBenificiaries"
-              placeholder="Num of benificiaries"
+              name="tbl_livelihoodmarketvalue"
+              placeholder="Livelihood market value"
+              width="75%"
+              keyboardType="number-pad"
+            />
+
+            <FormField
+              autoCorrect={false}
+              icon="bookmark-plus-outline"
+              name="tbl_livelihoodtotalarea"
+              placeholder="Livelihood total area"
               width="75%"
               keyboardType="number-pad"
             />
@@ -266,11 +283,34 @@ function AddProgramScreen({ navigation, route }) {
             <FormField
               autoCorrect={false}
               icon="alpha-p"
-              name="programEmplementer"
-              placeholder="Program Implementor"
+              name="tbl_livelihoodproducts"
+              placeholder="Product name"
             />
 
-            <SubmitButton title="Add Program" />
+            <Picker
+              icon="format-list-bulleted-type"
+              items={tenuralStatus}
+              name="lib_tenuralstatus_id"
+              PickerItemComponent={PickerItem}
+              placeholder="Tenural status"
+              setOther={setOtherTenuralStatus}
+            />
+
+            {otherTenuralStatus && (
+              <FormField
+                autoCorrect={false}
+                icon="home-import-outline"
+                name="otherTenuralStatusval"
+                placeholder="Add other type of program"
+              />
+            )}
+
+            <SwitchInput
+              icon="accusoft"
+              name="tbl_livelihoodiswithinsurance"
+              placeholder="Livelihood is with insrance"
+            />
+            <SubmitButton title="Add Livelihood" />
           </Form>
         </ScrollView>
       </Screen>
@@ -295,4 +335,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddProgramScreen;
+export default AddLivelihood;

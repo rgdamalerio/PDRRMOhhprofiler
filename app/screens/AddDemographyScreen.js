@@ -51,7 +51,7 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler17.db");
+const db = SQLite.openDatabase("hhprofiler18.db");
 
 function AddDemographyScreen({ navigation, route }) {
   //const [householdid, sethouseholdid] = useState(route.params.id);
@@ -536,8 +536,6 @@ function AddDemographyScreen({ navigation, route }) {
         >
           <TouchableHighlight
             style={{
-              //flex: 1,
-              //flexDirection: "row",
               ...styles.openButton,
               alignSelf: "flex-start",
               backgroundColor: "#ff5252",
@@ -545,7 +543,9 @@ function AddDemographyScreen({ navigation, route }) {
               marginBottom: 15,
             }}
             onPress={() => {
-              setModalVisible(!modalVisible);
+              navigation.navigate("Livelihood", {
+                id: householdid,
+              });
             }}
           >
             <Text style={styles.textStyle}>Skip</Text>
