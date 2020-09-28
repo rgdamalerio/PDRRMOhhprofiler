@@ -4,6 +4,7 @@ import { View, Text } from "react-native";
 import { Asset } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
 import { AppLoading } from "expo";
+import * as SQLite from "expo-sqlite";
 
 import RegisterScreens from "./app/screens/RegisterScreen";
 import RespondentScreen from "./app/screens/RespondentScreen";
@@ -12,6 +13,7 @@ import WelcomeScreen from "./app/screens/WelcomeScreen";
 import LoginScreen from "./app/screens/LoginScreen";
 import ProfilerScreen from "./app/screens/ProfilerScreen";
 import Household from "./app/screens/HouseholdScreen";
+import AddDemographyScreen from "./app/screens/AddDemographyScreen";
 import CameraInput from "./app/components/CameraInput";
 import LocationInput from "./app/components/LocationInput";
 import DateInput from "./app/components/DateInput";
@@ -22,10 +24,22 @@ import AppNavigator from "./app/navigation/AppNavigator";
 import AuthNavigator from "./app/navigation/AuthNavigator";
 import AuthContext from "./app/auth/context";
 import authStorage from "./app/auth/storage";
+import ActivityIndicator from "./app/components/ActivityIndicator";
+const databaseName = "hhprofiler.db";
 
 async function removeDatabase() {
-  const sqlDir = FileSystem.documentDirectory + "SQLite/";
+  const sqlDir = `${FileSystem.documentDirectory}SQLite/`;
   await FileSystem.deleteAsync(sqlDir + "hhprofiler.db", {
+    idempotent: true,
+  })
+    .then(() => {
+      console.log("Finished deleting ");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+
+  await FileSystem.deleteAsync(sqlDir + "database.db-journal", {
     idempotent: true,
   })
     .then(() => {
@@ -54,9 +68,12 @@ const checkDatabaseExist = async () => {
 export default function App() {
   const [user, setUser] = useState();
   const [isReady, setIsReady] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const startup = () => {
-    openDatabaseIShipWithApp();
+    //removeDatabase();
+    //penDatabaseIShipWithApp();
+    openDatabase();
     restoreUser();
   };
 
@@ -66,26 +83,38 @@ export default function App() {
     setUser(user);
   };
 
-  const openDatabaseIShipWithApp = async () => {
-    const sqlDir = FileSystem.documentDirectory + "SQLite/";
-    const internalDbName = "hhprofiler.db"; // Call whatever you want
-    if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
-      await FileSystem.makeDirectoryAsync(sqlDir, { intermediates: true });
-      const asset = Asset.fromModule(
-        require("./app/assets/database/hhprofiler.db")
-      ).uri;
-      await FileSystem.downloadAsync(
-        //"https://github.com/rgdamalerio/PDRRMOhhprofiler/raw/RefactorProfiler/app/assets/database/hhprofiler.db",
-        asset,
-        sqlDir + internalDbName
-      )
-        .then(({ uri }) => {
-          console.log("Finished downloading to " + uri);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    } else console.log("human na download");
+  const openDatabase = async () => {
+    try {
+      await FileSystem.makeDirectoryAsync(
+        `${FileSystem.documentDirectory}SQLite`,
+        {
+          intermediates: true,
+        }
+      );
+      const localDatabase = await FileSystem.getInfoAsync(
+        `${FileSystem.documentDirectory}SQLite/hhprofiler17.db`
+      );
+      if (!localDatabase.exists) {
+        FileSystem.downloadAsync(
+          Asset.fromModule(require("./app/assets/database/" + databaseName))
+            .uri,
+          `${FileSystem.documentDirectory}SQLite/hhprofiler17.db`
+        )
+          .then(({ uri }) => {
+            console.log("Database copy to : " + uri);
+            setLoading(true);
+          })
+          .catch((error) => {
+            console.log("Database copy error : " + error);
+          });
+      } else {
+        console.log("Database exist");
+        setLoading(true);
+      }
+    } catch (error) {
+      console.log("Error : " + error);
+      setLoading(true);
+    }
   };
 
   if (!isReady)
@@ -95,21 +124,33 @@ export default function App() {
 
   //checkDatabaseExist();
 
-  return (
-    <AuthContext.Provider value={{ user, setUser }}>
+  {
+    if (!loading) return <ActivityIndicator visible={true} />;
+    return (
+      <AuthContext.Provider value={{ user, setUser }}>
+        <NavigationContainer theme={navigationTheme}>
+          {user ? <AppNavigator /> : <AuthNavigator />}
+        </NavigationContainer>
+      </AuthContext.Provider>
+    );
+  }
+
+  //return (
+
+  /*<AuthContext.Provider value={{ user, setUser }}>
       <NavigationContainer theme={navigationTheme}>
         {user ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>
-    </AuthContext.Provider>
+    </AuthContext.Provider>*/
 
-    /*
+  /*
     <LocationInput
       name="coordinates"
       icon="add-location"
       placeholder="coordinates"
       width="50%"
     />*/
-    /*<DateInput
+  /*<DateInput
       name="yearconstract"
       icon="date"
       placeholder="Year construct"
@@ -119,6 +160,10 @@ export default function App() {
       //datevalue
       year
     />*/
-    /*<Household />*/
-  );
+
+  /*return (
+    <View>
+      <Text>Test</Text>
+    </View>
+  );*/
 }

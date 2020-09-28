@@ -6,6 +6,7 @@ import * as MediaLibrary from "expo-media-library";
 
 import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
+import ActivityIndicator from "../components/ActivityIndicator";
 import {
   AppForm as Form,
   AppFormField as FormField,
@@ -16,7 +17,6 @@ import {
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 const validationSchema = Yup.object().shape({
-  /*
   fname: Yup.string().required().label("First Name"),
   lname: Yup.string().required().label("Last Name"),
   phoneNumber: Yup.string()
@@ -28,17 +28,21 @@ const validationSchema = Yup.object().shape({
   brgy: Yup.string().required().label("Barangay"),
   email: Yup.string().required().email().label("Email"),
   password: Yup.string().required().min(4).label("Password"),
-  */
 });
-
-const db = SQLite.openDatabase("hhprofiler.db");
+const db = SQLite.openDatabase("hhprofiler17.db");
 
 function RegisterScreen({ navigation }) {
+  const [loading, setLoading] = useState(false);
+  const [asset, setAsset] = useState();
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
 
   useEffect(() => {
+    getProvince();
+  }, []);
+
+  const getProvince = () => {
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -59,9 +63,18 @@ function RegisterScreen({ navigation }) {
         );
       }
     );
-  }, []);
+  };
+
+  const handleProvChange = (munvalue) => {
+    setMun(munvalue);
+  };
+
+  const handleMunChange = (brgyvalue) => {
+    setBrgy(brgyvalue);
+  };
 
   const handleSubmit = (data) => {
+    setLoading(true);
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -91,6 +104,7 @@ function RegisterScreen({ navigation }) {
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
+              if (data.image) createAlbum(data.image);
               Alert.alert(
                 "Success",
                 "You are Registered Successfully, you can now Login to start encoding household information",
@@ -98,42 +112,44 @@ function RegisterScreen({ navigation }) {
                   {
                     text: "OK",
                     onPress: () => {
-                      if (data.image != null) createAlbum(data.image);
                       navigation.navigate("Login");
+                      setLoading(false);
                     },
                   },
                 ]
               );
-            } else alert("Registration Failed");
+            } else {
+              alert("Registration Failed");
+              setLoading(false);
+            }
           }
         );
       },
       (error) => {
-        if (
-          error.message ==
-          "UNIQUE constraint failed: tbl_enumerator.tbl_enumeratoremail (code 2067 SQLITE_CONSTRAINT_UNIQUE)"
-        ) {
-          alert("Email address already exist! Please try to use another email");
-        }
+        Alert.alert("Success", "Error: " + error);
+        setLoading(false);
       }
     );
   };
 
   const createAlbum = async (uri) => {
-    const asset = await MediaLibrary.createAssetAsync(uri);
-    MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
-      .then(() => {
-        return asset.uri;
-      })
-      .catch((error) => {
-        alert("Error saving image, Error details: " + error);
-        return null;
-      });
+    try {
+      const asset = await MediaLibrary.createAssetAsync(uri);
+      MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
+        .then(() => {
+          console.log("Album created!");
+        })
+        .catch((error) => {
+          console.log(error);
+          alert("Error saving image, Error details: " + error);
+        });
+    } catch (error) {}
   };
 
   return (
-    <Screen style={styles.container}>
-      <ScrollView>
+    <>
+      <ActivityIndicator visible={loading} />
+      <ScrollView style={styles.container}>
         <Form
           initialValues={{
             image: null,
@@ -151,6 +167,7 @@ function RegisterScreen({ navigation }) {
           validationSchema={validationSchema}
         >
           <FormCameraPicker name="image" />
+
           <FormField
             autoCorrect={false}
             icon="account"
@@ -183,8 +200,7 @@ function RegisterScreen({ navigation }) {
             name="prov"
             PickerItemComponent={PickerItem}
             placeholder="Province"
-            searchable
-            setMun={setMun}
+            setMun={handleProvChange}
           />
           <AddressPicker
             icon="earth"
@@ -192,8 +208,7 @@ function RegisterScreen({ navigation }) {
             name="mun"
             PickerItemComponent={PickerItem}
             placeholder="Municipality"
-            searchable
-            setBrgy={setBrgy}
+            setBrgy={handleMunChange}
           />
           <AddressPicker
             icon="earth"
@@ -201,7 +216,6 @@ function RegisterScreen({ navigation }) {
             name="brgy"
             PickerItemComponent={PickerItem}
             placeholder="Barangay"
-            searchable
             setbrgyValue
           />
           <FormField
@@ -225,7 +239,7 @@ function RegisterScreen({ navigation }) {
           <SubmitButton title="Register" />
         </Form>
       </ScrollView>
-    </Screen>
+    </>
   );
 }
 

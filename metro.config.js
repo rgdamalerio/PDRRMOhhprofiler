@@ -3,6 +3,6 @@ const defaultAssetExts = require("metro-config/src/defaults/defaults")
 
 module.exports = {
   resolver: {
-    assetExts: [...defaultAssetExts, "db", "sqlite"],
+    assetExts: [...defaultAssetExts, "db"],
   },
 };

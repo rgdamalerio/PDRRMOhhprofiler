@@ -23,7 +23,7 @@ function DateInput({
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    setDate(new Date(1598051730000));
+    setDate(new Date());
   }, []);
 
   const onChange = (event, selectedDate) => {
@@ -53,7 +53,12 @@ function DateInput({
               {year && datevalue.getFullYear()}
               {month && datevalue.getMonth()}
               {day && datevalue.getDate()}
-              {fullDate && datevalue.getDate()}
+              {fullDate &&
+                datevalue.getMonth() +
+                  "/" +
+                  datevalue.getDate() +
+                  "/" +
+                  datevalue.getFullYear()}
             </Text>
           ) : (
             <Text style={styles.placeholder}>{placeholder}</Text>

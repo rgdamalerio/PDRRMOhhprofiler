@@ -19,6 +19,7 @@ import {
   SubmitButton,
 } from "../components/forms";
 import SwitchInput from "../components/SwitchInput";
+import ActivityIndicator from "../components/ActivityIndicator";
 import useAuth from "../auth/useAuth";
 
 const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
@@ -36,15 +37,17 @@ const validationSchema = Yup.object().shape({
   beadroom: Yup.number().label("Number of bedrooms"),
   storeys: Yup.number().required().label("Number of Storey"),
   wallmaterial: Yup.string().required().label("Wall material"),
-  otherevacuation: Yup.string().when("evacuationarea.id", {
-    is: 9,
+  evacuationarea: Yup.object().nullable(),
+  otherevacuation: Yup.string().when("evacuationarea.label", {
+    is: "Other, Please specify",
     then: Yup.string().required().label("Add other evacuation"),
   }), //adjust this if there is item added to evacuation area library
 });
 
-const db = SQLite.openDatabase("hhprofiler.db");
+const db = SQLite.openDatabase("hhprofiler17.db");
 
 function ProfilerScreen({ navigation }) {
+  const [loading, setLoading] = useState(false);
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
@@ -97,6 +100,14 @@ function ProfilerScreen({ navigation }) {
         );
       }
     );
+  };
+
+  const handleProvChange = (munvalue) => {
+    setMun(munvalue);
+  };
+
+  const handleMunChange = (brgyvalue) => {
+    setBrgy(brgyvalue);
   };
 
   const gettypeBuilding = () => {
@@ -277,22 +288,8 @@ function ProfilerScreen({ navigation }) {
     setDate(d);
   };
 
-  const parseYear = (date) => {
-    try {
-      return date.getFullYear();
-    } catch (error) {
-      return "";
-    }
-  };
-
   const handleSubmit = (data, resetForm) => {
-    let filename = null;
-
-    if (data.image != null) {
-      const res = data.image.split("/");
-      filename = res[res.length - 1];
-    }
-
+    setLoading(true);
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -332,7 +329,7 @@ function ProfilerScreen({ navigation }) {
             String(date),
             data.coordinates != null ? data.coordinates.latitude : "",
             data.coordinates != null ? data.coordinates.longitude : "",
-            parseYear(data.yearconstract),
+            data.yearconstract,
             data.cost,
             data.beadroom,
             data.storeys,
@@ -355,90 +352,88 @@ function ProfilerScreen({ navigation }) {
             data.accesstelecommunication ? 1 : 0,
             data.accessdrillsimulation ? 1 : 0,
             data.purok,
-            filename,
+            data.image,
             data.respondentname,
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
               const insertId = results.insertId; //set newly inserted id
 
-              if (data.evacuationarea.id == 9) {
-                db.transaction((tx) => {
-                  tx.executeSql(
-                    "INSERT INTO tbl_addOtherEvacuation (" +
-                      "tbl_addOtherEvacuationLocation," +
-                      "created_at," +
-                      "created_by," +
-                      "updated_at," +
-                      "updated_by," +
-                      "tbl_household_id" +
-                      ") values (?,?,?,?,?,?)",
-                    [
-                      data.otherevacuation,
-                      String(date),
-                      user.idtbl_enumerator,
-                      String(date),
-                      user.idtbl_enumerator,
-                      user.idtbl_enumerator,
-                    ],
-                    (tx, results) => {
-                      Alert.alert(
-                        "Success",
-                        "Household and evacuation location information save, do you want to add more household?",
-                        [
-                          {
-                            text: "No",
-                            onPress: () => {
-                              createAlbum(data.image);
-                              resetForm({ data: "" });
-                              navigation.navigate("AnimatedMap", {
-                                id: insertId,
-                              });
+              if (data.evacuationarea.id == evacuationarea.length) {
+                db.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE lib_hhevacuationarea SET lib_heaname = ? where id = ?",
+                      [data.otherevacuation, evacuationarea.length],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO lib_hhevacuationarea (" +
+                                  "id," +
+                                  "lib_heaname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?,?)",
+                                [
+                                  evacuationarea.length + 1,
+                                  "Other, Please specify",
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    getEvacuationareas();
+                                    setOtherEvacuation(false);
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new evacuation area item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
                             },
-                          },
-                          {
-                            text: "Yes",
-                            onPress: () => {
-                              createAlbum(data.image);
-                              resetForm({ data: "" });
-                            },
-                          },
-                        ]
-                      );
-                    }
-                  );
-                });
+                            (error) => {
+                              Alert.alert("Error", error);
+                            }
+                          );
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in evacuation area failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    Alert.alert("Error", error);
+                  }
+                );
               }
 
-              Alert.alert(
-                "Success",
-                "Household information save. do you want to add more household?",
-                [
-                  {
-                    text: "No",
-                    onPress: () => {
-                      createAlbum(data.image);
-                      resetForm({ data: "" });
-                      navigation.navigate("AnimatedMap", {
-                        id: insertId,
-                      });
-                    },
-                  },
-                  {
-                    text: "Yes",
-                    onPress: () => {
-                      createAlbum(data.image);
-                      resetForm({ data: "" });
-                    },
-                  },
-                ]
-              );
-            } else alert("Adding household information Failed");
+              createAlbum(data.image);
+              setLoading(false);
+              resetForm({ data: "" });
+              navigation.navigate("Program", {
+                id: insertId,
+              });
+            } else {
+              setLoading(false);
+              alert("Adding household information Failed");
+            }
           }
         );
       },
       (error) => {
-        console.log("Error: " + error.message);
+        setLoading(false);
+        alert("Database Error: " + error.message);
       }
     );
   };
@@ -458,8 +453,9 @@ function ProfilerScreen({ navigation }) {
   };
 
   return (
-    <Screen style={styles.container}>
-      <ScrollView>
+    <>
+      <ActivityIndicator visible={loading} />
+      <ScrollView style={styles.container}>
         <Form
           initialValues={{
             respondentname: "",
@@ -506,8 +502,7 @@ function ProfilerScreen({ navigation }) {
             name="prov"
             PickerItemComponent={PickerItem}
             placeholder="Province"
-            searchable
-            setMun={setMun}
+            setMun={handleProvChange}
           />
           <AddressPicker
             icon="earth"
@@ -515,8 +510,7 @@ function ProfilerScreen({ navigation }) {
             name="mun"
             PickerItemComponent={PickerItem}
             placeholder="Municipality"
-            searchable
-            setBrgy={setBrgy}
+            setBrgy={handleMunChange}
           />
           <AddressPicker
             icon="earth"
@@ -524,7 +518,7 @@ function ProfilerScreen({ navigation }) {
             name="brgy"
             PickerItemComponent={PickerItem}
             placeholder="Barangay"
-            searchable
+            //searchable
             setbrgyValue
           />
 
@@ -559,14 +553,13 @@ function ProfilerScreen({ navigation }) {
             placeholder="Tenural Status"
           />
 
-          <FormDatePicker
+          <FormField
+            autoCorrect={false}
             name="yearconstract"
-            icon="date"
+            icon="calendar"
             placeholder="Year construct"
-            width="50%"
-            display="spinner"
-            mode="date"
-            year
+            width="75%"
+            keyboardType="number-pad"
           />
 
           <FormField
@@ -690,13 +683,19 @@ function ProfilerScreen({ navigation }) {
           <SubmitButton title="Save" />
         </Form>
       </ScrollView>
-    </Screen>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+    //justifyContent: "center",
+    textAlign: "center",
     padding: 10,
+  },
+  spinnerTextStyle: {
+    color: "#FFF",
   },
 });
 
