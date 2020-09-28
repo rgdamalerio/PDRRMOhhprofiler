@@ -20,6 +20,8 @@ import {
   SubmitButton,
 } from "../components/forms";
 
+import SwitchInput from "../components/SwitchInput";
+
 const validationSchema = Yup.object().shape({});
 
 const db = SQLite.openDatabase("hhprofiler18.db");
@@ -30,6 +32,7 @@ function AddLivelihood({ navigation, route }) {
   const [typelivelihood, setTypelivelihood] = useState([]);
   const [tenuralStatus, setTenuralStatus] = useState([]);
   const [otherTenuralStatus, setOtherTenuralStatus] = useState(false);
+  const [date, setDate] = useState(new Date());
   const { user } = useAuth();
 
   useEffect(() => {
@@ -104,7 +107,7 @@ function AddLivelihood({ navigation, route }) {
             "updated_by" +
             ") values (?,?,?,?,?,?,?,?,?,?,?)",
           [
-            data.lib_typeoflivelihood,
+            data.lib_typeoflivelihood.id,
             route.params.id,
             data.tbl_livelihoodmarketvalue,
             data.tbl_livelihoodtotalarea,
@@ -186,7 +189,7 @@ function AddLivelihood({ navigation, route }) {
                     onPress: () => {
                       setLoading(false);
                       resetForm({ data: "" });
-                      navigation.navigate("Demography", {
+                      navigation.navigate("Profiler", {
                         id: householdid,
                       });
                     },
@@ -217,103 +220,101 @@ function AddLivelihood({ navigation, route }) {
   return (
     <>
       <ActivityIndicator visible={loading} />
-      <Screen style={styles.container}>
-        <ScrollView>
-          <Form
-            initialValues={{
-              lib_typeoflivelihood: 0,
-              tbl_household_id: route.params.id,
-              tbl_livelihoodmarketvalue: 0,
-              tbl_livelihoodtotalarea: 0,
-              tbl_livelihoodproducts: "",
-              lib_tenuralstatus_id: 0,
-              otherTenuralStatusval: "",
-              tbl_livelihoodiswithinsurance: 0,
-              created_at: String(new Date()),
-              updated_at: String(new Date()),
-              created_by: user.idtbl_enumerator,
-              updated_by: user.idtbl_enumerator,
+      <ScrollView style={styles.container}>
+        <Form
+          initialValues={{
+            lib_typeoflivelihood: 0,
+            tbl_household_id: route.params.id,
+            tbl_livelihoodmarketvalue: 0,
+            tbl_livelihoodtotalarea: 0,
+            tbl_livelihoodproducts: "",
+            lib_tenuralstatus_id: 0,
+            otherTenuralStatusval: "",
+            tbl_livelihoodiswithinsurance: 0,
+            created_at: String(new Date()),
+            updated_at: String(new Date()),
+            created_by: user.idtbl_enumerator,
+            updated_by: user.idtbl_enumerator,
+          }}
+          onSubmit={(values, { resetForm }) => {
+            handleSubmit(values, resetForm);
+          }}
+          validationSchema={validationSchema}
+        >
+          <TouchableHighlight
+            style={{
+              ...styles.openButton,
+              alignSelf: "flex-start",
+              backgroundColor: "#ff5252",
+              marginTop: 15,
+              marginBottom: 15,
             }}
-            onSubmit={(values, { resetForm }) => {
-              handleSubmit(values, resetForm);
+            onPress={() => {
+              navigation.navigate("Profiler");
             }}
-            validationSchema={validationSchema}
           >
-            <TouchableHighlight
-              style={{
-                ...styles.openButton,
-                alignSelf: "flex-start",
-                backgroundColor: "#ff5252",
-                marginTop: 15,
-                marginBottom: 15,
-              }}
-              onPress={() => {
-                navigation.navigate("Profiler");
-              }}
-            >
-              <Text style={styles.textStyle}>Skip</Text>
-            </TouchableHighlight>
+            <Text style={styles.textStyle}>Skip</Text>
+          </TouchableHighlight>
 
-            <Picker
-              icon="format-list-bulleted-type"
-              items={typelivelihood}
-              name="lib_typeoflivelihood"
-              PickerItemComponent={PickerItem}
-              placeholder="Type of Livelihood"
-            />
+          <Picker
+            icon="format-list-bulleted-type"
+            items={typelivelihood}
+            name="lib_typeoflivelihood"
+            PickerItemComponent={PickerItem}
+            placeholder="Type of Livelihood"
+          />
 
+          <FormField
+            autoCorrect={false}
+            icon="cash"
+            name="tbl_livelihoodmarketvalue"
+            placeholder="Livelihood market value"
+            width="75%"
+            keyboardType="number-pad"
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="bookmark-plus-outline"
+            name="tbl_livelihoodtotalarea"
+            placeholder="Livelihood total area"
+            width="75%"
+            keyboardType="number-pad"
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="alpha-p"
+            name="tbl_livelihoodproducts"
+            placeholder="Product name"
+          />
+
+          <Picker
+            icon="format-list-bulleted-type"
+            items={tenuralStatus}
+            name="lib_tenuralstatus_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Tenural status"
+            setOther={setOtherTenuralStatus}
+          />
+
+          {otherTenuralStatus && (
             <FormField
               autoCorrect={false}
-              icon="cash"
-              name="tbl_livelihoodmarketvalue"
-              placeholder="Livelihood market value"
-              width="75%"
-              keyboardType="number-pad"
+              icon="home-import-outline"
+              name="otherTenuralStatusval"
+              placeholder="Add other type of program"
             />
+          )}
 
-            <FormField
-              autoCorrect={false}
-              icon="bookmark-plus-outline"
-              name="tbl_livelihoodtotalarea"
-              placeholder="Livelihood total area"
-              width="75%"
-              keyboardType="number-pad"
-            />
-
-            <FormField
-              autoCorrect={false}
-              icon="alpha-p"
-              name="tbl_livelihoodproducts"
-              placeholder="Product name"
-            />
-
-            <Picker
-              icon="format-list-bulleted-type"
-              items={tenuralStatus}
-              name="lib_tenuralstatus_id"
-              PickerItemComponent={PickerItem}
-              placeholder="Tenural status"
-              setOther={setOtherTenuralStatus}
-            />
-
-            {otherTenuralStatus && (
-              <FormField
-                autoCorrect={false}
-                icon="home-import-outline"
-                name="otherTenuralStatusval"
-                placeholder="Add other type of program"
-              />
-            )}
-
-            <SwitchInput
-              icon="accusoft"
-              name="tbl_livelihoodiswithinsurance"
-              placeholder="Livelihood is with insrance"
-            />
-            <SubmitButton title="Add Livelihood" />
-          </Form>
-        </ScrollView>
-      </Screen>
+          <SwitchInput
+            icon="accusoft"
+            name="tbl_livelihoodiswithinsurance"
+            placeholder="Livelihood is with insurance"
+          />
+          <SubmitButton title="Add Livelihood" />
+        </Form>
+      </ScrollView>
     </>
   );
 }

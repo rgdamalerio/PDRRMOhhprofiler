@@ -67,7 +67,7 @@ function AddDemographyScreen({ navigation, route }) {
   const [gradelvl, setGradelvl] = useState([]);
   const [tscshvc, setTscshvc] = useState([]);
   const [income, setIncome] = useState([]);
-  const [date, setDate] = useState(new Date(1598051730000));
+  const [date, setDate] = useState(new Date());
   const { user } = useAuth();
 
   useEffect(() => {
@@ -465,7 +465,7 @@ function AddDemographyScreen({ navigation, route }) {
                     text: "No",
                     onPress: () => {
                       setLoading(false);
-                      navigation.navigate("Demography", {
+                      navigation.navigate("Livelihood", {
                         id: householdid,
                       });
                     },
