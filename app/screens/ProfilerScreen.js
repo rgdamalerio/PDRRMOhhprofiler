@@ -44,7 +44,7 @@ const validationSchema = Yup.object().shape({
   }), //adjust this if there is item added to evacuation area library
 });
 
-const db = SQLite.openDatabase("hhprofiler18.db");
+const db = SQLite.openDatabase("hhprofiler20.db");
 
 function ProfilerScreen({ navigation }) {
   const [loading, setLoading] = useState(false);

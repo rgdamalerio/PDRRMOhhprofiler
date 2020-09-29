@@ -17,7 +17,7 @@ import defaultStyles from "../config/styles";
 import PickerItem from "./PickerItem";
 import Screen from "./Screen";
 
-const db = SQLite.openDatabase("hhprofiler18.db");
+const db = SQLite.openDatabase("hhprofiler20.db");
 
 function AddressPicker({
   icon,

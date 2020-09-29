@@ -22,9 +22,11 @@ import {
 
 import SwitchInput from "../components/SwitchInput";
 
-const validationSchema = Yup.object().shape({});
+const validationSchema = Yup.object().shape({
+  lib_typeoflivelihood: Yup.string().required().label("Type of livelihood"),
+});
 
-const db = SQLite.openDatabase("hhprofiler18.db");
+const db = SQLite.openDatabase("hhprofiler20.db");
 
 function AddLivelihood({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
@@ -112,7 +114,7 @@ function AddLivelihood({ navigation, route }) {
             data.tbl_livelihoodmarketvalue,
             data.tbl_livelihoodtotalarea,
             data.tbl_livelihoodproducts,
-            data.lib_tenuralstatus_id,
+            data.lib_tenuralstatus_id.id,
             data.tbl_livelihoodiswithinsurance,
             String(date),
             String(date),
@@ -125,16 +127,16 @@ function AddLivelihood({ navigation, route }) {
                 db.transaction(
                   (tx) => {
                     tx.executeSql(
-                      "UPDATE lib_typeofprogram SET lib_topname = ? where id = ?",
+                      "UPDATE libl_tenuralstatus SET tbl_tsname = ? where id = ?",
                       [data.otherTenuralStatusval, tenuralStatus.length],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
-                                "INSERT INTO lib_livelihood (" +
+                                "INSERT INTO libl_tenuralstatus (" +
                                   "id," +
-                                  "lib_desc," +
+                                  "tbl_tsname," +
                                   "created_at," +
                                   "created_by," +
                                   "updated_at," +
@@ -162,7 +164,7 @@ function AddLivelihood({ navigation, route }) {
                               );
                             },
                             (error) => {
-                              Alert.alert("Error", error);
+                              Alert.alert("Error", error.message);
                             }
                           );
                         } else {
@@ -175,14 +177,14 @@ function AddLivelihood({ navigation, route }) {
                     );
                   },
                   (error) => {
-                    Alert.alert("Error", error);
+                    Alert.alert("Error", error.message);
                   }
                 );
               }
 
               Alert.alert(
                 "Success",
-                "Program successfully save, do you want to add more program?",
+                "Livelihood successfully save, do you want to add more livelihood?",
                 [
                   {
                     text: "No",

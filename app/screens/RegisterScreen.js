@@ -29,7 +29,7 @@ const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
   password: Yup.string().required().min(4).label("Password"),
 });
-const db = SQLite.openDatabase("hhprofiler18.db");
+const db = SQLite.openDatabase("hhprofiler20.db");
 
 function RegisterScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -126,7 +126,7 @@ function RegisterScreen({ navigation }) {
         );
       },
       (error) => {
-        Alert.alert("Success", "Error: " + error);
+        Alert.alert("Success", "Error: " + error.message);
         setLoading(false);
       }
     );
@@ -136,11 +136,8 @@ function RegisterScreen({ navigation }) {
     try {
       const asset = await MediaLibrary.createAssetAsync(uri);
       MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
-        .then(() => {
-          console.log("Album created!");
-        })
+        .then(() => {})
         .catch((error) => {
-          console.log(error);
           alert("Error saving image, Error details: " + error);
         });
     } catch (error) {}

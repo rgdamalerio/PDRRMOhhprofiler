@@ -51,7 +51,7 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler18.db");
+const db = SQLite.openDatabase("hhprofiler20.db");
 
 function AddDemographyScreen({ navigation, route }) {
   //const [householdid, sethouseholdid] = useState(route.params.id);
@@ -438,7 +438,8 @@ function AddDemographyScreen({ navigation, route }) {
                             },
                             (error) => {
                               console.log(
-                                "Error in INSERT INTO lib_disability" + error
+                                "Error in INSERT INTO lib_disability" +
+                                  error.message
                               );
                             }
                           );
@@ -452,7 +453,7 @@ function AddDemographyScreen({ navigation, route }) {
                     );
                   },
                   (error) => {
-                    Alert.alert("Error", error);
+                    Alert.alert("Error", error.message);
                   }
                 );
               }

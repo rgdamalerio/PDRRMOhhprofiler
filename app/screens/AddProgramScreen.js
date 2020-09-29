@@ -31,7 +31,7 @@ const validationSchema = Yup.object().shape({
   programEmplementer: Yup.string().required().label("Program emplementer"),
 });
 
-const db = SQLite.openDatabase("hhprofiler18.db");
+const db = SQLite.openDatabase("hhprofiler20.db");
 
 function AddProgramScreen({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
@@ -139,7 +139,7 @@ function AddProgramScreen({ navigation, route }) {
                               );
                             },
                             (error) => {
-                              Alert.alert("Error", error);
+                              Alert.alert("Error", error.message);
                             }
                           );
                         } else {
@@ -152,7 +152,7 @@ function AddProgramScreen({ navigation, route }) {
                     );
                   },
                   (error) => {
-                    Alert.alert("Error", error);
+                    Alert.alert("Error", error.message);
                   }
                 );
               }
