@@ -169,13 +169,13 @@ function RegisterScreen({ navigation }) {
             autoCorrect={false}
             icon="account"
             name="fname"
-            placeholder="First Name"
+            placeholder="First Name *"
           />
           <FormField
             autoCorrect={false}
             icon="account"
             name="lname"
-            placeholder="Last Name"
+            placeholder="Last Name *"
           />
           <FormField
             autoCorrect={false}
@@ -187,7 +187,7 @@ function RegisterScreen({ navigation }) {
             autoCorrect={false}
             icon="phone"
             name="phoneNumber"
-            placeholder="Phone number"
+            placeholder="Phone number *"
             width={320}
             keyboardType="number-pad"
           />
@@ -196,7 +196,7 @@ function RegisterScreen({ navigation }) {
             items={pro}
             name="prov"
             PickerItemComponent={PickerItem}
-            placeholder="Province"
+            placeholder="Province  *"
             setMun={handleProvChange}
           />
           <AddressPicker
@@ -204,7 +204,7 @@ function RegisterScreen({ navigation }) {
             items={mun}
             name="mun"
             PickerItemComponent={PickerItem}
-            placeholder="Municipality"
+            placeholder="Municipality *"
             setBrgy={handleMunChange}
           />
           <AddressPicker
@@ -212,7 +212,7 @@ function RegisterScreen({ navigation }) {
             items={brgy}
             name="brgy"
             PickerItemComponent={PickerItem}
-            placeholder="Barangay"
+            placeholder="Barangay *"
             setbrgyValue
           />
           <FormField
@@ -221,7 +221,7 @@ function RegisterScreen({ navigation }) {
             icon="email"
             keyboardType="email-address"
             name="email"
-            placeholder="Email"
+            placeholder="Email *"
             textContentType="emailAddress"
           />
           <FormField
@@ -229,7 +229,7 @@ function RegisterScreen({ navigation }) {
             autoCorrect={false}
             icon="lock"
             name="password"
-            placeholder="Password"
+            placeholder="Password *"
             secureTextEntry
             textContentType="password"
           />

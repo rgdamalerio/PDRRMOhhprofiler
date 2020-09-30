@@ -857,12 +857,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   modalView: {
-    //margin: 20,
     backgroundColor: "white",
     borderRadius: 20,
     paddingVertical: 30,
     paddingHorizontal: 10,
-    //alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -905,7 +903,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F194FF",
   },
   moreInforDataTxt: {
-    //color: "red",
+    paddingTop: 5,
   },
 });
 

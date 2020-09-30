@@ -5,12 +5,13 @@ import {
   ScrollView,
   Alert,
   TouchableHighlight,
+  Modal,
+  View,
 } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 
 import useAuth from "../auth/useAuth";
-import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
 import ActivityIndicator from "../components/ActivityIndicator";
 import {
@@ -68,6 +69,8 @@ function AddDemographyScreen({ navigation, route }) {
   const [income, setIncome] = useState([]);
   const [nuclearfamily, setNuclearfamily] = useState([]);
   const [date, setDate] = useState(new Date());
+  const [modalVisible, setModalVisible] = useState(false);
+  const [tempData, settemData] = useState([]);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -294,6 +297,12 @@ function AddDemographyScreen({ navigation, route }) {
         );
       }
     );
+  };
+
+  const reviewInput = (data, resetForm) => {
+    settemData(data);
+    setModalVisible(true);
+    console.log(tempData);
   };
 
   const handleSubmit = (data, resetForm) => {
@@ -557,7 +566,8 @@ function AddDemographyScreen({ navigation, route }) {
             tbl_adependentofaphilhealthmember: 0,
           }}
           onSubmit={(values, { resetForm }) => {
-            handleSubmit(values, resetForm);
+            reviewInput(values, resetForm);
+            //handleSubmit(values, resetForm);
           }}
           validationSchema={validationSchema}
         >
@@ -582,13 +592,13 @@ function AddDemographyScreen({ navigation, route }) {
             autoCorrect={false}
             icon="account-outline"
             name="tbl_fname"
-            placeholder="Firstname"
+            placeholder="Firstname *"
           />
           <FormField
             autoCorrect={false}
             icon="account-outline"
             name="tbl_lname"
-            placeholder="Lastname"
+            placeholder="Lastname *"
           />
           <FormField
             autoCorrect={false}
@@ -603,12 +613,6 @@ function AddDemographyScreen({ navigation, route }) {
             placeholder="Name extension"
           />
 
-          {/*<FormField
-            autoCorrect={false}
-            icon="account-group"
-            name="lib_familybelongs_id"
-            placeholder="Nuclear family belongs to"
-          />*/}
           <Picker
             icon="account-group"
             items={nuclearfamily}
@@ -798,15 +802,59 @@ function AddDemographyScreen({ navigation, route }) {
           <SubmitButton title="Save Demography" />
         </Form>
       </ScrollView>
+      <Modal animationType="slide" transparent={true} visible={modalVisible}>
+        <View style={styles.modalView}>
+          <ScrollView>
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Address</Text>
+              </View>
+              <View
+                style={
+                  (styles.moreInforData,
+                  { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                }
+              >
+                <Text style={styles.moreInforDataTxt}>Test</Text>
+              </View>
+            </View>
+
+            <TouchableHighlight
+              style={{
+                ...styles.openButton,
+                backgroundColor: "#2196F3",
+                marginTop: 15,
+              }}
+              onPress={() => {
+                setModalVisible(!modalVisible);
+              }}
+            >
+              <Text style={styles.textStyle}>Close Information</Text>
+            </TouchableHighlight>
+          </ScrollView>
+        </View>
+      </Modal>
     </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    //padding: 10,
     paddingHorizontal: 10,
-    // backgroundColor: "#f8f4f4",
+  },
+  modalView: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingVertical: 30,
+    paddingHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   openButton: {
     backgroundColor: "#F194FF",
@@ -818,6 +866,24 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  moreInfoTable: {
+    flexDirection: "row",
+    width: "100%",
+  },
+  moreInfolabel: {
+    alignContent: "stretch",
+    width: "40%",
+    padding: 5,
+  },
+  moreInfolabeltxt: {
+    fontWeight: "bold",
+  },
+  moreInfoData: {
+    flex: 1,
+    width: "60%",
+    padding: 5,
+    backgroundColor: "#F194FF",
   },
 });
 

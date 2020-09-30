@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, ScrollView, Alert } from "react-native";
+import {
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Modal,
+  View,
+  Text,
+  TouchableHighlight,
+} from "react-native";
 import * as Random from "expo-random";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
@@ -79,6 +87,8 @@ function ProfilerScreen({ navigation }) {
     Constants.installationId + "-" + new Date().getTime()
   );
   const { user } = useAuth();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [tempData, settemData] = useState();
 
   useEffect(() => {
     getMunicipality();
@@ -298,6 +308,12 @@ function ProfilerScreen({ navigation }) {
     setDate(d);
   };
 
+  const reviewInput = (data, resetForm) => {
+    settemData(data);
+    setModalVisible(true);
+    console.log(tempData);
+  };
+
   const handleSubmit = (data, resetForm) => {
     setLoading(true);
     db.transaction(
@@ -488,7 +504,8 @@ function ProfilerScreen({ navigation }) {
             tenuralstatus: 0,
           }}
           onSubmit={(values, { resetForm }) => {
-            handleSubmit(values, resetForm);
+            reviewInput(values, resetForm);
+            //handleSubmit(values, resetForm);
           }}
           validationSchema={validationSchema}
         >
@@ -705,6 +722,498 @@ function ProfilerScreen({ navigation }) {
           <SubmitButton title="Save" />
         </Form>
       </ScrollView>
+      {tempData && (
+        <Modal animationType="slide" transparent={true} visible={modalVisible}>
+          <View style={styles.modalView}>
+            <ScrollView>
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Respondent Name</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.respondentname}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Address</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.mun.label +
+                      " " +
+                      tempData.brgy.label +
+                      " " +
+                      tempData.purok}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Coordinates</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {"Lat: "}
+                    {tempData.coordinates.latitude}
+                    {"\n"}
+                    {"Lng: "}
+                    {tempData.coordinates.longitude}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Type of Building</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.typebuilding.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Tenural Status</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tenuralstatus.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Year construct</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.yearconstract}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Estimated cost</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>{tempData.cost}</Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Number of Bedrooms
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.beadroom}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Number of Storey</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.storeys}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Has access to electricity?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.aelectricity ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Has access to internet?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.internet ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Roof material</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.roofmaterial.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Wall material</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.wallmaterial.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Has access to water?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.awater ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Has access to water?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.wpotable ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Has access to water?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.wpotable ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Tenural status of water
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.wtenuralstatus.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Level of water</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.wlvlsystem.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Do floods occure in your area?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_hhfloodsoccurinarea ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Year occured</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_hhfloodsoccurinareayear}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Do you experience evacuation duuring calamity?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_hhexperienceevacuationoncalamity
+                      ? "Yes"
+                      : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Year experienced</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_hhexperienceevacuationoncalamityyear}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Evacuation center location
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.evacuationarea.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Access to health/medical Facility?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.accessmedfacility ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Access to Telecomunications?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.accesstelecommunication ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Access to drill/simulation?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.accessdrillsimulation ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignContent: "space-between",
+                }}
+              >
+                <TouchableHighlight
+                  style={{
+                    ...styles.openButton,
+                    backgroundColor: "#2196F3",
+                    marginTop: 15,
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                  <Text style={styles.textStyle}>Cancel/Update</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                  style={{
+                    ...styles.openButton,
+                    backgroundColor: "#2196F3",
+                    marginTop: 15,
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                  <Text style={styles.textStyle}>Save Information</Text>
+                </TouchableHighlight>
+              </View>
+            </ScrollView>
+          </View>
+        </Modal>
+      )}
     </>
   );
 }
@@ -717,6 +1226,52 @@ const styles = StyleSheet.create({
   },
   spinnerTextStyle: {
     color: "#FFF",
+  },
+  modalView: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingVertical: 30,
+    paddingHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  openButton: {
+    backgroundColor: "#F194FF",
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  textStyle: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  moreInfoTable: {
+    flexDirection: "row",
+    width: "100%",
+  },
+  moreInfolabel: {
+    alignContent: "stretch",
+    width: "40%",
+    padding: 5,
+  },
+  moreInfolabeltxt: {
+    fontWeight: "bold",
+  },
+  moreInfoData: {
+    flex: 1,
+    width: "60%",
+    padding: 5,
+    backgroundColor: "#F194FF",
+  },
+  moreInforDataTxt: {
+    paddingTop: 5,
   },
 });
 
