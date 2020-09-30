@@ -31,7 +31,7 @@ const validationSchema = Yup.object().shape({
   programEmplementer: Yup.string().required().label("Program emplementer"),
 });
 
-const db = SQLite.openDatabase("hhprofiler20.db");
+const db = SQLite.openDatabase("hhprofiler21.db");
 
 function AddProgramScreen({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
@@ -234,7 +234,7 @@ function AddProgramScreen({ navigation, route }) {
               items={typeprogram}
               name="typeProgram"
               PickerItemComponent={PickerItem}
-              placeholder="Type of Program"
+              placeholder="Type of Program *"
               setOther={setOtherTypeprogram}
             />
 
@@ -243,7 +243,7 @@ function AddProgramScreen({ navigation, route }) {
                 autoCorrect={false}
                 icon="playlist-edit"
                 name="otherTypeprogramval"
-                placeholder="Add other type of program"
+                placeholder="Add other type of program *"
               />
             )}
 
@@ -251,7 +251,7 @@ function AddProgramScreen({ navigation, route }) {
               autoCorrect={false}
               icon="alpha-p"
               name="programname"
-              placeholder="Name of Program"
+              placeholder="Name of Program *"
             />
 
             <FormField
@@ -267,7 +267,7 @@ function AddProgramScreen({ navigation, route }) {
               autoCorrect={false}
               icon="alpha-p"
               name="programEmplementer"
-              placeholder="Program Implementor"
+              placeholder="Program Implementor *"
             />
 
             <SubmitButton title="Add Program" />

@@ -47,7 +47,7 @@ function AccountScreen({ navigation }) {
             user.tbl_imagepath === null
               ? require("../assets/user.png")
               : {
-                  uri: user.tbl_imagepath,
+                  uri: "file:///storage/emulated/0/PDRRMOProfiler/" + filename,
                 }
           }
         />

@@ -17,7 +17,7 @@ import defaultStyles from "../config/styles";
 import PickerItem from "./PickerItem";
 import Screen from "./Screen";
 
-const db = SQLite.openDatabase("hhprofiler20.db");
+const db = SQLite.openDatabase("hhprofiler21.db");
 
 function AddressPicker({
   icon,
@@ -71,7 +71,7 @@ function AddressPicker({
         </View>
       </TouchableOpacity>
       <Modal visible={modalVisible} animationType="slide">
-        <Screen style={{ marginTop: -12 }}>
+        <Screen style={styles.modalContainer}>
           <Button title="Close" onPress={() => setModalVisible(false)} />
           {searchable && (
             <SearchBar
@@ -189,6 +189,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 15,
     marginVertical: 10,
+  },
+  modalContainer: {
+    marginTop: -12,
+    marginBottom: 15,
   },
   icon: {
     marginRight: 10,

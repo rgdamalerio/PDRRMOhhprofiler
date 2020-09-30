@@ -10,7 +10,6 @@ import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 
 import useAuth from "../auth/useAuth";
-import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
 import ActivityIndicator from "../components/ActivityIndicator";
 import {
@@ -24,16 +23,21 @@ import SwitchInput from "../components/SwitchInput";
 
 const validationSchema = Yup.object().shape({
   lib_typeoflivelihood: Yup.string().required().label("Type of livelihood"),
+  lib_tenuralstatus_id: Yup.object().nullable(),
+  otherTenuralStatusval: Yup.string().when("lib_tenuralstatus_id.label", {
+    is: "Other, Please specify",
+    then: Yup.string().required().label("Add other Tenural status"),
+  }),
 });
 
-const db = SQLite.openDatabase("hhprofiler20.db");
+const db = SQLite.openDatabase("hhprofiler21.db");
 
 function AddLivelihood({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
   const [loading, setLoading] = useState(false);
   const [typelivelihood, setTypelivelihood] = useState([]);
   const [tenuralStatus, setTenuralStatus] = useState([]);
-  const [otherTenuralStatus, setOtherTenuralStatus] = useState(false);
+  //const [otherTenuralstatus, setOtherTenuralstatus] = useState(false);
   const [date, setDate] = useState(new Date());
   const { user } = useAuth();
 
@@ -131,6 +135,7 @@ function AddLivelihood({ navigation, route }) {
                       [data.otherTenuralStatusval, tenuralStatus.length],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
+                          console.log("Update success:" + results);
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
@@ -152,8 +157,11 @@ function AddLivelihood({ navigation, route }) {
                                 ],
                                 (tx, results) => {
                                   if (results.rowsAffected > 0) {
+                                    console.log(
+                                      "Add tenural success:" + results
+                                    );
                                     getTenuralStatus();
-                                    setOtherTenuralStatus(false);
+                                    //setOtherTenuralStatus(false);
                                   } else {
                                     Alert.alert(
                                       "Error",
@@ -181,7 +189,7 @@ function AddLivelihood({ navigation, route }) {
                   }
                 );
               }
-
+              resetForm({ data: "" });
               Alert.alert(
                 "Success",
                 "Livelihood successfully save, do you want to add more livelihood?",
@@ -190,7 +198,6 @@ function AddLivelihood({ navigation, route }) {
                     text: "No",
                     onPress: () => {
                       setLoading(false);
-                      resetForm({ data: "" });
                       navigation.navigate("Profiler", {
                         id: householdid,
                       });
@@ -199,7 +206,6 @@ function AddLivelihood({ navigation, route }) {
                   {
                     text: "Yes",
                     onPress: () => {
-                      resetForm({ data: "" });
                       setLoading(false);
                     },
                   },
@@ -225,7 +231,7 @@ function AddLivelihood({ navigation, route }) {
       <ScrollView style={styles.container}>
         <Form
           initialValues={{
-            lib_typeoflivelihood: 0,
+            lib_typeoflivelihood: "",
             tbl_household_id: route.params.id,
             tbl_livelihoodmarketvalue: 0,
             tbl_livelihoodtotalarea: 0,
@@ -266,6 +272,22 @@ function AddLivelihood({ navigation, route }) {
             placeholder="Type of Livelihood"
           />
 
+          <Picker
+            icon="format-list-bulleted-type"
+            items={tenuralStatus}
+            name="lib_tenuralstatus_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Tenural status"
+            //setOther={setOtherTenuralstatus}
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="home-import-outline"
+            name="otherTenuralStatusval"
+            placeholder="Add other type of program"
+          />
+
           <FormField
             autoCorrect={false}
             icon="cash"
@@ -290,24 +312,6 @@ function AddLivelihood({ navigation, route }) {
             name="tbl_livelihoodproducts"
             placeholder="Product name"
           />
-
-          <Picker
-            icon="format-list-bulleted-type"
-            items={tenuralStatus}
-            name="lib_tenuralstatus_id"
-            PickerItemComponent={PickerItem}
-            placeholder="Tenural status"
-            setOther={setOtherTenuralStatus}
-          />
-
-          {otherTenuralStatus && (
-            <FormField
-              autoCorrect={false}
-              icon="home-import-outline"
-              name="otherTenuralStatusval"
-              placeholder="Add other type of program"
-            />
-          )}
 
           <SwitchInput
             icon="accusoft"

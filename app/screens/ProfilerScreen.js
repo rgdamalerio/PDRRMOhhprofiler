@@ -26,10 +26,8 @@ const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2
 
 const validationSchema = Yup.object().shape({
   respondentname: Yup.string().required().label("Respondent Name"),
-  prov: Yup.string().required().label("Province"),
   mun: Yup.string().required().label("Municipality"),
   brgy: Yup.string().required().label("Barangay"),
-  image: Yup.string().required().nullable().label("Image"),
   coordinates: Yup.string().required().nullable().label("Coordinates"),
   typebuilding: Yup.string().required().label("Type of building"),
   yearconstract: Yup.string().label("Number of Storey"),
@@ -42,13 +40,29 @@ const validationSchema = Yup.object().shape({
     is: "Other, Please specify",
     then: Yup.string().required().label("Add other evacuation"),
   }), //adjust this if there is item added to evacuation area library
+  tbl_hhfloodsoccurinarea: Yup.boolean(),
+  tbl_hhfloodsoccurinareayear: Yup.string().when("tbl_hhfloodsoccurinarea", {
+    is: true,
+    then: Yup.string().required(
+      "Year flood occur is required when Flood occur in your area is true"
+    ),
+  }),
+  tbl_hhexperienceevacuationoncalamity: Yup.boolean(),
+  tbl_hhexperienceevacuationoncalamityyear: Yup.string().when(
+    "tbl_hhexperienceevacuationoncalamity",
+    {
+      is: true,
+      then: Yup.string().required(
+        "Year experience evacuation during calamity is required when Flood occur in your area is true"
+      ),
+    }
+  ),
 });
 
-const db = SQLite.openDatabase("hhprofiler20.db");
+const db = SQLite.openDatabase("hhprofiler21.db");
 
 function ProfilerScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
-  const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
   const [typebuilding, setTypebuilding] = useState();
@@ -67,7 +81,7 @@ function ProfilerScreen({ navigation }) {
   const { user } = useAuth();
 
   useEffect(() => {
-    getProvince();
+    getMunicipality();
     gettypeBuilding();
     gettenuralStatus();
     getroofMaterials();
@@ -79,13 +93,13 @@ function ProfilerScreen({ navigation }) {
     getDate();
   }, []);
 
-  const getProvince = () => {
+  const getMunicipality = () => {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          `select idtbl_psgc_prov AS id, tbl_psgc_provname AS label from tbl_psgc_prov`,
-          [],
-          (_, { rows: { _array } }) => setPro(_array)
+          `select idtbl_psgc_mun AS id, tbl_psgc_munname AS label from tbl_psgc_mun where tbl_psgc_prov_id_fk=?`,
+          ["PH160200000"],
+          (_, { rows: { _array } }) => setMun(_array)
         );
       },
       (error) => {
@@ -100,10 +114,6 @@ function ProfilerScreen({ navigation }) {
         );
       }
     );
-  };
-
-  const handleProvChange = (munvalue) => {
-    setMun(munvalue);
   };
 
   const handleMunChange = (brgyvalue) => {
@@ -316,14 +326,17 @@ function ProfilerScreen({ navigation }) {
             "tbl_hhwaterpotable," +
             "tbl_watertenuralstatus_id," +
             "tbl_hhlvlwatersystem_id," +
+            "tbl_hhfloodsoccurinarea," +
+            "tbl_hhfloodsoccurinareayear," +
+            "tbl_hhexperienceevacuationoncalamity," +
+            "tbl_hhexperienceevacuationoncalamityyear," +
             "tbl_evacuation_areas_id," +
             "tbl_hhhasaccesshealtmedicalfacility," +
             "tbl_hhhasaccesstelecom," +
             "tbl_hasaccessdrillsandsimulations," +
             "tbl_householdpuroksittio," +
-            "tbl_hhimage," +
             "tbl_respondent" +
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             uuid,
             String(date),
@@ -338,7 +351,7 @@ function ProfilerScreen({ navigation }) {
             user.idtbl_enumerator,
             data.brgy.id,
             data.mun.id,
-            data.prov.id,
+            "PH160200000",
             data.typebuilding.id ? data.typebuilding.id : 0,
             data.tenuralstatus.id ? data.tenuralstatus.id : 0,
             data.roofmaterial.id ? data.roofmaterial.id : 0,
@@ -347,12 +360,15 @@ function ProfilerScreen({ navigation }) {
             data.wpotable ? 1 : 0,
             data.wtenuralstatus.id ? data.wtenuralstatus.id : 0,
             data.wlvlsystem.id ? data.wlvlsystem.id : 0,
+            data.tbl_hhfloodsoccurinarea ? 1 : 0,
+            data.tbl_hhfloodsoccurinareayear,
+            data.tbl_hhexperienceevacuationoncalamity ? 1 : 0,
+            data.tbl_hhexperienceevacuationoncalamityyear,
             data.evacuationarea.id ? data.evacuationarea.id : 0,
             data.accessmedfacility ? 1 : 0,
             data.accesstelecommunication ? 1 : 0,
             data.accessdrillsimulation ? 1 : 0,
             data.purok,
-            data.image,
             data.respondentname,
           ],
           (tx, results) => {
@@ -417,8 +433,6 @@ function ProfilerScreen({ navigation }) {
                   }
                 );
               }
-
-              createAlbum(data.image);
               setLoading(false);
               resetForm({ data: "" });
               navigation.navigate("Program", {
@@ -438,20 +452,6 @@ function ProfilerScreen({ navigation }) {
     );
   };
 
-  const createAlbum = async (uri) => {
-    try {
-      const asset = await MediaLibrary.createAssetAsync(uri);
-      MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
-        .then(() => {
-          return asset.uri;
-        })
-        .catch((error) => {
-          alert("Error saving image, Error details: " + error);
-          return null;
-        });
-    } catch (error) {}
-  };
-
   return (
     <>
       <ActivityIndicator visible={loading} />
@@ -459,12 +459,10 @@ function ProfilerScreen({ navigation }) {
         <Form
           initialValues={{
             respondentname: "",
-            prov: "",
             mun: "",
             brgy: "",
             purok: "",
             coordinates: null,
-            image: null,
             typebuilding: "",
             yearconstract: 0,
             cost: 0,
@@ -478,6 +476,10 @@ function ProfilerScreen({ navigation }) {
             wpotable: false,
             wtenuralstatus: 0,
             wlvlsystem: 0,
+            tbl_hhfloodsoccurinarea: false,
+            tbl_hhfloodsoccurinareayear: "",
+            tbl_hhexperienceevacuationoncalamity: 0,
+            tbl_hhexperienceevacuationoncalamityyear: "",
             evacuationarea: 0,
             otherevacuation: "",
             accessmedfacility: false,
@@ -494,22 +496,14 @@ function ProfilerScreen({ navigation }) {
             autoCorrect={false}
             icon="account"
             name="respondentname"
-            placeholder="Respondent Name"
-          />
-          <AddressPicker
-            icon="earth"
-            items={pro}
-            name="prov"
-            PickerItemComponent={PickerItem}
-            placeholder="Province"
-            setMun={handleProvChange}
+            placeholder="Respondent Name *"
           />
           <AddressPicker
             icon="earth"
             items={mun}
             name="mun"
             PickerItemComponent={PickerItem}
-            placeholder="Municipality"
+            placeholder="Municipality *"
             setBrgy={handleMunChange}
           />
           <AddressPicker
@@ -517,8 +511,7 @@ function ProfilerScreen({ navigation }) {
             items={brgy}
             name="brgy"
             PickerItemComponent={PickerItem}
-            placeholder="Barangay"
-            //searchable
+            placeholder="Barangay *"
             setbrgyValue
           />
 
@@ -533,17 +526,16 @@ function ProfilerScreen({ navigation }) {
           <FormLocationPicker
             name="coordinates"
             icon="add-location"
-            placeholder="coordinates"
+            placeholder="coordinates *"
             width="50%"
           />
-          <FormCameraPicker name="image" />
 
           <Picker
             icon="warehouse"
             items={typebuilding}
             name="typebuilding"
             PickerItemComponent={PickerItem}
-            placeholder="Type of building"
+            placeholder="Type of building *"
           />
           <Picker
             icon="alpha-t-box"
@@ -644,6 +636,36 @@ function ProfilerScreen({ navigation }) {
             placeholder="Level of water"
           />
 
+          <SwitchInput
+            icon="water-percent"
+            name="tbl_hhfloodsoccurinarea"
+            placeholder="Do floods occure in your area?"
+          />
+
+          <FormField
+            autoCorrect={false}
+            name="tbl_hhfloodsoccurinareayear"
+            icon="calendar"
+            placeholder="Year occured"
+            width="75%"
+            keyboardType="number-pad"
+          />
+
+          <SwitchInput
+            icon="home-flood"
+            name="tbl_hhexperienceevacuationoncalamity"
+            placeholder="Do you experience evacuation during calamity ?"
+          />
+
+          <FormField
+            autoCorrect={false}
+            name="tbl_hhexperienceevacuationoncalamityyear"
+            icon="calendar"
+            placeholder="Year experienced"
+            width="75%"
+            keyboardType="number-pad"
+          />
+
           <Picker
             icon="home-flood"
             items={evacuationarea}
@@ -690,7 +712,6 @@ function ProfilerScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //justifyContent: "center",
     textAlign: "center",
     padding: 10,
   },

@@ -20,6 +20,9 @@
     },
     "web": {
       "favicon": "./app/assets/favicon.png"
+    },
+    "android": {
+      "permissions": ["WRITE_EXTERNAL_STORAGE"]
     }
   }
 }

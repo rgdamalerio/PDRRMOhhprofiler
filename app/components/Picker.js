@@ -53,7 +53,7 @@ function AppPicker({
         </View>
       </TouchableWithoutFeedback>
       <Modal visible={modalVisible} animationType="slide">
-        <Screen style={{ marginTop: -12 }}>
+        <Screen style={styles.modalContainer}>
           <Button title="Close" onPress={() => setModalVisible(false)} />
           <FlatList
             data={items}
@@ -66,12 +66,10 @@ function AppPicker({
                 onPress={() => {
                   setModalVisible(false);
                   onSelectItem(item);
-
-                  if (setOther) {
+                  if (setOther)
                     item.label == "Other, Please specify" //
                       ? setOther(true)
                       : setOther(false);
-                  }
                 }}
               />
             )}
@@ -89,6 +87,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 15,
     marginVertical: 10,
+  },
+  modalContainer: {
+    marginTop: -12,
+    marginBottom: 15,
   },
   icon: {
     marginRight: 10,

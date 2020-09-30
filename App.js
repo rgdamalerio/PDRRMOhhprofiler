@@ -24,6 +24,7 @@ import AppNavigator from "./app/navigation/AppNavigator";
 import AuthNavigator from "./app/navigation/AuthNavigator";
 import AuthContext from "./app/auth/context";
 import authStorage from "./app/auth/storage";
+import AddLivelihood from "./app/screens/AddLivelihood";
 import ActivityIndicator from "./app/components/ActivityIndicator";
 const databaseName = "hhprofiler.db";
 
@@ -92,13 +93,13 @@ export default function App() {
         }
       );
       const localDatabase = await FileSystem.getInfoAsync(
-        `${FileSystem.documentDirectory}SQLite/hhprofiler20.db`
+        `${FileSystem.documentDirectory}SQLite/hhprofiler21.db`
       );
       if (!localDatabase.exists) {
         FileSystem.downloadAsync(
           Asset.fromModule(require("./app/assets/database/" + databaseName))
             .uri,
-          `${FileSystem.documentDirectory}SQLite/hhprofiler20.db`
+          `${FileSystem.documentDirectory}SQLite/hhprofiler21.db`
         )
           .then(({ uri }) => {
             console.log("Database copy to : " + uri);
@@ -134,36 +135,4 @@ export default function App() {
       </AuthContext.Provider>
     );
   }
-
-  //return (
-
-  /*<AuthContext.Provider value={{ user, setUser }}>
-      <NavigationContainer theme={navigationTheme}>
-        {user ? <AppNavigator /> : <AuthNavigator />}
-      </NavigationContainer>
-    </AuthContext.Provider>*/
-
-  /*
-    <LocationInput
-      name="coordinates"
-      icon="add-location"
-      placeholder="coordinates"
-      width="50%"
-    />*/
-  /*<DateInput
-      name="yearconstract"
-      icon="date"
-      placeholder="Year construct"
-      width="45%"
-      display="spinner"
-      mode="date"
-      //datevalue
-      year
-    />*/
-
-  /*return (
-    <View>
-      <Text>Test</Text>
-    </View>
-  );*/
 }

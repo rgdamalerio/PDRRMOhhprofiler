@@ -51,11 +51,10 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler20.db");
+const db = SQLite.openDatabase("hhprofiler21.db");
 
 function AddDemographyScreen({ navigation, route }) {
-  //const [householdid, sethouseholdid] = useState(route.params.id);
-  const [householdid, sethouseholdid] = useState(1);
+  const [householdid, sethouseholdid] = useState(route.params.id);
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState([]);
   const [relationship, setRelationship] = useState([]);
@@ -67,6 +66,7 @@ function AddDemographyScreen({ navigation, route }) {
   const [gradelvl, setGradelvl] = useState([]);
   const [tscshvc, setTscshvc] = useState([]);
   const [income, setIncome] = useState([]);
+  const [nuclearfamily, setNuclearfamily] = useState([]);
   const [date, setDate] = useState(new Date());
   const { user } = useAuth();
 
@@ -79,7 +79,32 @@ function AddDemographyScreen({ navigation, route }) {
     _gradelvl();
     _tscshvc();
     _income();
+    _setNuclearfamily();
   }, []);
+
+  const _setNuclearfamily = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, tbl_fname || " "   || tbl_lname AS label from tbl_hhdemography where tbl_household_id = ?`,
+          [householdid],
+          (_, { rows: { _array } }) => setNuclearfamily(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading nuclear family Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
 
   const _setRelationship = () => {
     db.transaction(
@@ -312,7 +337,7 @@ function AddDemographyScreen({ navigation, route }) {
             data.tbl_lname,
             data.tbl_mname,
             data.tbl_extension,
-            data.lib_familybelongs_id,
+            data.lib_familybelongs_id.id,
             data.lib_gender_id.id,
             data.tbl_relationshiphead_id.id,
             String(data.tbl_datebirth),
@@ -475,6 +500,7 @@ function AddDemographyScreen({ navigation, route }) {
                     text: "Yes",
                     onPress: () => {
                       resetForm({ data: "" });
+                      _setNuclearfamily();
                       setLoading(false);
                     },
                   },
@@ -577,11 +603,19 @@ function AddDemographyScreen({ navigation, route }) {
             placeholder="Name extension"
           />
 
-          <FormField
+          {/*<FormField
             autoCorrect={false}
             icon="account-group"
             name="lib_familybelongs_id"
             placeholder="Nuclear family belongs to"
+          />*/}
+          <Picker
+            icon="account-group"
+            items={nuclearfamily}
+            name="lib_familybelongs_id"
+            PickerItemComponent={PickerItem}
+            placeholder="Nuclear family belongs to"
+            setOther={setNuclearfamily}
           />
 
           <Picker
