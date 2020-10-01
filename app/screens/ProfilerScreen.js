@@ -12,18 +12,14 @@ import * as Random from "expo-random";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 import Constants from "expo-constants";
-import * as MediaLibrary from "expo-media-library";
 
-import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
 import {
   AppForm as Form,
   AppFormField as FormField,
   FormPicker as Picker,
   AddressPicker,
-  FormCameraPicker,
   FormLocationPicker,
-  FormDatePicker,
   SubmitButton,
 } from "../components/forms";
 import SwitchInput from "../components/SwitchInput";
@@ -47,7 +43,7 @@ const validationSchema = Yup.object().shape({
   otherevacuation: Yup.string().when("evacuationarea.label", {
     is: "Other, Please specify",
     then: Yup.string().required().label("Add other evacuation"),
-  }), //adjust this if there is item added to evacuation area library
+  }),
   tbl_hhfloodsoccurinarea: Yup.boolean(),
   tbl_hhfloodsoccurinareayear: Yup.string().when("tbl_hhfloodsoccurinarea", {
     is: true,
@@ -308,13 +304,12 @@ function ProfilerScreen({ navigation }) {
     setDate(d);
   };
 
-  const reviewInput = (data, resetForm) => {
+  const reviewInput = (data) => {
     settemData(data);
     setModalVisible(true);
-    console.log(tempData);
   };
 
-  const handleSubmit = (data, resetForm) => {
+  const handleSubmit = (data) => {
     setLoading(true);
     db.transaction(
       (tx) => {
@@ -450,7 +445,6 @@ function ProfilerScreen({ navigation }) {
                 );
               }
               setLoading(false);
-              resetForm({ data: "" });
               navigation.navigate("Program", {
                 id: insertId,
               });
@@ -503,9 +497,8 @@ function ProfilerScreen({ navigation }) {
             accessdrillsimulation: false,
             tenuralstatus: 0,
           }}
-          onSubmit={(values, { resetForm }) => {
-            reviewInput(values, resetForm);
-            //handleSubmit(values, resetForm);
+          onSubmit={(values) => {
+            reviewInput(values);
           }}
           validationSchema={validationSchema}
         >
@@ -697,7 +690,7 @@ function ProfilerScreen({ navigation }) {
               autoCorrect={false}
               icon="bank-plus"
               name="otherevacuation"
-              placeholder="Add other evacuation center"
+              placeholder="Add other evacuation center *"
             />
           )}
 
@@ -726,6 +719,11 @@ function ProfilerScreen({ navigation }) {
         <Modal animationType="slide" transparent={true} visible={modalVisible}>
           <View style={styles.modalView}>
             <ScrollView>
+              <Text
+                style={{ fontWeight: "bold", marginBottom: 30, color: "red" }}
+              >
+                Review Add Household Input
+              </Text>
               <View style={styles.moreInfoTable}>
                 <View style={styles.moreInfolabel}>
                   <Text style={styles.moreInfolabeltxt}>Respondent Name</Text>
@@ -1205,6 +1203,7 @@ function ProfilerScreen({ navigation }) {
                   }}
                   onPress={() => {
                     setModalVisible(!modalVisible);
+                    handleSubmit(tempData);
                   }}
                 >
                   <Text style={styles.textStyle}>Save Information</Text>

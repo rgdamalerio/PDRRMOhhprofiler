@@ -69,9 +69,9 @@ function AddDemographyScreen({ navigation, route }) {
   const [income, setIncome] = useState([]);
   const [nuclearfamily, setNuclearfamily] = useState([]);
   const [date, setDate] = useState(new Date());
-  const [modalVisible, setModalVisible] = useState(false);
-  const [tempData, settemData] = useState([]);
   const { user } = useAuth();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [tempData, settemData] = useState();
 
   useEffect(() => {
     _setRelationship();
@@ -299,13 +299,16 @@ function AddDemographyScreen({ navigation, route }) {
     );
   };
 
-  const reviewInput = (data, resetForm) => {
+  const reviewInput = (data) => {
     settemData(data);
     setModalVisible(true);
-    console.log(tempData);
   };
 
-  const handleSubmit = (data, resetForm) => {
+  const handleSubmit = (data) => {
+    let _date = "";
+    if (data.tbl_datebirth) {
+      let d = new Date(data.tbl_datebirth);
+    }
     setLoading(true);
     db.transaction(
       (tx) => {
@@ -349,7 +352,7 @@ function AddDemographyScreen({ navigation, route }) {
             data.lib_familybelongs_id.id,
             data.lib_gender_id.id,
             data.tbl_relationshiphead_id.id,
-            String(data.tbl_datebirth),
+            String(_date),
             data.lib_maritalstatus_id.id,
             data.lib_ethnicity_id,
             data.lib_religion_id,
@@ -508,7 +511,6 @@ function AddDemographyScreen({ navigation, route }) {
                   {
                     text: "Yes",
                     onPress: () => {
-                      resetForm({ data: "" });
                       _setNuclearfamily();
                       setLoading(false);
                     },
@@ -543,7 +545,7 @@ function AddDemographyScreen({ navigation, route }) {
             lib_gender_id: 0,
             tbl_relationshiphead_id: 0,
             otherRelationship: "",
-            tbl_datebirth: 0,
+            tbl_datebirth: "",
             lib_maritalstatus_id: 0,
             lib_ethnicity_id: "",
             lib_religion_id: 0,
@@ -565,9 +567,9 @@ function AddDemographyScreen({ navigation, route }) {
             tbl_ismemberphilhealth: 0,
             tbl_adependentofaphilhealthmember: 0,
           }}
-          onSubmit={(values, { resetForm }) => {
-            reviewInput(values, resetForm);
-            //handleSubmit(values, resetForm);
+          onSubmit={(values) => {
+            console.log(values);
+            reviewInput(values);
           }}
           validationSchema={validationSchema}
         >
@@ -802,38 +804,497 @@ function AddDemographyScreen({ navigation, route }) {
           <SubmitButton title="Save Demography" />
         </Form>
       </ScrollView>
-      <Modal animationType="slide" transparent={true} visible={modalVisible}>
-        <View style={styles.modalView}>
-          <ScrollView>
-            <View style={styles.moreInfoTable}>
-              <View style={styles.moreInfolabel}>
-                <Text style={styles.moreInfolabeltxt}>Address</Text>
-              </View>
-              <View
-                style={
-                  (styles.moreInforData,
-                  { flexDirection: "row", flex: 1, flexWrap: "wrap" })
-                }
-              >
-                <Text style={styles.moreInforDataTxt}>Test</Text>
-              </View>
-            </View>
 
-            <TouchableHighlight
-              style={{
-                ...styles.openButton,
-                backgroundColor: "#2196F3",
-                marginTop: 15,
-              }}
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}
-            >
-              <Text style={styles.textStyle}>Close Information</Text>
-            </TouchableHighlight>
-          </ScrollView>
-        </View>
-      </Modal>
+      {tempData && (
+        <Modal animationType="slide" transparent={true} visible={modalVisible}>
+          <View style={styles.modalView}>
+            <ScrollView>
+              <Text
+                style={{ fontWeight: "bold", marginBottom: 30, color: "red" }}
+              >
+                Review Add Demography Input
+              </Text>
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>First Name *</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_fname}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Last Name *</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_lname}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Middle Name</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_mname}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Name Extension</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_extension}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Nuclear family belongs to
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_familybelongs_id.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Relationship to head
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_relationshiphead_id.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Gender</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_gender_id.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Birthday</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {String(tempData.tbl_datebirth)}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Marital status</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_maritalstatus_id.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Ethnicity/Tribe</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_ethnicity_id}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Religion</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_religion_id}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Is person with special needs
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_withspecialneeds ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Type of Disability
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_disability_id.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Is an OFW?</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_isofw ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Residence 3 years ago?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_is3yrsinlocation ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Is currently in school?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_iscurattschool ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Year/Grade currently attending
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_gradelvl_id.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Highest educational attainment
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_hea_id.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Track/strand/course completed?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_tscshvc_id.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    can read and write(if not atleast high school graduate)
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_canreadwriteorhighschoolgrade}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Primary occupation?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_primary_occupation}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Montly Income</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.lib_monthlyincome_id.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Member of SSS</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_ismembersss ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Member of GSIS?</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_ismembergsis ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Member of Phil-health?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_ismemberphilhealth ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Dependend of Phil-health member?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_adependentofaphilhealthmember ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignContent: "space-between",
+                }}
+              >
+                <TouchableHighlight
+                  style={{
+                    ...styles.openButton,
+                    backgroundColor: "#2196F3",
+                    marginTop: 15,
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                  <Text style={styles.textStyle}>Cancel/Update</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                  style={{
+                    ...styles.openButton,
+                    backgroundColor: "#2196F3",
+                    marginTop: 15,
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                    handleSubmit(tempData);
+                  }}
+                >
+                  <Text style={styles.textStyle}>Save Information</Text>
+                </TouchableHighlight>
+              </View>
+            </ScrollView>
+          </View>
+        </Modal>
+      )}
     </>
   );
 }

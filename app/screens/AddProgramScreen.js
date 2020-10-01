@@ -5,6 +5,8 @@ import {
   ScrollView,
   Alert,
   TouchableHighlight,
+  Modal,
+  View,
 } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
@@ -40,6 +42,8 @@ function AddProgramScreen({ navigation, route }) {
   const [otherTypeprogram, setOtherTypeprogram] = useState(false);
   const [date, setDate] = useState(new Date());
   const { user } = useAuth();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [tempData, settemData] = useState();
 
   useEffect(() => {
     getTypeProgram();
@@ -69,7 +73,12 @@ function AddProgramScreen({ navigation, route }) {
     );
   };
 
-  const handleSubmit = (data, resetForm) => {
+  const reviewInput = (data) => {
+    settemData(data);
+    setModalVisible(true);
+  };
+
+  const handleSubmit = (data) => {
     setLoading(true);
     db.transaction(
       (tx) => {
@@ -165,7 +174,6 @@ function AddProgramScreen({ navigation, route }) {
                     text: "No",
                     onPress: () => {
                       setLoading(false);
-                      resetForm({ data: "" });
                       navigation.navigate("Demography", {
                         id: householdid,
                       });
@@ -174,7 +182,6 @@ function AddProgramScreen({ navigation, route }) {
                   {
                     text: "Yes",
                     onPress: () => {
-                      resetForm({ data: "" });
                       setLoading(false);
                     },
                   },
@@ -207,8 +214,8 @@ function AddProgramScreen({ navigation, route }) {
               numberBenificiaries: 0,
               programEmplementer: "",
             }}
-            onSubmit={(values, { resetForm }) => {
-              handleSubmit(values, resetForm);
+            onSubmit={(values) => {
+              reviewInput(values);
             }}
             validationSchema={validationSchema}
           >
@@ -274,6 +281,123 @@ function AddProgramScreen({ navigation, route }) {
           </Form>
         </ScrollView>
       </Screen>
+
+      {tempData && (
+        <Modal animationType="slide" visible={modalVisible}>
+          <View style={styles.modalView}>
+            <ScrollView>
+              <Text
+                style={{ fontWeight: "bold", marginBottom: 30, color: "red" }}
+              >
+                Review Add Program Input
+              </Text>
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Type of Program</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.typeProgram.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Name of Program</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.programname}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Number of Benificiaries
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.numberBenificiaries}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Program Implementor
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.programEmplementer}
+                  </Text>
+                </View>
+              </View>
+
+              <View
+                style={{
+                  flex: 1,
+                  flexDirection: "row",
+                  alignContent: "space-between",
+                }}
+              >
+                <TouchableHighlight
+                  style={{
+                    ...styles.openButton,
+                    backgroundColor: "#2196F3",
+                    marginTop: 15,
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                  }}
+                >
+                  <Text style={styles.textStyle}>Cancel/Update</Text>
+                </TouchableHighlight>
+                <TouchableHighlight
+                  style={{
+                    ...styles.openButton,
+                    backgroundColor: "#2196F3",
+                    marginTop: 15,
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                    handleSubmit(tempData);
+                  }}
+                >
+                  <Text style={styles.textStyle}>Save Information</Text>
+                </TouchableHighlight>
+              </View>
+            </ScrollView>
+          </View>
+        </Modal>
+      )}
     </>
   );
 }
@@ -281,6 +405,20 @@ function AddProgramScreen({ navigation, route }) {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+  },
+  modalView: {
+    backgroundColor: "white",
+    borderRadius: 20,
+    paddingVertical: 30,
+    paddingHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   openButton: {
     backgroundColor: "#F194FF",
@@ -292,6 +430,27 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  moreInfoTable: {
+    flexDirection: "row",
+    width: "100%",
+  },
+  moreInfolabel: {
+    alignContent: "stretch",
+    width: "40%",
+    padding: 5,
+  },
+  moreInfolabeltxt: {
+    fontWeight: "bold",
+  },
+  moreInfoData: {
+    flex: 1,
+    width: "60%",
+    padding: 5,
+    backgroundColor: "#F194FF",
+  },
+  moreInforDataTxt: {
+    paddingTop: 5,
   },
 });
 

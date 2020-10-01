@@ -8,6 +8,7 @@ import Animated from "../screens/AnimatedScreen";
 import Program from "../screens/AddProgramScreen";
 import Demography from "../screens/AddDemographyScreen";
 import Livelihood from "../screens/AddLivelihood";
+import AddImage from "../screens/AddImage";
 
 const Stack = createStackNavigator();
 
@@ -44,6 +45,8 @@ const AppNavigator = () => (
       options={{ title: "Add Livelihood" }}
       component={Livelihood}
     />
+
+    <Stack.Screen name="AddImage" component={AddImage} />
   </Stack.Navigator>
 );
 
