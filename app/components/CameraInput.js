@@ -10,7 +10,6 @@ import {
   Image,
 } from "react-native";
 import * as Permissions from "expo-permissions";
-import * as MediaLibrary from "expo-media-library";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";

@@ -205,7 +205,7 @@ function AddLivelihood({ navigation, route }) {
                     text: "No",
                     onPress: () => {
                       setLoading(false);
-                      navigation.navigate("Profiler", {
+                      navigation.navigate("AddImage", {
                         id: householdid,
                       });
                     },
@@ -265,7 +265,9 @@ function AddLivelihood({ navigation, route }) {
               marginBottom: 15,
             }}
             onPress={() => {
-              navigation.navigate("Profiler");
+              navigation.navigate("AddImage", {
+                id: householdid,
+              });
             }}
           >
             <Text style={styles.textStyle}>Skip</Text>
@@ -367,7 +369,7 @@ function AddLivelihood({ navigation, route }) {
                   }
                 >
                   <Text style={styles.moreInforDataTxt}>
-                    {tempData.lib_tenuralstatus_id.id}
+                    {tempData.lib_tenuralstatus_id.label}
                   </Text>
                 </View>
               </View>
