@@ -11,21 +11,27 @@ import {
 } from "react-native";
 import * as Permissions from "expo-permissions";
 import { Camera } from "expo-camera";
-import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import * as ImageManipulator from "expo-image-manipulator";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import * as SQLite from "expo-sqlite";
 
 import colors from "../config/colors";
 import ErrorPermission from "../components/ErrormPermission";
 
 import Screen from "../components/Screen";
+const db = SQLite.openDatabase("hhprofiler21.db");
 
-function AddImage(props) {
+function AddImage({ navigation, route }) {
+  const [householdid, sethouseholdid] = useState(1); //route.params.id
+  const [householdHead, setHouseholdHead] = useState("ohyeah");
   const [hasPermission, setHasPermission] = useState(null);
   const [rollPermision, setRollPermission] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [imageUri, setImageUri] = useState();
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
+  const photoDir = FileSystem.cacheDirectory + "photos/";
 
   useEffect(() => {
     (async () => {
@@ -38,6 +44,11 @@ function AddImage(props) {
     })();
   }, []);
 
+  useEffect(() => {
+    //getHouseholdHead();
+    ensureDirExists();
+  }, []);
+
   const requestPermission = async () => {
     const { granted } = await Permissions.askAsync(
       Permissions.CAMERA_ROLL,
@@ -48,10 +59,57 @@ function AddImage(props) {
     else setHasPermission(true);
   };
 
+  const getHouseholdHead = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `SELECT tbl_household_id || "_" ||tbl_fname || "_" || tbl_lname as newfilename FROM tbl_hhdemography WHERE tbl_household_id=? AND tbl_relationshiphead_id=?`,
+          [householdid, 1],
+          (_, { rows: { _array } }) => setHouseholdHead(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Type of Livelihood Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  // Checks if gif directory exists. If not, creates it
+  async function ensureDirExists() {
+    const dirInfo = await FileSystem.getInfoAsync(photoDir);
+    if (!dirInfo.exists) {
+      console.log("photoDir directory doesn't exist, creating...");
+      await FileSystem.makeDirectoryAsync(photoDir, { intermediates: true });
+    }
+  }
+
   const takePicture = async () => {
     if (cameraRef) {
       let photo = await cameraRef.takePictureAsync();
-      onChangeImage(photo.uri);
+
+      let resizedPhoto = await ImageManipulator.manipulateAsync(
+        photo.uri,
+        [{ resize: { width: 108, height: 192 } }],
+        { compress: 0, format: "jpeg", base64: false }
+      );
+      FileSystem.moveAsync({
+        from: resizedPhoto.uri,
+        to: `${FileSystem.documentDirectory}photos/${householdHead}.jpeg`,
+      });
+
+      setImageUri(
+        `${FileSystem.documentDirectory}photos/${householdHead}.jpeg`
+      );
+
       setModalVisible(false);
     }
   };
@@ -68,7 +126,7 @@ function AddImage(props) {
             text: "Yes",
             onPress: () => {
               setModalVisible(true);
-              onChangeImage(null);
+              setImageUri(null);
             },
           },
           { text: "No" },
@@ -76,15 +134,27 @@ function AddImage(props) {
       );
   };
 
+  const createAlbum = async (uri) => {
+    try {
+      const asset = await MediaLibrary.createAssetAsync(uri);
+      MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
+        .then(() => {})
+        .catch((error) => {
+          alert("Error saving image, Error details: " + error);
+        });
+    } catch (error) {}
+  };
+
   return (
     <>
       <TouchableWithoutFeedback onPress={handlePress}>
         <View style={styles.container}>
+          <Text style={styles.instruction}>Tap To Take Picture</Text>
           {!imageUri && (
             <MaterialCommunityIcons
               color={colors.medium}
               name="camera"
-              size={40}
+              size={200}
             />
           )}
           {imageUri && (
@@ -92,6 +162,26 @@ function AddImage(props) {
           )}
         </View>
       </TouchableWithoutFeedback>
+      {imageUri && (
+        <TouchableOpacity
+          style={{
+            alignItems: "center",
+            bottom: 50,
+            justifyContent: "center",
+            height: 50,
+            position: "absolute",
+            width: "100%",
+          }}
+          onPress={() => {
+            alert("test");
+          }}
+        >
+          <MaterialCommunityIcons
+            name="check-circle"
+            style={{ color: "green", fontSize: 100 }}
+          />
+        </TouchableOpacity>
+      )}
       <Modal visible={modalVisible}>
         {hasPermission === null || rollPermision === null ? (
           <View
@@ -137,28 +227,7 @@ function AddImage(props) {
               style={{ flex: 3 }}
               type={type}
               ref={(ref) => setCameraRef(ref)}
-            >
-              <View
-                style={{
-                  flex: 1,
-                }}
-              >
-                <TouchableOpacity
-                  style={{
-                    alignSelf: "flex-end",
-                    alignItems: "center",
-                    backgroundColor: "transparent",
-                    margin: 10,
-                  }}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <MaterialCommunityIcons
-                    name="close-circle"
-                    style={{ color: colors.white, fontSize: 40 }}
-                  />
-                </TouchableOpacity>
-              </View>
-            </Camera>
+            ></Camera>
 
             <View
               style={{
@@ -171,12 +240,15 @@ function AddImage(props) {
               <TouchableOpacity
                 style={styles.cameraControl}
                 onPress={() => {
-                  selectImage();
-                  setModalVisible(false);
+                  setType(
+                    type === Camera.Constants.Type.back
+                      ? Camera.Constants.Type.front
+                      : Camera.Constants.Type.back
+                  );
                 }}
               >
                 <MaterialCommunityIcons
-                  name="image-album"
+                  name="camera-switch"
                   style={{ color: "#fff", fontSize: 40 }}
                 />
               </TouchableOpacity>
@@ -193,17 +265,11 @@ function AddImage(props) {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.cameraControl}
-                onPress={() => {
-                  setType(
-                    type === Camera.Constants.Type.back
-                      ? Camera.Constants.Type.front
-                      : Camera.Constants.Type.back
-                  );
-                }}
+                onPress={() => setModalVisible(false)}
               >
                 <MaterialCommunityIcons
-                  name="camera-switch"
-                  style={{ color: "#fff", fontSize: 40 }}
+                  name="close-circle"
+                  style={{ color: colors.white, fontSize: 40 }}
                 />
               </TouchableOpacity>
             </View>
@@ -221,17 +287,21 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   container: {
+    flex: 1,
+    marginHorizontal: 40,
+    marginVertical: 170,
     backgroundColor: colors.secondary,
     borderRadius: 15,
     justifyContent: "center",
     alignItems: "center",
-    width: 100,
-    height: 100,
     overflow: "hidden",
   },
   image: {
     height: "100%",
     width: "100%",
+  },
+  instruction: {
+    marginBottom: 15,
   },
 });
 
