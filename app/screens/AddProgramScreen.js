@@ -34,6 +34,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const db = SQLite.openDatabase("hhprofiler21.db");
+let resetFormHolder;
 
 function AddProgramScreen({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
@@ -174,6 +175,7 @@ function AddProgramScreen({ navigation, route }) {
                     text: "No",
                     onPress: () => {
                       setLoading(false);
+                      resetFormHolder();
                       navigation.navigate("Demography", {
                         id: householdid,
                       });
@@ -183,6 +185,7 @@ function AddProgramScreen({ navigation, route }) {
                     text: "Yes",
                     onPress: () => {
                       setLoading(false);
+                      resetFormHolder();
                     },
                   },
                 ]
@@ -214,7 +217,8 @@ function AddProgramScreen({ navigation, route }) {
               numberBenificiaries: 0,
               programEmplementer: "",
             }}
-            onSubmit={(values) => {
+            onSubmit={(values, { resetForm }) => {
+              resetFormHolder = resetForm;
               reviewInput(values);
             }}
             validationSchema={validationSchema}

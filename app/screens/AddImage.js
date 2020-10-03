@@ -15,6 +15,8 @@ import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as SQLite from "expo-sqlite";
+import ActivityIndicator from "../components/ActivityIndicator";
+import LottieView from "lottie-react-native";
 
 import colors from "../config/colors";
 import ErrorPermission from "../components/ErrormPermission";
@@ -24,7 +26,13 @@ const db = SQLite.openDatabase("hhprofiler21.db");
 
 function AddImage({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
-  const [householdHead, setHouseholdHead] = useState(route.params.id);
+  const [householdHead, setHouseholdHead] = useState([
+    {
+      newfilename: route.params.id,
+    },
+  ]);
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
   const [rollPermision, setRollPermission] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -102,7 +110,10 @@ function AddImage({ navigation, route }) {
           `${FileSystem.documentDirectory}Photo/${filename}.jpeg`
         );
         if (newFile.exists) {
-          createAlbum(`${FileSystem.documentDirectory}Photo/${filename}.jpeg`);
+          createAlbum(
+            `${FileSystem.documentDirectory}Photo/${filename}.jpeg`,
+            `${filename}.jpeg`
+          );
         }
       } else {
         console.log("Folder not exist");
@@ -139,23 +150,47 @@ function AddImage({ navigation, route }) {
       );
   };
 
-  const createAlbum = async (uri) => {
+  const createAlbum = async (uri, filename) => {
     try {
       const asset = await MediaLibrary.createAssetAsync(uri);
       MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
-        .then(() => {
-          console.log("Created Album success");
-        })
+        .then(() => {})
         .catch((error) => {
           alert("Error saving image, Error details: " + error);
         });
     } catch (error) {
       console.log(error);
     }
+    handleSubmit(filename);
   };
 
+  const handleSubmit = (filename) => {
+    setLoading(true);
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "UPDATE tbl_household SET tbl_hhimage = ? where tbl_household_id = ?",
+          [filename, householdid],
+          (tx, results) => {
+            if (results.rowsAffected > 0) {
+              setLoading(false);
+              console.log("success");
+            } else {
+              setLoading(false);
+              console.log("wa oi");
+            }
+          }
+        );
+      },
+      (error) => {
+        Alert.alert("Error", "Error: " + error.message);
+        setLoading(false);
+      }
+    );
+  };
   return (
     <>
+      <ActivityIndicator visible={loading} />
       <TouchableWithoutFeedback onPress={handlePress}>
         <View style={styles.container}>
           <Text style={styles.instruction}>Tap To Take Picture</Text>
@@ -182,7 +217,7 @@ function AddImage({ navigation, route }) {
             width: "100%",
           }}
           onPress={() => {
-            copyImage(imageUri, householdHead);
+            copyImage(imageUri, householdHead[0].newfilename);
           }}
         >
           <MaterialCommunityIcons
@@ -311,6 +346,9 @@ const styles = StyleSheet.create({
   },
   instruction: {
     marginBottom: 15,
+  },
+  animation: {
+    width: 150,
   },
 });
 

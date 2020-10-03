@@ -53,6 +53,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const db = SQLite.openDatabase("hhprofiler21.db");
+let resetFormHolder;
 
 function AddDemographyScreen({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
@@ -72,6 +73,7 @@ function AddDemographyScreen({ navigation, route }) {
   const { user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [tempData, settemData] = useState();
+  const [hasHead, setHasHead] = useState(false);
 
   useEffect(() => {
     _setRelationship();
@@ -83,7 +85,33 @@ function AddDemographyScreen({ navigation, route }) {
     _tscshvc();
     _income();
     _setNuclearfamily();
+    _sethasHead();
   }, []);
+
+  const _sethasHead = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `SELECT tbl_household_id || "_" ||tbl_fname || "_" || tbl_lname as newfilename FROM tbl_hhdemography WHERE tbl_household_id=? AND tbl_ishead=?`,
+          [householdid, 1],
+          (_, { rows: { _array } }) =>
+            _array.length > 0 ? setHasHead(true) : setHasHead(false)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Type of Livelihood Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
 
   const _setNuclearfamily = () => {
     db.transaction(
@@ -343,7 +371,7 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_ismembergsis," +
             "tbl_ismemberphilhealth," +
             "tbl_adependentofaphilhealthmember" +
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             householdid,
             data.tbl_fname,
@@ -505,6 +533,7 @@ function AddDemographyScreen({ navigation, route }) {
                     text: "No",
                     onPress: () => {
                       setLoading(false);
+                      resetFormHolder();
                       navigation.navigate("Livelihood", {
                         id: householdid,
                       });
@@ -513,7 +542,9 @@ function AddDemographyScreen({ navigation, route }) {
                   {
                     text: "Yes",
                     onPress: () => {
+                      resetFormHolder();
                       _setNuclearfamily();
+                      _sethasHead();
                       setLoading(false);
                     },
                   },
@@ -570,8 +601,8 @@ function AddDemographyScreen({ navigation, route }) {
             tbl_ismemberphilhealth: 0,
             tbl_adependentofaphilhealthmember: 0,
           }}
-          onSubmit={(values) => {
-            console.log(values);
+          onSubmit={(values, { resetForm }) => {
+            resetFormHolder = resetForm;
             reviewInput(values);
           }}
           validationSchema={validationSchema}
@@ -618,11 +649,13 @@ function AddDemographyScreen({ navigation, route }) {
             placeholder="Name extension"
           />
 
-          <SwitchInput
-            icon="account"
-            name="tbl_ishead"
-            placeholder="Is person head of the family?"
-          />
+          {!hasHead && (
+            <SwitchInput
+              icon="account"
+              name="tbl_ishead"
+              placeholder="Is person head of the family?"
+            />
+          )}
 
           <Picker
             icon="account-group"
@@ -883,6 +916,24 @@ function AddDemographyScreen({ navigation, route }) {
                 >
                   <Text style={styles.moreInforDataTxt}>
                     {tempData.tbl_extension}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Is person head of family
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_ishead ? "Yes" : "No"}
                   </Text>
                 </View>
               </View>

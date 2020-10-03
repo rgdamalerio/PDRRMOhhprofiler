@@ -46,7 +46,11 @@ const AppNavigator = () => (
       component={Livelihood}
     />
 
-    <Stack.Screen name="AddImage" component={AddImage} />
+    <Stack.Screen
+      options={{ headerShown: false }}
+      name="AddImage"
+      component={AddImage}
+    />
   </Stack.Navigator>
 );
 

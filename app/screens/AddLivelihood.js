@@ -33,6 +33,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const db = SQLite.openDatabase("hhprofiler21.db");
+let resetFormHolder;
 
 function AddLivelihood({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
@@ -143,7 +144,6 @@ function AddLivelihood({ navigation, route }) {
                       [data.otherTenuralStatusval, tenuralStatus.length],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
-                          console.log("Update success:" + results);
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
@@ -165,11 +165,7 @@ function AddLivelihood({ navigation, route }) {
                                 ],
                                 (tx, results) => {
                                   if (results.rowsAffected > 0) {
-                                    console.log(
-                                      "Add tenural success:" + results
-                                    );
                                     getTenuralStatus();
-                                    //setOtherTenuralStatus(false);
                                   } else {
                                     Alert.alert(
                                       "Error",
@@ -205,6 +201,7 @@ function AddLivelihood({ navigation, route }) {
                     text: "No",
                     onPress: () => {
                       setLoading(false);
+                      resetFormHolder();
                       navigation.navigate("AddImage", {
                         id: householdid,
                       });
@@ -214,6 +211,7 @@ function AddLivelihood({ navigation, route }) {
                     text: "Yes",
                     onPress: () => {
                       setLoading(false);
+                      resetFormHolder();
                     },
                   },
                 ]
@@ -251,7 +249,8 @@ function AddLivelihood({ navigation, route }) {
             created_by: user.idtbl_enumerator,
             updated_by: user.idtbl_enumerator,
           }}
-          onSubmit={(values) => {
+          onSubmit={(values, { resetForm }) => {
+            resetFormHolder = resetForm;
             reviewInput(values);
           }}
           validationSchema={validationSchema}
@@ -278,7 +277,7 @@ function AddLivelihood({ navigation, route }) {
             items={typelivelihood}
             name="lib_typeoflivelihood"
             PickerItemComponent={PickerItem}
-            placeholder="Type of Livelihood"
+            placeholder="Type of Livelihood *"
           />
 
           <Picker

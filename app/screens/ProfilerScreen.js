@@ -64,6 +64,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const db = SQLite.openDatabase("hhprofiler21.db");
+let resetFormHolder;
 
 function ProfilerScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
@@ -445,6 +446,7 @@ function ProfilerScreen({ navigation }) {
                 );
               }
               setLoading(false);
+              resetFormHolder();
               navigation.navigate("Program", {
                 id: insertId,
               });
@@ -497,7 +499,8 @@ function ProfilerScreen({ navigation }) {
             accessdrillsimulation: false,
             tenuralstatus: 0,
           }}
-          onSubmit={(values) => {
+          onSubmit={(values, { resetForm }) => {
+            resetFormHolder = resetForm;
             reviewInput(values);
           }}
           validationSchema={validationSchema}
