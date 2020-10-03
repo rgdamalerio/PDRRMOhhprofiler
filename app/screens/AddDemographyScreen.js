@@ -319,6 +319,7 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_lname," +
             "tbl_mname," +
             "tbl_extension," +
+            "tbl_ishead," +
             "lib_familybelongs_id," +
             "lib_gender_id," +
             "tbl_relationshiphead_id," +
@@ -349,6 +350,7 @@ function AddDemographyScreen({ navigation, route }) {
             data.tbl_lname,
             data.tbl_mname,
             data.tbl_extension,
+            data.tbl_ishead ? 1 : 0,
             data.lib_familybelongs_id.id,
             data.lib_gender_id.id,
             data.tbl_relationshiphead_id.id,
@@ -541,6 +543,7 @@ function AddDemographyScreen({ navigation, route }) {
             tbl_lname: "",
             tbl_mname: "",
             tbl_extension: "",
+            tbl_ishead: 0,
             lib_familybelongs_id: 0,
             lib_gender_id: 0,
             tbl_relationshiphead_id: 0,
@@ -613,6 +616,12 @@ function AddDemographyScreen({ navigation, route }) {
             icon="account-outline"
             name="tbl_extension"
             placeholder="Name extension"
+          />
+
+          <SwitchInput
+            icon="account"
+            name="tbl_ishead"
+            placeholder="Is person head of the family?"
           />
 
           <Picker

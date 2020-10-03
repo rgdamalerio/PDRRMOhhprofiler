@@ -129,13 +129,12 @@ export default function App() {
   {
     if (!loading) return <ActivityIndicator visible={true} />;
     return (
-      /*<AuthContext.Provider value={{ user, setUser }}>
+      <AuthContext.Provider value={{ user, setUser }}>
         <NavigationContainer theme={navigationTheme}>
           {user ? <AppNavigator /> : <AuthNavigator />}
         </NavigationContainer>
       </AuthContext.Provider>
-      */
-      <AddImage />
+      /*<AddImage />*/
     );
   }
 }
