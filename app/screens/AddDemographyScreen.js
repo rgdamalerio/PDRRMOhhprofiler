@@ -541,12 +541,16 @@ function AddDemographyScreen({ navigation, route }) {
                     onPress: () => {
                       setLoading(false);
                       resetFormHolder();
-                      navigation.navigate("Livelihood", {
-                        id: householdid,
-                        new: true,
-                        addmore: false,
-                        update: false,
-                      });
+                      if (route.params.addmore) {
+                        navigation.navigate("Done", { screen: "AnimatedMap" });
+                      } else {
+                        navigation.navigate("Livelihood", {
+                          id: householdid,
+                          new: true,
+                          addmore: false,
+                          update: false,
+                        });
+                      }
                     },
                   },
                   {

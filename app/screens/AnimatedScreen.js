@@ -212,7 +212,6 @@ function AnimatedScreen({ navigation }) {
     fetchDemographys(marker.tbl_household_id);
     fetchLivelihood(marker.tbl_household_id);
     setModalVisible(true);
-    console.log(livelihoods);
   };
 
   const fetchHHprofile = (householdid) => {
@@ -1097,6 +1096,57 @@ function AnimatedScreen({ navigation }) {
               </View>
             </View>
 
+            <View style={(styles.moreInfoTable, styles.relatedInfo)}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Picture</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                <TouchableHighlight
+                  style={{
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                    navigation.navigate("AddImage", {
+                      id: moreinfo.tbl_household_id,
+                      filename: moreinfo.tbl_hhimage,
+                      update: true,
+                      addmore: false,
+                      new: false,
+                    });
+                  }}
+                >
+                  <Image
+                    source={{
+                      uri:
+                        "file:///storage/emulated/0/PDRRMOProfiler/" +
+                        moreinfo.tbl_hhimage,
+                    }}
+                    // style={styles.cardImage}
+                    resizeMode="cover"
+                  />
+                </TouchableHighlight>
+
+                <TouchableHighlight
+                  style={{
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                    navigation.navigate("AddImage", {
+                      id: moreinfo.tbl_household_id,
+                      addmore: true,
+                      update: false,
+                      new: false,
+                    });
+                  }}
+                >
+                  <Text style={{ ...styles.moreInforDataTxt, color: "red" }}>
+                    Take Picture....
+                  </Text>
+                </TouchableHighlight>
+              </View>
+            </View>
             <View
               style={{
                 flex: 1,

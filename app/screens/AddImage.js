@@ -26,11 +26,7 @@ const db = SQLite.openDatabase("hhprofiler21.db");
 
 function AddImage({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
-  const [householdHead, setHouseholdHead] = useState([
-    {
-      newfilename: route.params.id,
-    },
-  ]);
+  const [householdHead, setHouseholdHead] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
   const [rollPermision, setRollPermission] = useState(null);
@@ -38,7 +34,6 @@ function AddImage({ navigation, route }) {
   const [imageUri, setImageUri] = useState();
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
-  const photoDir = FileSystem.cacheDirectory + "photos/";
 
   useEffect(() => {
     (async () => {
@@ -53,7 +48,6 @@ function AddImage({ navigation, route }) {
 
   useEffect(() => {
     getHouseholdHead();
-    console.log(householdHead);
   }, []);
 
   const requestPermission = async () => {
@@ -73,7 +67,11 @@ function AddImage({ navigation, route }) {
           `SELECT tbl_household_id || "_" ||tbl_fname || "_" || tbl_lname as newfilename FROM tbl_hhdemography WHERE tbl_household_id=? AND tbl_ishead=?`,
           [householdid, 1],
           (_, { rows: { _array } }) => {
-            _array.length > 0 ? setHouseholdHead(_array) : "";
+            _array.length > 0
+              ? setHouseholdHead(_array)
+              : setHouseholdHead({
+                  newfilename: route.params.id,
+                });
           }
         );
       },
@@ -125,6 +123,7 @@ function AddImage({ navigation, route }) {
     }
   };
   const takePicture = async () => {
+    console.log(householdHead);
     if (cameraRef) {
       let photo = await cameraRef.takePictureAsync();
       setImageUri(photo.uri);
@@ -176,7 +175,11 @@ function AddImage({ navigation, route }) {
           (tx, results) => {
             if (results.rowsAffected > 0) {
               setLoading(false);
-              navigation.navigate("Done", { screen: "Profiler" });
+              // if (route.params.update) {
+              //   navigation.navigate("Done", { screen: "AnimatedMap" });
+              // } else {
+              //   navigation.navigate("Done", { screen: "Profiler" });
+              // }
             } else {
               setLoading(false);
             }
@@ -218,7 +221,7 @@ function AddImage({ navigation, route }) {
             width: "100%",
           }}
           onPress={() => {
-            copyImage(imageUri, householdHead[0].newfilename);
+            copyImage(imageUri, householdHead.newfilename);
           }}
         >
           <MaterialCommunityIcons

@@ -209,9 +209,16 @@ function AddLivelihood({ navigation, route }) {
                     onPress: () => {
                       setLoading(false);
                       resetFormHolder();
-                      navigation.navigate("AddImage", {
-                        id: householdid,
-                      });
+                      if (route.params.addmore) {
+                        navigation.navigate("Done", { screen: "AnimatedMap" });
+                      } else {
+                        navigation.navigate("AddImage", {
+                          id: householdid,
+                          new: true,
+                          addmore: false,
+                          update: false,
+                        });
+                      }
                     },
                   },
                   {
