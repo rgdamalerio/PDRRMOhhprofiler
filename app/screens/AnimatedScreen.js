@@ -1109,10 +1109,9 @@ function AnimatedScreen({ navigation }) {
                     setModalVisible(!modalVisible);
                     navigation.navigate("AddImage", {
                       id: moreinfo.tbl_household_id,
-                      filename: moreinfo.tbl_hhimage,
-                      update: true,
-                      addmore: false,
                       new: false,
+                      addmore: false,
+                      update: true,
                     });
                   }}
                 >
@@ -1135,14 +1134,16 @@ function AnimatedScreen({ navigation }) {
                     setModalVisible(!modalVisible);
                     navigation.navigate("AddImage", {
                       id: moreinfo.tbl_household_id,
-                      addmore: true,
-                      update: false,
+                      addmore: false,
+                      update: true,
                       new: false,
                     });
                   }}
                 >
                   <Text style={{ ...styles.moreInforDataTxt, color: "red" }}>
-                    Take Picture....
+                    Update Picture....{" ("}
+                    {moreinfo.tbl_hhimage}
+                    {")"}
                   </Text>
                 </TouchableHighlight>
               </View>

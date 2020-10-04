@@ -36,6 +36,10 @@ function AddImage({ navigation, route }) {
   const [type, setType] = useState(Camera.Constants.Type.back);
 
   useEffect(() => {
+    getHouseholdHead();
+  }, []);
+
+  useEffect(() => {
     (async () => {
       const { status } = await Camera.requestPermissionsAsync();
       setHasPermission(status === "granted");
@@ -44,10 +48,6 @@ function AddImage({ navigation, route }) {
       setRollPermission(cam_roll === "granted");
       setRollPermission(true);
     })();
-  }, []);
-
-  useEffect(() => {
-    getHouseholdHead();
   }, []);
 
   const requestPermission = async () => {
@@ -69,9 +69,11 @@ function AddImage({ navigation, route }) {
           (_, { rows: { _array } }) => {
             _array.length > 0
               ? setHouseholdHead(_array)
-              : setHouseholdHead({
-                  newfilename: route.params.id,
-                });
+              : setHouseholdHead([
+                  {
+                    newfilename: route.params.id,
+                  },
+                ]);
           }
         );
       },
@@ -123,7 +125,6 @@ function AddImage({ navigation, route }) {
     }
   };
   const takePicture = async () => {
-    console.log(householdHead);
     if (cameraRef) {
       let photo = await cameraRef.takePictureAsync();
       setImageUri(photo.uri);
@@ -155,14 +156,16 @@ function AddImage({ navigation, route }) {
     try {
       const asset = await MediaLibrary.createAssetAsync(uri);
       MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
-        .then(() => {})
+        .then(() => {
+          handleSubmit(asset.filename);
+        })
         .catch((error) => {
           alert("Error saving image, Error details: " + error);
         });
     } catch (error) {
       console.log(error);
     }
-    handleSubmit(filename);
+    return;
   };
 
   const handleSubmit = (filename) => {
@@ -175,11 +178,11 @@ function AddImage({ navigation, route }) {
           (tx, results) => {
             if (results.rowsAffected > 0) {
               setLoading(false);
-              // if (route.params.update) {
-              //   navigation.navigate("Done", { screen: "AnimatedMap" });
-              // } else {
-              //   navigation.navigate("Done", { screen: "Profiler" });
-              // }
+              if (route.params.update) {
+                navigation.navigate("Done", { screen: "AnimatedMap" });
+              } else {
+                navigation.navigate("Done", { screen: "Profiler" });
+              }
             } else {
               setLoading(false);
             }
@@ -221,7 +224,7 @@ function AddImage({ navigation, route }) {
             width: "100%",
           }}
           onPress={() => {
-            copyImage(imageUri, householdHead.newfilename);
+            copyImage(imageUri, householdHead[0].newfilename);
           }}
         >
           <MaterialCommunityIcons
