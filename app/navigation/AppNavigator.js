@@ -9,6 +9,7 @@ import Program from "../screens/AddProgramScreen";
 import Demography from "../screens/AddDemographyScreen";
 import Livelihood from "../screens/AddLivelihood";
 import AddImage from "../screens/AddImage";
+import Done from "../screens/Done";
 
 const Stack = createStackNavigator();
 
@@ -50,6 +51,12 @@ const AppNavigator = () => (
       options={{ headerShown: false }}
       name="AddImage"
       component={AddImage}
+    />
+
+    <Stack.Screen
+      options={{ headerShown: false }}
+      name="Done"
+      component={Done}
     />
   </Stack.Navigator>
 );

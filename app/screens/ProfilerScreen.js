@@ -449,6 +449,7 @@ function ProfilerScreen({ navigation }) {
               resetFormHolder();
               navigation.navigate("Program", {
                 id: insertId,
+                new: true,
               });
             } else {
               setLoading(false);

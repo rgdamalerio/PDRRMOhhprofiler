@@ -14,7 +14,7 @@ import {
   Modal,
   TouchableHighlight,
 } from "react-native";
-import Fontisto from "react-native-vector-icons/Fontisto";
+import Constants from "expo-constants";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as SQLite from "expo-sqlite";
 
@@ -32,48 +32,10 @@ const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 
 const db = SQLite.openDatabase("hhprofiler21.db");
 
-function AnimatedScreen(props) {
+function AnimatedScreen({ navigation }) {
   const theme = useTheme();
 
   const initialMapState = {
-    categories: [
-      {
-        name: "Fastfood Center",
-        icon: (
-          <MaterialCommunityIcons
-            style={styles.chipsIcon}
-            name="food-fork-drink"
-            size={18}
-          />
-        ),
-      },
-      {
-        name: "Restaurant",
-        icon: (
-          <Ionicons name="ios-restaurant" style={styles.chipsIcon} size={18} />
-        ),
-      },
-      {
-        name: "Dineouts",
-        icon: (
-          <Ionicons name="md-restaurant" style={styles.chipsIcon} size={18} />
-        ),
-      },
-      {
-        name: "Snacks Corner",
-        icon: (
-          <MaterialCommunityIcons
-            name="food"
-            style={styles.chipsIcon}
-            size={18}
-          />
-        ),
-      },
-      {
-        name: "Hotel",
-        icon: <Fontisto name="hotel" style={styles.chipsIcon} size={15} />,
-      },
-    ],
     region: {
       latitude: 9.190489360418237,
       latitudeDelta: 2.239664674768459,
@@ -86,6 +48,7 @@ function AnimatedScreen(props) {
   const [markers, setMarkers] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [moreinfo, setMoreinfo] = React.useState([]);
+  const [programs, setPrograms] = React.useState([]);
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -198,7 +161,7 @@ function AnimatedScreen(props) {
             "lib_wtdesc," + //lib_hhwatertenuralstatus
             "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
             "lib_hhlvldesc," +
-            "lib_heaname " + //lib_hhevacuationarea
+            "lib_heaname," + //lib_hhevacuationarea
             "lib_hhlvldesc " +
             "FROM tbl_household " +
             "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
@@ -233,9 +196,42 @@ function AnimatedScreen(props) {
   };
 
   const moreInformation = (marker) => {
-    console.log(marker);
     setMoreinfo(marker);
+    fetchPrograms(marker.tbl_household_id);
     setModalVisible(true);
+  };
+
+  const fetchPrograms = (householdid) => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "SELECT lib_pname," +
+            "tbl_household_id," +
+            "lib_pname," +
+            "lib_pnumbeni," +
+            "lib_pimplementor," +
+            "lib_typeofprogram.id as typeofprogramid," + //lib_typeofprogram
+            "lib_topname " +
+            "FROM tbl_programs " +
+            "LEFT JOIN lib_typeofprogram ON tbl_programs.lib_typeofprogram_id=lib_typeofprogram.id " + //lib_typeofprogram
+            "where tbl_household_id = ?",
+          [householdid],
+          (_, { rows: { _array } }) => setPrograms(_array)
+        );
+      },
+      (error) => {
+        console.log(error);
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading availed program, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
   };
 
   const interpolations = markers.map((marker, index) => {
@@ -727,18 +723,85 @@ function AnimatedScreen(props) {
                 </Text>
               </View>
             </View>
-            <TouchableHighlight
+
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Availed program</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                {programs.map((program, index) => (
+                  <TouchableHighlight
+                    style={{
+                      flex: 1,
+                    }}
+                    key={index}
+                    onPress={() => {
+                      setModalVisible(!modalVisible);
+                      navigation.navigate("Program", {
+                        id: moreinfo.tbl_household_id,
+                        program: program,
+                        update: true,
+                      });
+                    }}
+                  >
+                    <Text style={{ color: "blue" }}>{program.lib_topname}</Text>
+                  </TouchableHighlight>
+                ))}
+                <TouchableHighlight
+                  style={{
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                    navigation.navigate("Program", {
+                      id: moreinfo.tbl_household_id,
+                      addmore: true,
+                    });
+                  }}
+                >
+                  <Text style={{ ...styles.moreInforDataTxt, color: "red" }}>
+                    Add more....
+                  </Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+
+            <View
               style={{
-                ...styles.openButton,
-                backgroundColor: "#2196F3",
+                flex: 1,
+                flexDirection: "row",
+                alignContent: "space-between",
+                marginBottom: 15,
                 marginTop: 15,
               }}
-              onPress={() => {
-                setModalVisible(!modalVisible);
-              }}
             >
-              <Text style={styles.textStyle}>Close Information</Text>
-            </TouchableHighlight>
+              <TouchableHighlight
+                style={{
+                  ...styles.openButton,
+                  backgroundColor: "gold",
+                  marginTop: 15,
+                  flex: 1,
+                }}
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                }}
+              >
+                <Text style={styles.textStyle}>Update</Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={{
+                  ...styles.openButton,
+                  backgroundColor: "#2196F3",
+                  marginTop: 15,
+                  flex: 1,
+                }}
+                onPress={() => {
+                  setModalVisible(!modalVisible);
+                }}
+              >
+                <Text style={styles.textStyle}>Close Information</Text>
+              </TouchableHighlight>
+            </View>
           </ScrollView>
         </View>
       </Modal>
@@ -752,7 +815,7 @@ const styles = StyleSheet.create({
   },
   searchBox: {
     position: "absolute",
-    marginTop: Platform.OS === "ios" ? 40 : 20,
+    marginTop: Constants.statusBarHeight + 5,
     flexDirection: "row",
     backgroundColor: "#fff",
     width: "90%",
@@ -858,7 +921,6 @@ const styles = StyleSheet.create({
   },
   modalView: {
     backgroundColor: "white",
-    borderRadius: 20,
     paddingVertical: 30,
     paddingHorizontal: 10,
     shadowColor: "#000",

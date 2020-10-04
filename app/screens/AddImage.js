@@ -32,7 +32,6 @@ function AddImage({ navigation, route }) {
     },
   ]);
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
   const [rollPermision, setRollPermission] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -54,6 +53,7 @@ function AddImage({ navigation, route }) {
 
   useEffect(() => {
     getHouseholdHead();
+    console.log(householdHead);
   }, []);
 
   const requestPermission = async () => {
@@ -72,7 +72,9 @@ function AddImage({ navigation, route }) {
         tx.executeSql(
           `SELECT tbl_household_id || "_" ||tbl_fname || "_" || tbl_lname as newfilename FROM tbl_hhdemography WHERE tbl_household_id=? AND tbl_ishead=?`,
           [householdid, 1],
-          (_, { rows: { _array } }) => setHouseholdHead(_array)
+          (_, { rows: { _array } }) => {
+            _array.length > 0 ? setHouseholdHead(_array) : "";
+          }
         );
       },
       (error) => {
@@ -174,10 +176,9 @@ function AddImage({ navigation, route }) {
           (tx, results) => {
             if (results.rowsAffected > 0) {
               setLoading(false);
-              console.log("success");
+              navigation.navigate("Done", { screen: "Profiler" });
             } else {
               setLoading(false);
-              console.log("wa oi");
             }
           }
         );

@@ -27,6 +27,7 @@ import authStorage from "./app/auth/storage";
 import AddLivelihood from "./app/screens/AddLivelihood";
 import ActivityIndicator from "./app/components/ActivityIndicator";
 import AddImage from "./app/screens/AddImage";
+import Done from "./app/screens/Done";
 const databaseName = "hhprofiler.db";
 
 async function removeDatabase() {
@@ -134,7 +135,7 @@ export default function App() {
           {user ? <AppNavigator /> : <AuthNavigator />}
         </NavigationContainer>
       </AuthContext.Provider>
-      /*<AddImage />*/
+      /*<Done />*/
     );
   }
 }

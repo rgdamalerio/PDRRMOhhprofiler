@@ -38,6 +38,9 @@ let resetFormHolder;
 
 function AddProgramScreen({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
+  const [program, setProgram] = useState(
+    route.params.update ? route.params.program : []
+  );
   const [loading, setLoading] = useState(false);
   const [typeprogram, setTypeprogram] = useState([]);
   const [otherTypeprogram, setOtherTypeprogram] = useState(false);
@@ -48,6 +51,10 @@ function AddProgramScreen({ navigation, route }) {
 
   useEffect(() => {
     getTypeProgram();
+    route.params.update
+      ? navigation.setOptions({ title: "Update Program info" })
+      : "";
+    console.log(program);
   }, []);
 
   const getTypeProgram = () => {
@@ -79,7 +86,7 @@ function AddProgramScreen({ navigation, route }) {
     setModalVisible(true);
   };
 
-  const handleSubmit = (data) => {
+  const handleSubmitNew = (data) => {
     setLoading(true);
     db.transaction(
       (tx) => {
@@ -176,9 +183,13 @@ function AddProgramScreen({ navigation, route }) {
                     onPress: () => {
                       setLoading(false);
                       resetFormHolder();
-                      navigation.navigate("Demography", {
-                        id: householdid,
-                      });
+                      if (route.params.addmore) {
+                        navigation.navigate("Done", { screen: "AnimatedMap" });
+                      } else {
+                        navigation.navigate("Demography", {
+                          id: householdid,
+                        });
+                      }
                     },
                   },
                   {
@@ -204,6 +215,106 @@ function AddProgramScreen({ navigation, route }) {
     );
   };
 
+  const handleSubmitUpdate = (data) => {
+    setLoading(true);
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "UPDATE tbl_programs SET " +
+            "lib_typeofprogram_id = ?," +
+            "lib_pname=?," +
+            "lib_pnumbeni =?," +
+            "lib_pimplementor =?," +
+            "updated_at = ?," +
+            "updated_by= ?  WHERE id = ?",
+          [
+            data.typeProgram.id,
+            data.programname,
+            data.numberBenificiaries,
+            data.programEmplementer,
+            String(date),
+            user.idtbl_enumerator,
+            route.params.id,
+          ],
+          (tx, results) => {
+            if (results.rowsAffected > 0) {
+              if (data.typeProgram.id == typeprogram.length) {
+                db.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE lib_typeofprogram SET lib_topname = ? where id = ?",
+                      [data.otherTypeprogramval, typeprogram.length],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO lib_typeofprogram (" +
+                                  "id," +
+                                  "lib_topname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?,?)",
+                                [
+                                  typeprogram.length + 1,
+                                  "Other, Please specify",
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    getTypeProgram();
+                                    setOtherTypeprogram(false);
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new type of program item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
+                            },
+                            (error) => {
+                              Alert.alert("Error", error.message);
+                            }
+                          );
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in type of program failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    Alert.alert("Error", error.message);
+                  }
+                );
+              }
+
+              setLoading(false);
+              resetFormHolder();
+              navigation.navigate("Done", { screen: "AnimatedMap" });
+            } else {
+              setLoading(false);
+              alert("Adding Program information Failed");
+            }
+          }
+        );
+      },
+      (error) => {
+        setLoading(false);
+        console.log(error);
+        alert("Database Error: " + error.message);
+      }
+    );
+  };
+
   return (
     <>
       <ActivityIndicator visible={loading} />
@@ -211,11 +322,17 @@ function AddProgramScreen({ navigation, route }) {
         <ScrollView>
           <Form
             initialValues={{
-              typeProgram: 0,
+              typeProgram: route.params.update
+                ? { id: program.typeofprogramid, label: program.lib_topname }
+                : "",
               otherTypeprogramval: "",
-              programname: "",
-              numberBenificiaries: 0,
-              programEmplementer: "",
+              programname: route.params.update ? program.lib_pname : "",
+              numberBenificiaries: route.params.update
+                ? String(program.lib_pnumbeni)
+                : 0,
+              programEmplementer: route.params.update
+                ? program.lib_pimplementor
+                : "",
             }}
             onSubmit={(values, { resetForm }) => {
               resetFormHolder = resetForm;
@@ -223,22 +340,24 @@ function AddProgramScreen({ navigation, route }) {
             }}
             validationSchema={validationSchema}
           >
-            <TouchableHighlight
-              style={{
-                ...styles.openButton,
-                alignSelf: "flex-start",
-                backgroundColor: "#ff5252",
-                marginTop: 15,
-                marginBottom: 15,
-              }}
-              onPress={() => {
-                navigation.navigate("Demography", {
-                  id: householdid,
-                });
-              }}
-            >
-              <Text style={styles.textStyle}>Skip</Text>
-            </TouchableHighlight>
+            {route.params.new && (
+              <TouchableHighlight
+                style={{
+                  ...styles.openButton,
+                  alignSelf: "flex-start",
+                  backgroundColor: "#ff5252",
+                  marginTop: 15,
+                  marginBottom: 15,
+                }}
+                onPress={() => {
+                  navigation.navigate("Demography", {
+                    id: householdid,
+                  });
+                }}
+              >
+                <Text style={styles.textStyle}>Skip</Text>
+              </TouchableHighlight>
+            )}
 
             <Picker
               icon="format-list-bulleted-type"
@@ -281,7 +400,11 @@ function AddProgramScreen({ navigation, route }) {
               placeholder="Program Implementor *"
             />
 
-            <SubmitButton title="Add Program" />
+            {route.params.update ? (
+              <SubmitButton title="Update Program" />
+            ) : (
+              <SubmitButton title="Add Program" />
+            )}
           </Form>
         </ScrollView>
       </Screen>
@@ -392,10 +515,15 @@ function AddProgramScreen({ navigation, route }) {
                   }}
                   onPress={() => {
                     setModalVisible(!modalVisible);
-                    handleSubmit(tempData);
+                    if (route.params.update) handleSubmitUpdate(tempData);
+                    else handleSubmitNew(tempData);
                   }}
                 >
-                  <Text style={styles.textStyle}>Save Information</Text>
+                  {route.params.update ? (
+                    <Text style={styles.textStyle}>Update Information</Text>
+                  ) : (
+                    <Text style={styles.textStyle}>Add Information</Text>
+                  )}
                 </TouchableHighlight>
               </View>
             </ScrollView>
