@@ -66,7 +66,9 @@ function AccountScreen({ navigation }) {
                   backgroundColor={item.icon.backgroundColor}
                 />
               }
-              onPress={() => navigation.navigate(item.route)}
+              onPress={() =>
+                navigation.navigate(item.route, { id: "", update: false })
+              }
             />
           )}
         />

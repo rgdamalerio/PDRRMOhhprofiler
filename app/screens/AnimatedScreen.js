@@ -19,7 +19,6 @@ import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import * as SQLite from "expo-sqlite";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { useTheme } from "@react-navigation/native";
 
 import { mapDarkStyle, mapStandardStyle } from "../model/mapData";
@@ -49,6 +48,8 @@ function AnimatedScreen({ navigation }) {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [moreinfo, setMoreinfo] = React.useState([]);
   const [programs, setPrograms] = React.useState([]);
+  const [household, setHousehold] = React.useState([]);
+  const [demographys, setDemographys] = React.useState([]);
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -197,8 +198,113 @@ function AnimatedScreen({ navigation }) {
 
   const moreInformation = (marker) => {
     setMoreinfo(marker);
+    fetchHHprofile(marker.tbl_household_id);
     fetchPrograms(marker.tbl_household_id);
+    fetchDemographys(marker.tbl_household_id);
     setModalVisible(true);
+  };
+
+  const fetchHHprofile = (householdid) => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "SELECT tbl_household_id," +
+            "tbl_hhissethead," +
+            "tbl_hhcontrolnumber," +
+            "tbl_hhdateinterview," +
+            "tbl_hhlatitude," +
+            "tbl_hhlongitude," +
+            "tbl_hhfield_editor," +
+            "tbl_hhyearconstruct," +
+            "tbl_hhyearconstruct," +
+            "tbl_hhyearconstruct," +
+            "tbl_hhnobedroms," +
+            "tbl_hhnostorey," +
+            "tbl_hhaelectricity," +
+            "tbl_hhainternet," +
+            "tbl_hhainternet," +
+            "tbl_enumerator_id_fk," +
+            "tbl_psgc_brgy_id," +
+            "tbl_psgc_mun_id," +
+            "tbl_psgc_pro_id," +
+            "lib_typeofbuilding_id," +
+            "tbl_hhecost," +
+            "tbl_tenuralstatus_id," +
+            "tbl_typeofconmaterials_id," +
+            "tbl_wallconmaterials_id," +
+            "tbl_hhaccesswater," +
+            "tbl_hhwaterpotable," +
+            "tbl_watertenuralstatus_id," +
+            "tbl_evacuation_areas_id," +
+            "tbl_hhhasaccesshealtmedicalfacility," +
+            "tbl_hhhasaccesshealtmedicalfacility," +
+            "tbl_hhhasaccesstelecom," +
+            "tbl_hasaccessdrillsandsimulations," +
+            "tbl_household.created_at," +
+            "tbl_household.updated_at," +
+            "tbl_household.created_by," +
+            "tbl_household.updatedy_by," +
+            "tbl_householdpuroksittio," +
+            "tbl_hhimage," +
+            "tbl_respondent," +
+            "idtbl_psgc_brgy," + //tbl_psgc_brgy
+            "tbl_psgc_brgyname," +
+            "tbl_psgc_mun_id_fk," +
+            "idtbl_psgc_mun," + //tbl_psgc_municipality
+            "tbl_psgc_munname," +
+            "tbl_psgc_prov_id_fk," +
+            "idtbl_psgc_prov," + //tbl_psgc_prov
+            "tbl_psgc_provname," +
+            "tbl_psgc_region_id_fk," +
+            "idtbl_enumerator," + //tbl_enumerator
+            "tbl_enumeratorfname," +
+            "tbl_enumeratorlname," +
+            "tbl_enumeratormname," +
+            "tbl_enumeratoremail," +
+            "tbl_enumeratorcontact," +
+            "tbl_enumeratorprov," +
+            "tbl_enumeratormun," +
+            "tbl_enumeratorbrgy," +
+            "tbl_imagepath," +
+            "lib_buildingtypedesc," + //lib_hhtypeofbuilding
+            "lib_tenuralstatusdesc," + //lib_hhtenuralstatus
+            "lib_roofmaterialsdesc," + //lib_hhroofmaterials
+            "lib_wallmaterialsdesc," + //lib_hhwallconmaterials
+            "lib_wtdesc," + //lib_hhwatertenuralstatus
+            "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
+            "lib_hhlvldesc," +
+            "lib_heaname," + //lib_hhevacuationarea
+            "lib_hhlvldesc " +
+            "FROM tbl_household " +
+            "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
+            "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
+            "LEFT JOIN tbl_psgc_prov ON tbl_household.tbl_psgc_pro_id=tbl_psgc_prov.idtbl_psgc_prov " + //tbl_psgc_prov
+            "LEFT JOIN tbl_enumerator ON tbl_household.tbl_enumerator_id_fk=tbl_enumerator.idtbl_enumerator " + //tbl_enumerator
+            "LEFT JOIN lib_hhtypeofbuilding ON tbl_household.lib_typeofbuilding_id=lib_hhtypeofbuilding.id " + //lib_hhtypeofbuilding
+            "LEFT JOIN lib_hhtenuralstatus ON tbl_household.tbl_tenuralstatus_id=lib_hhtenuralstatus.id " + //lib_hhtenuralstatus
+            "LEFT JOIN lib_hhroofmaterials ON tbl_household.tbl_typeofconmaterials_id=lib_hhroofmaterials.id " + //lib_hhroofmaterials
+            "LEFT JOIN lib_hhwallconmaterials ON tbl_household.tbl_wallconmaterials_id=lib_hhwallconmaterials.id " + //lib_hhwallconmaterials
+            "LEFT JOIN lib_hhwatertenuralstatus ON tbl_household.tbl_watertenuralstatus_id=lib_hhwatertenuralstatus.id " + //lib_hhwatertenuralstatus
+            "LEFT JOIN lib_hhlvlwatersystem ON tbl_household.tbl_hhlvlwatersystem_id=lib_hhlvlwatersystem.id " + //lib_hhlvlwatersystem
+            "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
+            "where tbl_household_id = ?",
+          [householdid],
+          (_, { rows: { _array } }) => setHousehold(_array)
+        );
+      },
+      (error) => {
+        console.log(error);
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Household data, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
   };
 
   const fetchPrograms = (householdid) => {
@@ -217,6 +323,47 @@ function AnimatedScreen({ navigation }) {
             "where tbl_household_id = ?",
           [householdid],
           (_, { rows: { _array } }) => setPrograms(_array)
+        );
+      },
+      (error) => {
+        console.log(error);
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading availed program, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const fetchDemographys = (householdid) => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "SELECT tbl_household_id," +
+            "tbl_hhcontrolnumber," +
+            "tbl_respondent," +
+            "tbl_hhissethead," +
+            "tbl_hhlatitude," +
+            "tbl_hhlongitude," +
+            "tbl_hhyearconstruct," +
+            "tbl_hhecost," +
+            "tbl_hhnobedroms," +
+            "tbl_hhnostorey," +
+            "tbl_hhaelectricity," +
+            "tbl_hhainternet," +
+            "tbl_hhainternet," +
+            "idtbl_psgc_brgy," + // tbl_psgc_brgy
+            "tbl_psgc_brgyname " + // tbl_psgc_brgy
+            "FROM tbl_household " +
+            "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //lib_typeofprogram
+            "where tbl_household_id = ?",
+          [householdid],
+          (_, { rows: { _array } }) => setDemographys(_array)
         );
       },
       (error) => {
@@ -766,6 +913,51 @@ function AnimatedScreen({ navigation }) {
               </View>
             </View>
 
+            <View style={styles.moreInfoTable}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Demography</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                {demographys.map((demography, index) => (
+                  <TouchableHighlight
+                    style={{
+                      flex: 1,
+                    }}
+                    key={index}
+                    onPress={() => {
+                      setModalVisible(!modalVisible);
+                      navigation.navigate("Program", {
+                        id: moreinfo.tbl_household_id,
+                        program: demography,
+                        update: true,
+                      });
+                    }}
+                  >
+                    <Text style={{ color: "blue" }}>
+                      {demography.tbl_respondent}{" "}
+                      {demography.tbl_hhissethead == 1 ? "(Head)" : ""}
+                    </Text>
+                  </TouchableHighlight>
+                ))}
+                <TouchableHighlight
+                  style={{
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                    navigation.navigate("Program", {
+                      id: moreinfo.tbl_household_id,
+                      addmore: true,
+                    });
+                  }}
+                >
+                  <Text style={{ ...styles.moreInforDataTxt, color: "red" }}>
+                    Add more....
+                  </Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+
             <View
               style={{
                 flex: 1,
@@ -784,6 +976,11 @@ function AnimatedScreen({ navigation }) {
                 }}
                 onPress={() => {
                   setModalVisible(!modalVisible);
+                  navigation.navigate("Profiler", {
+                    id: moreinfo.tbl_household_id,
+                    hhinfo: household,
+                    update: true,
+                  });
                 }}
               >
                 <Text style={styles.textStyle}>Update</Text>
@@ -957,9 +1154,6 @@ const styles = StyleSheet.create({
   },
   moreInfoData: {
     flex: 1,
-    //flexDirection: "row",
-    //justifyContent: "flex-end",
-    //alignContent: "stretch",
     width: "60%",
     padding: 5,
     backgroundColor: "#F194FF",

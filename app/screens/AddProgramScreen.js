@@ -54,7 +54,6 @@ function AddProgramScreen({ navigation, route }) {
     route.params.update
       ? navigation.setOptions({ title: "Update Program info" })
       : "";
-    console.log(program);
   }, []);
 
   const getTypeProgram = () => {

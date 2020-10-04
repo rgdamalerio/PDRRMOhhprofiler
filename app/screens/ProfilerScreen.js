@@ -66,7 +66,13 @@ const validationSchema = Yup.object().shape({
 const db = SQLite.openDatabase("hhprofiler21.db");
 let resetFormHolder;
 
-function ProfilerScreen({ navigation }) {
+function ProfilerScreen({ navigation, route }) {
+  const [householdid, sethouseholdid] = useState(
+    route.params.id ? route.params.id : ""
+  );
+  const [hhinfo, setHhinfo] = useState(
+    route.params.update ? route.params.hhinfo : []
+  );
   const [loading, setLoading] = useState(false);
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
@@ -88,6 +94,9 @@ function ProfilerScreen({ navigation }) {
   const [tempData, settemData] = useState();
 
   useEffect(() => {
+    route.params.update
+      ? navigation.setOptions({ title: "Update Household info" })
+      : "";
     getMunicipality();
     gettypeBuilding();
     gettenuralStatus();
@@ -98,6 +107,7 @@ function ProfilerScreen({ navigation }) {
     getEvacuationareas();
     getRandomBytes();
     getDate();
+    console.log(hhinfo);
   }, []);
 
   const getMunicipality = () => {
