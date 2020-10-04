@@ -50,6 +50,7 @@ function AnimatedScreen({ navigation }) {
   const [programs, setPrograms] = React.useState([]);
   const [household, setHousehold] = React.useState([]);
   const [demographys, setDemographys] = React.useState([]);
+  const [livelihoods, setLivelihoods] = React.useState([]);
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -209,7 +210,9 @@ function AnimatedScreen({ navigation }) {
     fetchHHprofile(marker.tbl_household_id);
     fetchPrograms(marker.tbl_household_id);
     fetchDemographys(marker.tbl_household_id);
+    fetchLivelihood(marker.tbl_household_id);
     setModalVisible(true);
+    console.log(livelihoods);
   };
 
   const fetchHHprofile = (householdid) => {
@@ -356,23 +359,55 @@ function AnimatedScreen({ navigation }) {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          "SELECT tbl_household_id," +
-            "tbl_hhcontrolnumber," +
-            "tbl_respondent," +
-            "tbl_hhissethead," +
-            "tbl_hhlatitude," +
-            "tbl_hhlongitude," +
-            "tbl_hhyearconstruct," +
-            "tbl_hhecost," +
-            "tbl_hhnobedroms," +
-            "tbl_hhnostorey," +
-            "tbl_hhaelectricity," +
-            "tbl_hhainternet," +
-            "tbl_hhainternet," +
-            "idtbl_psgc_brgy," + // tbl_psgc_brgy
-            "tbl_psgc_brgyname " + // tbl_psgc_brgy
-            "FROM tbl_household " +
-            "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //lib_typeofprogram
+          "SELECT tbl_hhdemography.id," +
+            "tbl_household_id," +
+            "tbl_fname," +
+            "tbl_lname," +
+            "tbl_mname," +
+            "tbl_extension," +
+            "tbl_ishead," +
+            "lib_familybelongs_id," +
+            "lib_gender_id," +
+            "lib_gname," +
+            "tbl_relationshiphead_id," +
+            "lib_rhname," +
+            "tbl_datebirth," +
+            "lib_maritalstatus_id," +
+            "lib_msname," +
+            "lib_ethnicity_id," +
+            "lib_religion_id," +
+            "tbl_withspecialneeds," +
+            "lib_disability_id," +
+            "lib_dname," +
+            "tbl_isofw," +
+            "tbl_is3yrsinlocation," +
+            "lib_nutritioanalstatus_id," +
+            "lib_nsname," +
+            "tbl_iscurattschool," +
+            "lib_gradelvl_id," +
+            "lvl.lib_glname as lvllib_glname," +
+            "lib_hea_id," +
+            "hea.lib_glname as healib_glname," +
+            "lib_tscshvc_id," +
+            "lib_tscshvcname," +
+            "tbl_canreadwriteorhighschoolgrade," +
+            "tbl_primary_occupation," +
+            "lib_monthlyincome_id," +
+            "lib_miname," +
+            "tbl_ismembersss," +
+            "tbl_ismembergsis," +
+            "tbl_ismemberphilhealth," +
+            "tbl_adependentofaphilhealthmember " +
+            "FROM tbl_hhdemography " +
+            "LEFT JOIN lib_gender ON tbl_hhdemography.lib_gender_id=lib_gender.id " + //lib_gender
+            "LEFT JOIN lib_maritalstatus ON tbl_hhdemography.lib_maritalstatus_id=lib_maritalstatus.id " + //lib_maritalstatus
+            "LEFT JOIN libl_relationshiphead ON tbl_hhdemography.tbl_relationshiphead_id=libl_relationshiphead.id " + //libl_relationshiphead
+            "LEFT JOIN lib_disability ON tbl_hhdemography.lib_disability_id=lib_disability.id " + //lib_disability
+            "LEFT JOIN lib_nutritioanalstatus ON tbl_hhdemography.lib_nutritioanalstatus_id=lib_nutritioanalstatus.id " + //lib_nutritioanalstatus
+            "LEFT JOIN lib_gradelvl as lvl ON tbl_hhdemography.lib_gradelvl_id=lvl.id " + //lib_gradelvl_id
+            "LEFT JOIN lib_gradelvl as hea ON tbl_hhdemography.lib_hea_id=hea.id " + //lib_hea_id
+            "LEFT JOIN lib_tscshvc ON tbl_hhdemography.lib_tscshvc_id=lib_tscshvc.id " + //lib_tscshvc
+            "LEFT JOIN lib_monthlyincome ON tbl_hhdemography.lib_monthlyincome_id=lib_monthlyincome.id " + //lib_monthlyincome
             "where tbl_household_id = ?",
           [householdid],
           (_, { rows: { _array } }) => setDemographys(_array)
@@ -382,7 +417,44 @@ function AnimatedScreen({ navigation }) {
         console.log(error);
         Alert.alert(
           "SQLITE ERROR",
-          "Error loading availed program, Please contact developer, " + error,
+          "Error loading Demography, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const fetchLivelihood = (householdid) => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "SELECT tbl_livelihood.id," +
+            "lib_typeoflivelihood," +
+            "lib_desc," +
+            "tbl_livelihoodmarketvalue," +
+            "tbl_livelihoodtotalarea," +
+            "tbl_livelihoodproducts," +
+            "lib_tenuralstatus_id," +
+            "tbl_tsname," +
+            "tbl_livelihoodiswithinsurance " +
+            "FROM tbl_livelihood " +
+            "LEFT JOIN lib_livelihood ON tbl_livelihood.lib_typeoflivelihood=lib_livelihood.id " + //lib_livelihood
+            "LEFT JOIN libl_tenuralstatus ON tbl_livelihood.lib_tenuralstatus_id=libl_tenuralstatus.id " + //libl_tenuralstatus
+            "where tbl_household_id = ?",
+          [householdid],
+          (_, { rows: { _array } }) => setLivelihoods(_array)
+        );
+      },
+      (error) => {
+        console.log(error);
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Livelihood details, Please contact developer, " +
+            error,
           [
             {
               text: "OK",
@@ -883,7 +955,7 @@ function AnimatedScreen({ navigation }) {
               </View>
             </View>
 
-            <View style={styles.moreInfoTable}>
+            <View style={(styles.moreInfoTable, styles.relatedInfo)}>
               <View style={styles.moreInfolabel}>
                 <Text style={styles.moreInfolabeltxt}>Availed program</Text>
               </View>
@@ -899,6 +971,7 @@ function AnimatedScreen({ navigation }) {
                       navigation.navigate("Program", {
                         id: moreinfo.tbl_household_id,
                         program: program,
+                        addmore: false,
                         update: true,
                       });
                     }}
@@ -915,6 +988,7 @@ function AnimatedScreen({ navigation }) {
                     navigation.navigate("Program", {
                       id: moreinfo.tbl_household_id,
                       addmore: true,
+                      update: false,
                     });
                   }}
                 >
@@ -925,7 +999,7 @@ function AnimatedScreen({ navigation }) {
               </View>
             </View>
 
-            <View style={styles.moreInfoTable}>
+            <View style={(styles.moreInfoTable, styles.relatedInfo)}>
               <View style={styles.moreInfolabel}>
                 <Text style={styles.moreInfolabeltxt}>Demography</Text>
               </View>
@@ -938,16 +1012,19 @@ function AnimatedScreen({ navigation }) {
                     key={index}
                     onPress={() => {
                       setModalVisible(!modalVisible);
-                      navigation.navigate("Program", {
+                      navigation.navigate("Demography", {
                         id: moreinfo.tbl_household_id,
-                        program: demography,
+                        memberinfo: demography,
                         update: true,
+                        addmore: false,
+                        new: false,
                       });
                     }}
                   >
                     <Text style={{ color: "blue" }}>
-                      {demography.tbl_respondent}{" "}
-                      {demography.tbl_hhissethead == 1 ? "(Head)" : ""}
+                      {demography.tbl_fname} {demography.tbl_lname}{" "}
+                      {demography.tbl_mname}{" "}
+                      {demography.tbl_relationshiphead_id == 1 ? "(Head)" : ""}
                     </Text>
                   </TouchableHighlight>
                 ))}
@@ -957,9 +1034,59 @@ function AnimatedScreen({ navigation }) {
                   }}
                   onPress={() => {
                     setModalVisible(!modalVisible);
-                    navigation.navigate("Program", {
+                    navigation.navigate("Demography", {
                       id: moreinfo.tbl_household_id,
                       addmore: true,
+                      update: false,
+                      new: false,
+                    });
+                  }}
+                >
+                  <Text style={{ ...styles.moreInforDataTxt, color: "red" }}>
+                    Add more....
+                  </Text>
+                </TouchableHighlight>
+              </View>
+            </View>
+
+            <View style={(styles.moreInfoTable, styles.relatedInfo)}>
+              <View style={styles.moreInfolabel}>
+                <Text style={styles.moreInfolabeltxt}>Livelihood</Text>
+              </View>
+              <View style={styles.moreInforData}>
+                {livelihoods.map((livelihood, index) => (
+                  <TouchableHighlight
+                    style={{
+                      flex: 1,
+                    }}
+                    key={index}
+                    onPress={() => {
+                      setModalVisible(!modalVisible);
+                      navigation.navigate("Livelihood", {
+                        id: moreinfo.tbl_household_id,
+                        hhlivelihood: livelihood,
+                        update: true,
+                        addmore: false,
+                        new: false,
+                      });
+                    }}
+                  >
+                    <Text style={{ color: "blue" }}>
+                      {livelihood.tbl_livelihoodproducts}
+                    </Text>
+                  </TouchableHighlight>
+                ))}
+                <TouchableHighlight
+                  style={{
+                    flex: 1,
+                  }}
+                  onPress={() => {
+                    setModalVisible(!modalVisible);
+                    navigation.navigate("Livelihood", {
+                      id: moreinfo.tbl_household_id,
+                      addmore: true,
+                      update: false,
+                      new: false,
                     });
                   }}
                 >
@@ -1172,6 +1299,13 @@ const styles = StyleSheet.create({
   },
   moreInforDataTxt: {
     paddingTop: 5,
+  },
+  relatedInfo: {
+    borderColor: "black",
+    borderStyle: "dotted",
+    borderWidth: 2,
+    borderRadius: 1,
+    padding: 5,
   },
 });
 

@@ -187,6 +187,9 @@ function AddProgramScreen({ navigation, route }) {
                       } else {
                         navigation.navigate("Demography", {
                           id: householdid,
+                          new: true,
+                          addmore: false,
+                          update: false,
                         });
                       }
                     },
@@ -351,6 +354,9 @@ function AddProgramScreen({ navigation, route }) {
                 onPress={() => {
                   navigation.navigate("Demography", {
                     id: householdid,
+                    new: true,
+                    addmore: false,
+                    update: false,
                   });
                 }}
               >

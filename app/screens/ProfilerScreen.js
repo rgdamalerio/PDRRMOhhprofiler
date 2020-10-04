@@ -460,6 +460,8 @@ function ProfilerScreen({ navigation, route }) {
               navigation.navigate("Program", {
                 id: insertId,
                 new: true,
+                addmore: false,
+                update: false,
               });
             } else {
               setLoading(false);

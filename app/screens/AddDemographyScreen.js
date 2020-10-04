@@ -57,6 +57,9 @@ let resetFormHolder;
 
 function AddDemographyScreen({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
+  const [demograpy, setDemograpy] = useState(
+    route.params.update ? route.params.memberinfo : []
+  );
   const [loading, setLoading] = useState(false);
   const [gender, setGender] = useState([]);
   const [relationship, setRelationship] = useState([]);
@@ -76,6 +79,9 @@ function AddDemographyScreen({ navigation, route }) {
   const [hasHead, setHasHead] = useState(false);
 
   useEffect(() => {
+    route.params.update
+      ? navigation.setOptions({ title: "Update Demograpy info" })
+      : "";
     _setRelationship();
     _gender();
     _setMaritalStatus();
@@ -86,6 +92,7 @@ function AddDemographyScreen({ navigation, route }) {
     _income();
     _setNuclearfamily();
     _sethasHead();
+    console.log(demograpy);
   }, []);
 
   const _sethasHead = () => {
@@ -332,10 +339,10 @@ function AddDemographyScreen({ navigation, route }) {
     setModalVisible(true);
   };
 
-  const handleSubmit = (data) => {
+  const handleSubmitNew = (data) => {
     let _date = "";
     if (data.tbl_datebirth) {
-      let d = new Date(data.tbl_datebirth);
+      _date = new Date(data.tbl_datebirth);
     }
     setLoading(true);
     db.transaction(
@@ -536,6 +543,9 @@ function AddDemographyScreen({ navigation, route }) {
                       resetFormHolder();
                       navigation.navigate("Livelihood", {
                         id: householdid,
+                        new: true,
+                        addmore: false,
+                        update: false,
                       });
                     },
                   },
@@ -564,42 +574,369 @@ function AddDemographyScreen({ navigation, route }) {
     );
   };
 
+  const handleSubmitUpdate = (data) => {
+    let _date = "";
+    if (data.tbl_datebirth) {
+      _date = new Date(data.tbl_datebirth);
+    }
+    //console.log(data);
+    //console.log(_date);
+    //return;
+    setLoading(true);
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "UPDATE tbl_hhdemography SET " +
+            "tbl_fname = ?," +
+            "tbl_lname =?," +
+            "tbl_mname =?," +
+            "tbl_extension =?," +
+            "tbl_ishead =?," +
+            "lib_familybelongs_id =?," +
+            "lib_gender_id =?," +
+            "tbl_relationshiphead_id =?," +
+            "tbl_datebirth =?," +
+            "lib_maritalstatus_id =?," +
+            "lib_ethnicity_id =?," +
+            "lib_religion_id =?," +
+            "tbl_withspecialneeds =?," +
+            "lib_disability_id =?," +
+            "lib_nutritioanalstatus_id =?," +
+            "tbl_isofw =?," +
+            "tbl_is3yrsinlocation =?," +
+            "tbl_iscurattschool =?," +
+            "lib_gradelvl_id =?," +
+            "tbl_canreadwriteorhighschoolgrade =?," +
+            "lib_hea_id =?," +
+            "tbl_primary_occupation =?," +
+            "lib_tscshvc_id =?," +
+            "lib_monthlyincome_id =?," +
+            "tbl_ismembersss =?," +
+            "tbl_ismembergsis =?," +
+            "tbl_ismemberphilhealth =?," +
+            "tbl_adependentofaphilhealthmember =?," +
+            "updated_at = ?," +
+            "updated_by= ?  WHERE id = ?",
+          [
+            data.tbl_fname,
+            data.tbl_lname,
+            data.tbl_mname,
+            data.tbl_extension,
+            data.tbl_ishead ? 1 : 0,
+            data.lib_familybelongs_id.id,
+            data.lib_gender_id.id,
+            data.tbl_relationshiphead_id.id,
+            String(data.tbl_datebirth),
+            data.lib_maritalstatus_id.id,
+            data.lib_ethnicity_id,
+            data.lib_religion_id,
+            data.tbl_withspecialneeds ? 1 : 0,
+            data.lib_disability_id.id,
+            data.lib_nutritioanalstatus_id.id,
+            data.tbl_isofw ? 1 : 0,
+            data.tbl_is3yrsinlocation ? 1 : 0,
+            data.tbl_iscurattschool ? 1 : 0,
+            data.lib_gradelvl_id.id,
+            data.tbl_canreadwriteorhighschoolgrade ? 1 : 0,
+            data.lib_hea_id.id,
+            data.tbl_primary_occupation,
+            data.lib_tscshvc_id.id,
+            data.lib_monthlyincome_id.id,
+            data.tbl_ismembersss ? 1 : 0,
+            data.tbl_ismembergsis ? 1 : 0,
+            data.tbl_ismemberphilhealth ? 1 : 0,
+            data.tbl_adependentofaphilhealthmember ? 1 : 0,
+            String(date),
+            user.idtbl_enumerator,
+            householdid,
+          ],
+          (tx, results) => {
+            if (results.rowsAffected > 0) {
+              if (data.tbl_relationshiphead_id.id == relationship.length) {
+                db.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE libl_relationshiphead SET lib_rhname = ? where id = ?",
+                      [data.otherRelationship, relationship.length],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO libl_relationshiphead (" +
+                                  "id," +
+                                  "lib_rhname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?,?)",
+                                [
+                                  relationship.length + 1,
+                                  "Other, Please specify",
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    _setRelationship();
+                                    setOtherRelationship(false);
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new relationship item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
+                            },
+                            (error) => {
+                              Alert.alert("Error", error);
+                            }
+                          );
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in relationship failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    Alert.alert("Error", error);
+                  }
+                );
+              }
+              if (data.lib_disability_id.id == disability.length) {
+                db.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE lib_disability SET lib_dname = ? where id = ?",
+                      [data.otherDisabilityval, disability.length],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO lib_disability (" +
+                                  "id," +
+                                  "lib_dname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?,?)",
+                                [
+                                  disability.length + 1,
+                                  "Other, Please specify",
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    _setDisabilities();
+                                    setOtherDisability(false);
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new relationship item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
+                            },
+                            (error) => {
+                              console.log(
+                                "Error in INSERT INTO lib_disability" +
+                                  error.message
+                              );
+                            }
+                          );
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in relationship failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    Alert.alert("Error", error.message);
+                  }
+                );
+              }
+
+              setLoading(false);
+              resetFormHolder();
+              navigation.navigate("Done", { screen: "AnimatedMap" });
+            } else {
+              setLoading(false);
+              alert("Adding Program information Failed");
+            }
+          }
+        );
+      },
+      (error) => {
+        setLoading(false);
+        alert("Adding Demography Database Error: " + error.message);
+      }
+    );
+  };
+
   return (
     <>
       <ActivityIndicator visible={loading} />
       <ScrollView style={styles.container}>
         <Form
           initialValues={{
-            tbl_fname: "",
-            tbl_lname: "",
-            tbl_mname: "",
-            tbl_extension: "",
-            tbl_ishead: 0,
-            lib_familybelongs_id: 0,
-            lib_gender_id: 0,
-            tbl_relationshiphead_id: 0,
+            tbl_fname: route.params.update ? demograpy.tbl_fname : "",
+            tbl_lname: route.params.update ? demograpy.tbl_lname : "",
+            tbl_mname: route.params.update ? demograpy.tbl_mname : "",
+            tbl_extension: route.params.update ? demograpy.tbl_extension : "",
+            tbl_ishead: route.params.update
+              ? demograpy.tbl_ishead == 1
+                ? true
+                : false
+              : false,
+            lib_familybelongs_id: route.params.update
+              ? demograpy.lib_familybelongs_id
+                ? { id: demograpy.lib_familybelongs_id, label: demograpy.id }
+                : 0
+              : 0,
+            tbl_relationshiphead_id: route.params.update
+              ? demograpy.tbl_relationshiphead_id
+                ? {
+                    id: demograpy.tbl_relationshiphead_id,
+                    label: demograpy.lib_rhname,
+                  }
+                : 0
+              : 0,
+            lib_gender_id: route.params.update
+              ? demograpy.lib_gender_id
+                ? { id: demograpy.lib_gender_id, label: demograpy.lib_gname }
+                : 0
+              : 0,
             otherRelationship: "",
-            tbl_datebirth: "",
-            lib_maritalstatus_id: 0,
-            lib_ethnicity_id: "",
-            lib_religion_id: 0,
-            tbl_withspecialneeds: false,
-            lib_disability_id: 0,
+            tbl_datebirth: route.params.update
+              ? new Date(demograpy.tbl_datebirth)
+              : "",
+            lib_maritalstatus_id: route.params.update
+              ? demograpy.lib_maritalstatus_id
+                ? {
+                    id: demograpy.lib_maritalstatus_id,
+                    label: demograpy.lib_msname,
+                  }
+                : 0
+              : 0,
+            lib_ethnicity_id: route.params.update
+              ? demograpy.lib_ethnicity_id
+              : "",
+            lib_religion_id: route.params.update
+              ? demograpy.lib_religion_id
+              : 0,
+            tbl_withspecialneeds: route.params.update
+              ? demograpy.tbl_withspecialneeds == 1
+                ? true
+                : false
+              : false,
+            lib_disability_id: route.params.update
+              ? demograpy.lib_disability_id
+                ? {
+                    id: demograpy.lib_disability_id,
+                    label: demograpy.lib_dname,
+                  }
+                : 0
+              : 0,
             otherDisabilityval: "",
-            lib_nutritioanalstatus_id: 0,
-            tbl_isofw: 0,
-            tbl_is3yrsinlocation: 0,
-            tbl_iscurattschool: false,
-            lib_gradelvl_id: "",
-            tbl_canreadwriteorhighschoolgrade: 0,
-            lib_hea_id: 0,
-            tbl_primary_occupation: 0,
-            lib_tscshvc_id: 0,
-            lib_monthlyincome_id: 0,
-            tbl_ismembersss: 0,
-            tbl_ismembergsis: 0,
-            tbl_ismemberphilhealth: 0,
-            tbl_adependentofaphilhealthmember: 0,
+            tbl_isofw: route.params.update
+              ? demograpy.tbl_isofw == 1
+                ? true
+                : false
+              : false,
+            tbl_is3yrsinlocation: route.params.update
+              ? demograpy.tbl_is3yrsinlocation == 1
+                ? true
+                : false
+              : false,
+            lib_nutritioanalstatus_id: route.params.update
+              ? demograpy.lib_nutritioanalstatus_id
+                ? {
+                    id: demograpy.lib_nutritioanalstatus_id,
+                    label: demograpy.lib_nsname,
+                  }
+                : 0
+              : 0,
+            tbl_iscurattschool: route.params.update
+              ? demograpy.tbl_iscurattschool == 1
+                ? true
+                : false
+              : false,
+            lib_gradelvl_id: route.params.update
+              ? demograpy.lib_gradelvl_id
+                ? {
+                    id: demograpy.lib_gradelvl_id,
+                    label: demograpy.lvllib_glname,
+                  }
+                : ""
+              : "",
+            lib_hea_id: route.params.update
+              ? demograpy.lib_hea_id
+                ? {
+                    id: demograpy.lib_hea_id,
+                    label: demograpy.healib_glname,
+                  }
+                : 0
+              : 0,
+            lib_tscshvc_id: route.params.update
+              ? demograpy.lib_tscshvc_id
+                ? {
+                    id: demograpy.lib_tscshvc_id,
+                    label: demograpy.lib_tscshvcname,
+                  }
+                : 0
+              : 0,
+            tbl_canreadwriteorhighschoolgrade: route.params.update
+              ? demograpy.tbl_canreadwriteorhighschoolgrade == 1
+                ? true
+                : false
+              : false,
+            tbl_primary_occupation: route.params.update
+              ? demograpy.tbl_primary_occupation
+              : "",
+            lib_monthlyincome_id: route.params.update
+              ? demograpy.lib_monthlyincome_id
+                ? {
+                    id: demograpy.lib_monthlyincome_id,
+                    label: demograpy.lib_miname,
+                  }
+                : 0
+              : 0,
+            tbl_ismembersss: route.params.update
+              ? demograpy.tbl_ismembersss == 1
+                ? true
+                : false
+              : false,
+            tbl_ismembergsis: route.params.update
+              ? demograpy.tbl_ismembergsis == 1
+                ? true
+                : false
+              : false,
+            tbl_ismemberphilhealth: route.params.update
+              ? demograpy.tbl_ismemberphilhealth == 1
+                ? true
+                : false
+              : false,
+            tbl_adependentofaphilhealthmember: route.params.update
+              ? demograpy.tbl_adependentofaphilhealthmember == 1
+                ? true
+                : false
+              : false,
           }}
           onSubmit={(values, { resetForm }) => {
             resetFormHolder = resetForm;
@@ -607,22 +944,27 @@ function AddDemographyScreen({ navigation, route }) {
           }}
           validationSchema={validationSchema}
         >
-          <TouchableHighlight
-            style={{
-              ...styles.openButton,
-              alignSelf: "flex-start",
-              backgroundColor: "#ff5252",
-              marginTop: 15,
-              marginBottom: 15,
-            }}
-            onPress={() => {
-              navigation.navigate("Livelihood", {
-                id: householdid,
-              });
-            }}
-          >
-            <Text style={styles.textStyle}>Skip</Text>
-          </TouchableHighlight>
+          {route.params.new && (
+            <TouchableHighlight
+              style={{
+                ...styles.openButton,
+                alignSelf: "flex-start",
+                backgroundColor: "#ff5252",
+                marginTop: 15,
+                marginBottom: 15,
+              }}
+              onPress={() => {
+                navigation.navigate("Livelihood", {
+                  id: householdid,
+                  new: true,
+                  addmore: false,
+                  update: false,
+                });
+              }}
+            >
+              <Text style={styles.textStyle}>Skip</Text>
+            </TouchableHighlight>
+          )}
 
           <FormField
             autoCorrect={false}
@@ -650,6 +992,14 @@ function AddDemographyScreen({ navigation, route }) {
           />
 
           {!hasHead && (
+            <SwitchInput
+              icon="account"
+              name="tbl_ishead"
+              placeholder="Is person head of the family?"
+            />
+          )}
+
+          {route.params.update && (
             <SwitchInput
               icon="account"
               name="tbl_ishead"
@@ -842,8 +1192,11 @@ function AddDemographyScreen({ navigation, route }) {
             name="tbl_adependentofaphilhealthmember"
             placeholder="Dependent of Phil-health member"
           />
-
-          <SubmitButton title="Save Demography" />
+          {route.params.update ? (
+            <SubmitButton title="Update Demography" />
+          ) : (
+            <SubmitButton title="Save Demography" />
+          )}
         </Form>
       </ScrollView>
 
@@ -1345,10 +1698,15 @@ function AddDemographyScreen({ navigation, route }) {
                   }}
                   onPress={() => {
                     setModalVisible(!modalVisible);
-                    handleSubmit(tempData);
+                    if (route.params.update) handleSubmitUpdate(tempData);
+                    else handleSubmitNew(tempData);
                   }}
                 >
-                  <Text style={styles.textStyle}>Save Information</Text>
+                  {route.params.update ? (
+                    <Text style={styles.textStyle}>Update Information</Text>
+                  ) : (
+                    <Text style={styles.textStyle}>Add Information</Text>
+                  )}
                 </TouchableHighlight>
               </View>
             </ScrollView>

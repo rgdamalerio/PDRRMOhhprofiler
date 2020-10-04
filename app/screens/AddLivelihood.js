@@ -25,6 +25,7 @@ import SwitchInput from "../components/SwitchInput";
 
 const validationSchema = Yup.object().shape({
   lib_typeoflivelihood: Yup.string().required().label("Type of livelihood"),
+  tbl_livelihoodproducts: Yup.string().required().label("Product name"),
   lib_tenuralstatus_id: Yup.object().nullable(),
   otherTenuralStatusval: Yup.string().when("lib_tenuralstatus_id.label", {
     is: "Other, Please specify",
@@ -37,6 +38,9 @@ let resetFormHolder;
 
 function AddLivelihood({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);
+  const [livelihod, setLivelihod] = useState(
+    route.params.update ? route.params.hhlivelihood : []
+  );
   const [loading, setLoading] = useState(false);
   const [typelivelihood, setTypelivelihood] = useState([]);
   const [tenuralStatus, setTenuralStatus] = useState([]);
@@ -46,6 +50,9 @@ function AddLivelihood({ navigation, route }) {
   const [tempData, settemData] = useState();
 
   useEffect(() => {
+    route.params.update
+      ? navigation.setOptions({ title: "Update Livelihood info" })
+      : "";
     getTypeLivelihood();
     getTenuralStatus();
   }, []);
@@ -103,7 +110,7 @@ function AddLivelihood({ navigation, route }) {
     setModalVisible(true);
   };
 
-  const handleSubmit = (data) => {
+  const handleSubmitNew = (data) => {
     setLoading(true);
     db.transaction(
       (tx) => {
@@ -230,20 +237,145 @@ function AddLivelihood({ navigation, route }) {
     );
   };
 
+  const handleSubmitUpdate = (data) => {
+    setLoading(true);
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "UPDATE tbl_livelihood SET " +
+            "lib_typeoflivelihood = ?," +
+            "tbl_livelihoodmarketvalue = ?," +
+            "tbl_livelihoodtotalarea = ?," +
+            "tbl_livelihoodproducts = ?," +
+            "lib_tenuralstatus_id = ?," +
+            "tbl_livelihoodiswithinsurance = ?," +
+            "updated_at = ?," +
+            "updated_by= ?  WHERE id = ?",
+          [
+            data.lib_typeoflivelihood.id,
+            data.tbl_livelihoodmarketvalue,
+            data.tbl_livelihoodtotalarea,
+            data.tbl_livelihoodproducts,
+            data.lib_tenuralstatus_id.id,
+            data.tbl_livelihoodiswithinsurance,
+            String(date),
+            user.idtbl_enumerator,
+            route.params.id,
+          ],
+          (tx, results) => {
+            if (results.rowsAffected > 0) {
+              if (data.lib_tenuralstatus_id.id == tenuralStatus.length) {
+                db.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE libl_tenuralstatus SET tbl_tsname = ? where id = ?",
+                      [data.otherTenuralStatusval, tenuralStatus.length],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO libl_tenuralstatus (" +
+                                  "id," +
+                                  "tbl_tsname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?,?)",
+                                [
+                                  tenuralStatus.length + 1,
+                                  "Other, Please specify",
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    getTenuralStatus();
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new Tenural status item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
+                            },
+                            (error) => {
+                              Alert.alert("Error", error.message);
+                            }
+                          );
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in evacuation area failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    Alert.alert("Error", error.message);
+                  }
+                );
+              }
+              setLoading(false);
+              resetFormHolder();
+              navigation.navigate("Done", { screen: "AnimatedMap" });
+            } else {
+              setLoading(false);
+              alert("Adding Program information Failed");
+            }
+          }
+        );
+      },
+      (error) => {
+        setLoading(false);
+        alert("Database Error: " + error.message);
+      }
+    );
+  };
+
   return (
     <>
       <ActivityIndicator visible={loading} />
       <ScrollView style={styles.container}>
         <Form
           initialValues={{
-            lib_typeoflivelihood: "",
+            lib_typeoflivelihood: route.params.update
+              ? livelihod.lib_typeoflivelihood
+                ? {
+                    id: livelihod.lib_typeoflivelihood,
+                    label: livelihod.lib_desc,
+                  }
+                : ""
+              : "",
             tbl_household_id: route.params.id,
-            tbl_livelihoodmarketvalue: 0,
-            tbl_livelihoodtotalarea: 0,
-            tbl_livelihoodproducts: "",
-            lib_tenuralstatus_id: 0,
+            tbl_livelihoodmarketvalue: route.params.update
+              ? String(livelihod.tbl_livelihoodmarketvalue)
+              : 0,
+            tbl_livelihoodtotalarea: route.params.update
+              ? String(livelihod.tbl_livelihoodtotalarea)
+              : 0,
+            tbl_livelihoodproducts: route.params.update
+              ? livelihod.tbl_livelihoodproducts
+              : "",
+            lib_tenuralstatus_id: route.params.update
+              ? livelihod.lib_tenuralstatus_id
+                ? {
+                    id: livelihod.lib_tenuralstatus_id,
+                    label: livelihod.tbl_tsname,
+                  }
+                : 0
+              : 0,
             otherTenuralStatusval: "",
-            tbl_livelihoodiswithinsurance: 0,
+            tbl_livelihoodiswithinsurance: route.params.update
+              ? livelihod.tbl_livelihoodiswithinsurance == 1
+                ? true
+                : false
+              : false,
             created_at: String(new Date()),
             updated_at: String(new Date()),
             created_by: user.idtbl_enumerator,
@@ -255,22 +387,27 @@ function AddLivelihood({ navigation, route }) {
           }}
           validationSchema={validationSchema}
         >
-          <TouchableHighlight
-            style={{
-              ...styles.openButton,
-              alignSelf: "flex-start",
-              backgroundColor: "#ff5252",
-              marginTop: 15,
-              marginBottom: 15,
-            }}
-            onPress={() => {
-              navigation.navigate("AddImage", {
-                id: householdid,
-              });
-            }}
-          >
-            <Text style={styles.textStyle}>Skip</Text>
-          </TouchableHighlight>
+          {route.params.new && (
+            <TouchableHighlight
+              style={{
+                ...styles.openButton,
+                alignSelf: "flex-start",
+                backgroundColor: "#ff5252",
+                marginTop: 15,
+                marginBottom: 15,
+              }}
+              onPress={() => {
+                navigation.navigate("AddImage", {
+                  id: householdid,
+                  new: true,
+                  addmore: false,
+                  update: false,
+                });
+              }}
+            >
+              <Text style={styles.textStyle}>Skip</Text>
+            </TouchableHighlight>
+          )}
 
           <Picker
             icon="format-list-bulleted-type"
@@ -318,7 +455,7 @@ function AddLivelihood({ navigation, route }) {
             autoCorrect={false}
             icon="alpha-p"
             name="tbl_livelihoodproducts"
-            placeholder="Product name"
+            placeholder="Product name *"
           />
 
           <SwitchInput
@@ -326,7 +463,12 @@ function AddLivelihood({ navigation, route }) {
             name="tbl_livelihoodiswithinsurance"
             placeholder="Livelihood is with insurance"
           />
-          <SubmitButton title="Add Livelihood" />
+
+          {route.params.update ? (
+            <SubmitButton title="Update Livelihood" />
+          ) : (
+            <SubmitButton title="Add Livelihood" />
+          )}
         </Form>
       </ScrollView>
 
@@ -474,10 +616,15 @@ function AddLivelihood({ navigation, route }) {
                   }}
                   onPress={() => {
                     setModalVisible(!modalVisible);
-                    handleSubmit(tempData);
+                    if (route.params.update) handleSubmitUpdate(tempData);
+                    else handleSubmitNew(tempData);
                   }}
                 >
-                  <Text style={styles.textStyle}>Save Information</Text>
+                  {route.params.update ? (
+                    <Text style={styles.textStyle}>Update Information</Text>
+                  ) : (
+                    <Text style={styles.textStyle}>Add Information</Text>
+                  )}
                 </TouchableHighlight>
               </View>
             </ScrollView>
