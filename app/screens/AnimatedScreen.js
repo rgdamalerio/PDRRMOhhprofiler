@@ -93,6 +93,14 @@ function AnimatedScreen({ navigation }) {
     });
   });
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchHousehold();
+    });
+    // Return the function to unsubscribe from the event so it gets removed on unmount
+    return unsubscribe;
+  }, [navigation]);
+
   const fetchHousehold = () => {
     db.transaction(
       (tx) => {
@@ -124,6 +132,7 @@ function AnimatedScreen({ navigation }) {
             "tbl_hhaccesswater," +
             "tbl_hhwaterpotable," +
             "tbl_watertenuralstatus_id," +
+            "tbl_hhlvlwatersystem_id," +
             "tbl_evacuation_areas_id," +
             "tbl_hhhasaccesshealtmedicalfacility," +
             "tbl_hhhasaccesshealtmedicalfacility," +
@@ -162,8 +171,7 @@ function AnimatedScreen({ navigation }) {
             "lib_wtdesc," + //lib_hhwatertenuralstatus
             "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
             "lib_hhlvldesc," +
-            "lib_heaname," + //lib_hhevacuationarea
-            "lib_hhlvldesc " +
+            "lib_heaname " + //lib_hhevacuationarea
             "FROM tbl_household " +
             "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
             "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
@@ -235,6 +243,11 @@ function AnimatedScreen({ navigation }) {
             "tbl_hhaccesswater," +
             "tbl_hhwaterpotable," +
             "tbl_watertenuralstatus_id," +
+            "tbl_hhlvlwatersystem_id," +
+            "tbl_hhfloodsoccurinarea," +
+            "tbl_hhfloodsoccurinareayear," +
+            "tbl_hhexperienceevacuationoncalamity," +
+            "tbl_hhexperienceevacuationoncalamityyear," +
             "tbl_evacuation_areas_id," +
             "tbl_hhhasaccesshealtmedicalfacility," +
             "tbl_hhhasaccesshealtmedicalfacility," +
@@ -273,8 +286,7 @@ function AnimatedScreen({ navigation }) {
             "lib_wtdesc," + //lib_hhwatertenuralstatus
             "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
             "lib_hhlvldesc," +
-            "lib_heaname," + //lib_hhevacuationarea
-            "lib_hhlvldesc " +
+            "lib_heaname " + //lib_hhevacuationarea
             "FROM tbl_household " +
             "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
             "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality

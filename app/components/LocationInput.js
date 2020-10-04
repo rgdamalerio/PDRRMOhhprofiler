@@ -95,21 +95,6 @@ function LocationInput({
               }}
             />
           </MapView>
-
-          {/*<FontAwesome
-            name="dot-circle-o"
-            style={{
-              zIndex: 3,
-              position: "absolute",
-              marginTop: -37,
-              marginLeft: -11,
-              left: "50%",
-              top: "50%",
-            }}
-            size={10}
-            color={defaultStyles.colors.green}
-          />*/}
-
           <View
             style={{
               flexDirection: "row",

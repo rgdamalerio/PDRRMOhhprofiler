@@ -320,7 +320,7 @@ function ProfilerScreen({ navigation, route }) {
     setModalVisible(true);
   };
 
-  const handleSubmit = (data) => {
+  const handleSubmitNew = (data) => {
     setLoading(true);
     db.transaction(
       (tx) => {
@@ -475,40 +475,288 @@ function ProfilerScreen({ navigation, route }) {
     );
   };
 
+  const handleSubmitUpdate = (data) => {
+    setLoading(true);
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "UPDATE tbl_household SET " +
+            "tbl_hhlatitude = ?," +
+            "tbl_hhlongitude = ?," +
+            "tbl_hhyearconstruct = ?," +
+            "tbl_hhecost = ?," +
+            "tbl_hhnobedroms = ?," +
+            "tbl_hhnostorey = ?," +
+            "tbl_hhaelectricity = ?," +
+            "tbl_hhainternet = ? ," +
+            "tbl_enumerator_id_fk =? ," +
+            "tbl_psgc_brgy_id =? ," +
+            "tbl_psgc_mun_id = ?," +
+            "tbl_psgc_pro_id =? ," +
+            "lib_typeofbuilding_id =? ," +
+            "tbl_tenuralstatus_id =? ," +
+            "tbl_typeofconmaterials_id =? ," +
+            "tbl_wallconmaterials_id =? ," +
+            "tbl_hhaccesswater =? ," +
+            "tbl_hhwaterpotable =? ," +
+            "tbl_watertenuralstatus_id =? ," +
+            "tbl_hhlvlwatersystem_id =?," +
+            "tbl_hhfloodsoccurinarea =? ," +
+            "tbl_hhfloodsoccurinareayear =? ," +
+            "tbl_hhexperienceevacuationoncalamity =? ," +
+            "tbl_hhexperienceevacuationoncalamityyear =?," +
+            "tbl_evacuation_areas_id =?," +
+            "tbl_hhhasaccesshealtmedicalfacility =? ," +
+            "tbl_hhhasaccesstelecom =? ," +
+            "tbl_hasaccessdrillsandsimulations =? ," +
+            "tbl_householdpuroksittio =? ," +
+            "tbl_respondent = ? ," +
+            "updated_at = ?," +
+            "updatedy_by= ?  WHERE tbl_household_id = ?",
+          [
+            data.coordinates != null ? data.coordinates.latitude : "",
+            data.coordinates != null ? data.coordinates.longitude : "",
+            data.yearconstract,
+            data.cost,
+            data.beadroom,
+            data.storeys,
+            data.aelectricity ? 1 : 0,
+            data.internet ? 1 : 0,
+            user.idtbl_enumerator,
+            data.brgy.id,
+            data.mun.id,
+            "PH160200000",
+            data.typebuilding.id ? data.typebuilding.id : 0,
+            data.tenuralstatus.id ? data.tenuralstatus.id : 0,
+            data.roofmaterial.id ? data.roofmaterial.id : 0,
+            data.wallmaterial.id ? data.wallmaterial.id : 0,
+            data.awater ? 1 : 0,
+            data.wpotable ? 1 : 0,
+            data.wtenuralstatus.id ? data.wtenuralstatus.id : 0,
+            data.wlvlsystem.id ? data.wlvlsystem.id : 0,
+            data.tbl_hhfloodsoccurinarea ? 1 : 0,
+            data.tbl_hhfloodsoccurinareayear,
+            data.tbl_hhexperienceevacuationoncalamity ? 1 : 0,
+            data.tbl_hhexperienceevacuationoncalamityyear,
+            data.evacuationarea.id ? data.evacuationarea.id : 0,
+            data.accessmedfacility ? 1 : 0,
+            data.accesstelecommunication ? 1 : 0,
+            data.accessdrillsimulation ? 1 : 0,
+            data.purok,
+            data.respondentname,
+            String(date),
+            user.idtbl_enumerator,
+            route.params.id,
+          ],
+          (tx, results) => {
+            if (results.rowsAffected > 0) {
+              const insertId = results.insertId; //set newly inserted id
+
+              if (data.evacuationarea.id == evacuationarea.length) {
+                db.transaction(
+                  (tx) => {
+                    tx.executeSql(
+                      "UPDATE lib_hhevacuationarea SET lib_heaname = ? where id = ?",
+                      [data.otherevacuation, evacuationarea.length],
+                      (tx, results) => {
+                        if (results.rowsAffected > 0) {
+                          db.transaction(
+                            (tx) => {
+                              tx.executeSql(
+                                "INSERT INTO lib_hhevacuationarea (" +
+                                  "id," +
+                                  "lib_heaname," +
+                                  "created_at," +
+                                  "created_by," +
+                                  "updated_at," +
+                                  "updated_by" +
+                                  ") values (?,?,?,?,?,?)",
+                                [
+                                  evacuationarea.length + 1,
+                                  "Other, Please specify",
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                  String(date),
+                                  user.idtbl_enumerator,
+                                ],
+                                (tx, results) => {
+                                  if (results.rowsAffected > 0) {
+                                    getEvacuationareas();
+                                    setOtherEvacuation(false);
+                                  } else {
+                                    Alert.alert(
+                                      "Error",
+                                      "Adding new evacuation area item failed, Please update data or contact administrator"
+                                    );
+                                  }
+                                }
+                              );
+                            },
+                            (error) => {
+                              Alert.alert("Error", error);
+                            }
+                          );
+                        } else {
+                          Alert.alert(
+                            "Error",
+                            "Update last item in evacuation area failed, Please update data or contact administrator"
+                          );
+                        }
+                      }
+                    );
+                  },
+                  (error) => {
+                    Alert.alert("Error", error);
+                  }
+                );
+              }
+              setLoading(false);
+              resetFormHolder();
+              navigation.navigate("Done", { screen: "AnimatedMap" });
+            } else {
+              setLoading(false);
+              alert("Adding household information Failed");
+            }
+          }
+        );
+      },
+      (error) => {
+        setLoading(false);
+        alert("Database Error: " + error.message);
+      }
+    );
+  };
+
   return (
     <>
       <ActivityIndicator visible={loading} />
       <ScrollView style={styles.container}>
         <Form
           initialValues={{
-            respondentname: "",
-            mun: "",
-            brgy: "",
-            purok: "",
-            coordinates: null,
-            typebuilding: "",
-            yearconstract: 0,
-            cost: 0,
-            beadroom: 0,
-            storeys: 0,
-            aelectricity: false,
-            internet: false,
-            roofmaterial: 0,
-            wallmaterial: 0,
-            awater: false,
-            wpotable: false,
-            wtenuralstatus: 0,
-            wlvlsystem: 0,
-            tbl_hhfloodsoccurinarea: false,
-            tbl_hhfloodsoccurinareayear: "",
-            tbl_hhexperienceevacuationoncalamity: 0,
-            tbl_hhexperienceevacuationoncalamityyear: "",
-            evacuationarea: 0,
+            respondentname: route.params.update ? hhinfo[0].tbl_respondent : "",
+            mun: route.params.update
+              ? {
+                  id: hhinfo[0].tbl_psgc_mun_id,
+                  label: hhinfo[0].tbl_psgc_munname,
+                }
+              : "",
+            brgy: route.params.update
+              ? {
+                  id: hhinfo[0].tbl_psgc_brgy_id,
+                  label: hhinfo[0].tbl_psgc_brgyname,
+                }
+              : "",
+            purok: route.params.update
+              ? hhinfo[0].tbl_householdpuroksittio
+              : "",
+            coordinates: route.params.update
+              ? {
+                  latitude: hhinfo[0].tbl_hhlatitude,
+                  longitude: hhinfo[0].tbl_hhlongitude,
+                }
+              : null,
+            typebuilding: route.params.update
+              ? {
+                  id: hhinfo[0].lib_typeofbuilding_id,
+                  label: hhinfo[0].lib_buildingtypedesc,
+                }
+              : "",
+            tenuralstatus: route.params.update
+              ? {
+                  id: hhinfo[0].tbl_tenuralstatus_id,
+                  label: hhinfo[0].lib_tenuralstatusdesc,
+                }
+              : "",
+            yearconstract: route.params.update
+              ? hhinfo[0].tbl_hhyearconstruct
+              : 0,
+            cost: route.params.update ? String(hhinfo[0].tbl_hhecost) : 0,
+            beadroom: route.params.update
+              ? String(hhinfo[0].tbl_hhnobedroms)
+              : 0,
+            storeys: route.params.update ? String(hhinfo[0].tbl_hhnostorey) : 0,
+            aelectricity: route.params.update
+              ? hhinfo[0].tbl_hhaelectricity == 1
+                ? true
+                : false
+              : false,
+            internet: route.params.update
+              ? hhinfo[0].tbl_hhainternet == 1
+                ? true
+                : false
+              : false,
+            roofmaterial: route.params.update
+              ? {
+                  id: hhinfo[0].tbl_wallconmaterials_id,
+                  label: hhinfo[0].lib_roofmaterialsdesc,
+                }
+              : 0,
+            wallmaterial: route.params.update
+              ? {
+                  id: hhinfo[0].tbl_typeofconmaterials_id,
+                  label: hhinfo[0].lib_wallmaterialsdesc,
+                }
+              : 0,
+            awater: route.params.update
+              ? hhinfo[0].tbl_hhaccesswater == 1
+                ? true
+                : false
+              : false,
+            wpotable: route.params.update
+              ? hhinfo[0].tbl_hhwaterpotable == 1
+                ? true
+                : false
+              : false,
+            wtenuralstatus: route.params.update
+              ? {
+                  id: hhinfo[0].tbl_watertenuralstatus_id,
+                  label: hhinfo[0].lib_wtdesc,
+                }
+              : "",
+            wlvlsystem: route.params.update
+              ? {
+                  id: hhinfo[0].tbl_hhlvlwatersystem_id,
+                  label: hhinfo[0].lib_hhlvldesc,
+                }
+              : "",
+            tbl_hhfloodsoccurinarea: route.params.update
+              ? hhinfo[0].tbl_hhfloodsoccurinarea == 1
+                ? true
+                : false
+              : false,
+            tbl_hhfloodsoccurinareayear: route.params.update
+              ? hhinfo[0].tbl_hhfloodsoccurinareayear
+              : "",
+            tbl_hhexperienceevacuationoncalamity: route.params.update
+              ? hhinfo[0].tbl_hhexperienceevacuationoncalamity == 1
+                ? true
+                : false
+              : false,
+            tbl_hhexperienceevacuationoncalamityyear: route.params.update
+              ? hhinfo[0].tbl_hhexperienceevacuationoncalamityyear
+              : "",
+            evacuationarea: route.params.update
+              ? {
+                  id: hhinfo[0].tbl_evacuation_areas_id,
+                  label: hhinfo[0].lib_heaname,
+                }
+              : "",
             otherevacuation: "",
-            accessmedfacility: false,
-            accesstelecommunication: false,
-            accessdrillsimulation: false,
-            tenuralstatus: 0,
+            accessmedfacility: route.params.update
+              ? hhinfo[0].tbl_hhhasaccesshealtmedicalfacility == 1
+                ? true
+                : false
+              : false,
+            accesstelecommunication: route.params.update
+              ? hhinfo[0].tbl_hhhasaccesstelecom == 1
+                ? true
+                : false
+              : false,
+            accessdrillsimulation: route.params.update
+              ? hhinfo[0].tbl_hasaccessdrillsandsimulations == 1
+                ? true
+                : false
+              : false,
           }}
           onSubmit={(values, { resetForm }) => {
             resetFormHolder = resetForm;
@@ -726,7 +974,11 @@ function ProfilerScreen({ navigation, route }) {
             placeholder="Access to drill/simulation"
           />
 
-          <SubmitButton title="Save" />
+          {route.params.update ? (
+            <SubmitButton title="Update" />
+          ) : (
+            <SubmitButton title="Save" />
+          )}
         </Form>
       </ScrollView>
       {tempData && (
@@ -1217,10 +1469,15 @@ function ProfilerScreen({ navigation, route }) {
                   }}
                   onPress={() => {
                     setModalVisible(!modalVisible);
-                    handleSubmit(tempData);
+                    if (route.params.update) handleSubmitUpdate(tempData);
+                    else handleSubmitNew(tempData);
                   }}
                 >
-                  <Text style={styles.textStyle}>Save Information</Text>
+                  {route.params.update ? (
+                    <Text style={styles.textStyle}>Update Information</Text>
+                  ) : (
+                    <Text style={styles.textStyle}>Add Information</Text>
+                  )}
                 </TouchableHighlight>
               </View>
             </ScrollView>
