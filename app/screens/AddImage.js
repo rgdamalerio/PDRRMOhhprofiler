@@ -112,10 +112,7 @@ function AddImage({ navigation, route }) {
           `${FileSystem.documentDirectory}Photo/${filename}.jpeg`
         );
         if (newFile.exists) {
-          createAlbum(
-            `${FileSystem.documentDirectory}Photo/${filename}.jpeg`,
-            `${filename}.jpeg`
-          );
+          createAlbum(`${FileSystem.documentDirectory}Photo/${filename}.jpeg`);
         }
       } else {
         console.log("Folder not exist");
@@ -152,29 +149,62 @@ function AddImage({ navigation, route }) {
       );
   };
 
-  const createAlbum = async (uri, filename) => {
-    try {
-      const asset = await MediaLibrary.createAssetAsync(uri);
-      MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
-        .then(() => {
-          handleSubmit(asset.filename);
-        })
-        .catch((error) => {
-          alert("Error saving image, Error details: " + error);
-        });
-    } catch (error) {
-      console.log(error);
-    }
-    return;
+  const createAlbum = async (uri) => {
+    //Initialize asset from uri
+    const asset = await MediaLibrary.createAssetAsync(uri);
+
+    //Remove existing image if available
+    MediaLibrary.getAlbumAsync("PDRRMOProfiler").then((album) => {
+      console.log(asset);
+      if (album) {
+        MediaLibrary.removeAssetsFromAlbumAsync(asset, album.id)
+          .then((result) => {
+            console.log(result);
+          })
+          .catch((error) => {
+            alert("Error deleting previous image from album");
+          });
+      }
+    });
+    //Check if album exist
+    MediaLibrary.getAlbumAsync("PDRRMOProfiler").then((album) => {
+      //if return true just add asset to album
+      if (album) {
+        try {
+          MediaLibrary.addAssetsToAlbumAsync(asset, album.id, false)
+            .then((result) => {
+              handleSubmit(asset.filename, asset.uri);
+            })
+            .catch((error) => {
+              alert("Error adding asset to album: " + error);
+            });
+        } catch (error) {
+          handleSubmit(asset.filename, asset.uri);
+        }
+        //if false create album with initial asset
+      } else {
+        try {
+          MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
+            .then(() => {
+              handleSubmit(asset.filename, asset.uri);
+            })
+            .catch((error) => {
+              alert("Error saving image, Error details: " + error);
+            });
+        } catch (error) {
+          handleSubmit(asset.filename, asset.uri);
+        }
+      }
+    });
   };
 
-  const handleSubmit = (filename) => {
+  const handleSubmit = (filename, uri) => {
     setLoading(true);
     db.transaction(
       (tx) => {
         tx.executeSql(
-          "UPDATE tbl_household SET tbl_hhimage = ? where tbl_household_id = ?",
-          [filename, householdid],
+          "UPDATE tbl_household SET tbl_hhimage = ?, tbl_uri = ? where tbl_household_id = ?",
+          [filename, uri, householdid],
           (tx, results) => {
             if (results.rowsAffected > 0) {
               setLoading(false);
@@ -224,7 +254,9 @@ function AddImage({ navigation, route }) {
             width: "100%",
           }}
           onPress={() => {
-            copyImage(imageUri, householdHead[0].newfilename);
+            const filename =
+              householdHead[0].newfilename + "_" + new Date().getTime();
+            copyImage(imageUri, filename);
           }}
         >
           <MaterialCommunityIcons
