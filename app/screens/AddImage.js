@@ -40,24 +40,22 @@ function AddImage({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-      // camera roll
-      const { cam_roll } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      setRollPermission(cam_roll === "granted");
-      setRollPermission(true);
-    })();
+    requestCameraPermission();
+    requestMediaLibraryPermission();
   }, []);
 
-  const requestPermission = async () => {
-    const { granted } = await Permissions.askAsync(
-      Permissions.CAMERA_ROLL,
-      Permissions.CAMERA
-    );
+  const requestCameraPermission = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA);
     if (!granted)
       alert("You need to enable permission to access the Camera library.");
     else setHasPermission(true);
+  };
+
+  const requestMediaLibraryPermission = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (!granted)
+      alert("You need to enable permission to access the Media library.");
+    else setRollPermission(true);
   };
 
   const getHouseholdHead = () => {
@@ -115,10 +113,10 @@ function AddImage({ navigation, route }) {
           createAlbum(`${FileSystem.documentDirectory}Photo/${filename}.jpeg`);
         }
       } else {
-        console.log("Folder not exist");
+        alert("Folder not exist");
       }
     } catch (error) {
-      console.log("Error : " + error);
+      alert("Error : " + error);
     }
   };
   const takePicture = async () => {
@@ -130,7 +128,8 @@ function AddImage({ navigation, route }) {
   };
 
   const handlePress = () => {
-    requestPermission();
+    requestCameraPermission();
+    requestMediaLibraryPermission();
     if (!imageUri) setModalVisible(true);
     else
       Alert.alert(
@@ -155,12 +154,9 @@ function AddImage({ navigation, route }) {
 
     //Remove existing image if available
     MediaLibrary.getAlbumAsync("PDRRMOProfiler").then((album) => {
-      console.log(asset);
       if (album) {
         MediaLibrary.removeAssetsFromAlbumAsync(asset, album.id)
-          .then((result) => {
-            console.log(result);
-          })
+          .then((result) => {})
           .catch((error) => {
             alert("Error deleting previous image from album");
           });

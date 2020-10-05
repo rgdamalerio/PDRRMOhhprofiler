@@ -1,72 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as FileSystem from "expo-file-system";
-import { View, Text } from "react-native";
 import { Asset } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
 import { AppLoading } from "expo";
-import * as SQLite from "expo-sqlite";
+import * as Permissions from "expo-permissions";
 
-import RegisterScreens from "./app/screens/RegisterScreen";
-import RespondentScreen from "./app/screens/RespondentScreen";
-import AccountScreen from "./app/screens/AccountScreen";
-import WelcomeScreen from "./app/screens/WelcomeScreen";
-import LoginScreen from "./app/screens/LoginScreen";
-import ProfilerScreen from "./app/screens/ProfilerScreen";
-import Household from "./app/screens/HouseholdScreen";
-import AddDemographyScreen from "./app/screens/AddDemographyScreen";
-import CameraInput from "./app/components/CameraInput";
-import LocationInput from "./app/components/LocationInput";
-import DateInput from "./app/components/DateInput";
-import RegisterScreen from "./app/screens/RegisterScreen";
-import Picker from "./app/components/Picker";
 import navigationTheme from "./app/navigation/navigationTheme";
 import AppNavigator from "./app/navigation/AppNavigator";
 import AuthNavigator from "./app/navigation/AuthNavigator";
 import AuthContext from "./app/auth/context";
 import authStorage from "./app/auth/storage";
-import AddLivelihood from "./app/screens/AddLivelihood";
 import ActivityIndicator from "./app/components/ActivityIndicator";
-import AddImage from "./app/screens/AddImage";
-import Done from "./app/screens/Done";
 const databaseName = "hhprofiler.db";
-
-async function removeDatabase() {
-  const sqlDir = `${FileSystem.documentDirectory}SQLite/`;
-  await FileSystem.deleteAsync(sqlDir + "hhprofiler.db", {
-    idempotent: true,
-  })
-    .then(() => {
-      console.log("Finished deleting ");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-
-  await FileSystem.deleteAsync(sqlDir + "database.db-journal", {
-    idempotent: true,
-  })
-    .then(() => {
-      console.log("Finished deleting ");
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-
-  const internalDbName = "hhprofiler.db"; // Call whatever you want
-  if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
-    console.log("Wala najud ha. pa abtan nato 5mins");
-  }
-}
-
-const checkDatabaseExist = async () => {
-  const internalDbName = "hhprofiler.db";
-  const sqlDir = FileSystem.documentDirectory + "SQLite/";
-  if (!(await FileSystem.getInfoAsync(sqlDir + internalDbName)).exists) {
-    console.log("dir not exists");
-  } else {
-    console.log("dir exists");
-  }
-};
 
 export default function App() {
   const [user, setUser] = useState();
@@ -74,10 +19,25 @@ export default function App() {
   const [loading, setLoading] = useState(false);
 
   const startup = () => {
-    //removeDatabase();
-    //penDatabaseIShipWithApp();
     openDatabase();
     restoreUser();
+  };
+
+  useEffect(() => {
+    requestCameraPermission();
+    requestMediaLibraryPermission();
+  }, []);
+
+  const requestCameraPermission = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA);
+    if (!granted)
+      alert("You need to enable permission to access the Camera library.");
+  };
+
+  const requestMediaLibraryPermission = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (!granted)
+      alert("You need to enable permission to access the Media library.");
   };
 
   const restoreUser = async () => {
@@ -125,8 +85,6 @@ export default function App() {
       <AppLoading startAsync={startup} onFinish={() => setIsReady(true)} />
     );
 
-  //checkDatabaseExist();
-
   {
     if (!loading) return <ActivityIndicator visible={true} />;
     return (
@@ -135,7 +93,6 @@ export default function App() {
           {user ? <AppNavigator /> : <AuthNavigator />}
         </NavigationContainer>
       </AuthContext.Provider>
-      /*<Done />*/
     );
   }
 }

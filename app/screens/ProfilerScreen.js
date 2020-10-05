@@ -637,37 +637,47 @@ function ProfilerScreen({ navigation, route }) {
           initialValues={{
             respondentname: route.params.update ? hhinfo[0].tbl_respondent : "",
             mun: route.params.update
-              ? {
-                  id: hhinfo[0].tbl_psgc_mun_id,
-                  label: hhinfo[0].tbl_psgc_munname,
-                }
+              ? hhinfo[0].tbl_psgc_mun_id
+                ? {
+                    id: hhinfo[0].tbl_psgc_mun_id,
+                    label: hhinfo[0].tbl_psgc_munname,
+                  }
+                : ""
               : "",
             brgy: route.params.update
-              ? {
-                  id: hhinfo[0].tbl_psgc_brgy_id,
-                  label: hhinfo[0].tbl_psgc_brgyname,
-                }
+              ? hhinfo[0].tbl_psgc_brgy_id
+                ? {
+                    id: hhinfo[0].tbl_psgc_brgy_id,
+                    label: hhinfo[0].tbl_psgc_brgyname,
+                  }
+                : ""
               : "",
             purok: route.params.update
               ? hhinfo[0].tbl_householdpuroksittio
               : "",
             coordinates: route.params.update
-              ? {
-                  latitude: hhinfo[0].tbl_hhlatitude,
-                  longitude: hhinfo[0].tbl_hhlongitude,
-                }
+              ? hhinfo[0].tbl_hhlatitude
+                ? {
+                    latitude: hhinfo[0].tbl_hhlatitude,
+                    longitude: hhinfo[0].tbl_hhlongitude,
+                  }
+                : null
               : null,
             typebuilding: route.params.update
-              ? {
-                  id: hhinfo[0].lib_typeofbuilding_id,
-                  label: hhinfo[0].lib_buildingtypedesc,
-                }
+              ? hhinfo[0].lib_typeofbuilding_id
+                ? {
+                    id: hhinfo[0].lib_typeofbuilding_id,
+                    label: hhinfo[0].lib_buildingtypedesc,
+                  }
+                : ""
               : "",
             tenuralstatus: route.params.update
-              ? {
-                  id: hhinfo[0].tbl_tenuralstatus_id,
-                  label: hhinfo[0].lib_tenuralstatusdesc,
-                }
+              ? hhinfo[0].tbl_tenuralstatus_id
+                ? {
+                    id: hhinfo[0].tbl_tenuralstatus_id,
+                    label: hhinfo[0].lib_tenuralstatusdesc,
+                  }
+                : ""
               : "",
             yearconstract: route.params.update
               ? hhinfo[0].tbl_hhyearconstruct
@@ -688,16 +698,20 @@ function ProfilerScreen({ navigation, route }) {
                 : false
               : false,
             roofmaterial: route.params.update
-              ? {
-                  id: hhinfo[0].tbl_wallconmaterials_id,
-                  label: hhinfo[0].lib_roofmaterialsdesc,
-                }
+              ? hhinfo[0].tbl_wallconmaterials_id
+                ? {
+                    id: hhinfo[0].tbl_wallconmaterials_id,
+                    label: hhinfo[0].lib_roofmaterialsdesc,
+                  }
+                : ""
               : 0,
             wallmaterial: route.params.update
-              ? {
-                  id: hhinfo[0].tbl_typeofconmaterials_id,
-                  label: hhinfo[0].lib_wallmaterialsdesc,
-                }
+              ? hhinfo[0].tbl_typeofconmaterials_id
+                ? {
+                    id: hhinfo[0].tbl_typeofconmaterials_id,
+                    label: hhinfo[0].lib_wallmaterialsdesc,
+                  }
+                : ""
               : 0,
             awater: route.params.update
               ? hhinfo[0].tbl_hhaccesswater == 1
@@ -710,16 +724,20 @@ function ProfilerScreen({ navigation, route }) {
                 : false
               : false,
             wtenuralstatus: route.params.update
-              ? {
-                  id: hhinfo[0].tbl_watertenuralstatus_id,
-                  label: hhinfo[0].lib_wtdesc,
-                }
+              ? hhinfo[0].tbl_watertenuralstatus_id
+                ? {
+                    id: hhinfo[0].tbl_watertenuralstatus_id,
+                    label: hhinfo[0].lib_wtdesc,
+                  }
+                : ""
               : "",
             wlvlsystem: route.params.update
-              ? {
-                  id: hhinfo[0].tbl_hhlvlwatersystem_id,
-                  label: hhinfo[0].lib_hhlvldesc,
-                }
+              ? hhinfo[0].tbl_hhlvlwatersystem_id
+                ? {
+                    id: hhinfo[0].tbl_hhlvlwatersystem_id,
+                    label: hhinfo[0].lib_hhlvldesc,
+                  }
+                : ""
               : "",
             tbl_hhfloodsoccurinarea: route.params.update
               ? hhinfo[0].tbl_hhfloodsoccurinarea == 1
@@ -738,10 +756,12 @@ function ProfilerScreen({ navigation, route }) {
               ? hhinfo[0].tbl_hhexperienceevacuationoncalamityyear
               : "",
             evacuationarea: route.params.update
-              ? {
-                  id: hhinfo[0].tbl_evacuation_areas_id,
-                  label: hhinfo[0].lib_heaname,
-                }
+              ? hhinfo[0].tbl_evacuation_areas_id
+                ? {
+                    id: hhinfo[0].tbl_evacuation_areas_id,
+                    label: hhinfo[0].lib_heaname,
+                  }
+                : ""
               : "",
             otherevacuation: "",
             accessmedfacility: route.params.update

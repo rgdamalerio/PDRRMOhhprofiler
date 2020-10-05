@@ -25,26 +25,23 @@ function CameraInput({ imageUri, onChangeImage }) {
   const [type, setType] = useState(Camera.Constants.Type.back);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      setHasPermission(status === "granted");
-      // camera roll
-      const { cam_roll } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-      setRollPermission(cam_roll === "granted");
-      setRollPermission(true);
-    })();
+    requestCameraPermission();
+    requestMediaLibraryPermission();
   }, []);
 
-  const requestPermission = async () => {
-    const { granted } = await Permissions.askAsync(
-      Permissions.CAMERA_ROLL,
-      Permissions.CAMERA
-    );
+  const requestCameraPermission = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA);
     if (!granted)
       alert("You need to enable permission to access the Camera library.");
     else setHasPermission(true);
   };
 
+  const requestMediaLibraryPermission = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (!granted)
+      alert("You need to enable permission to access the Media library.");
+    else setRollPermission(true);
+  };
   const takePicture = async () => {
     if (cameraRef) {
       let photo = await cameraRef.takePictureAsync();
@@ -54,7 +51,8 @@ function CameraInput({ imageUri, onChangeImage }) {
   };
 
   const handlePress = () => {
-    requestPermission();
+    requestCameraPermission();
+    requestMediaLibraryPermission();
     if (!imageUri) setModalVisible(true);
     else
       Alert.alert(

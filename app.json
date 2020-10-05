@@ -22,6 +22,8 @@
       "favicon": "./app/assets/favicon.png"
     },
     "android": {
+      "package": "com.pdrrmo.hhprofiler",
+      "versionCode": 1,
       "permissions": ["WRITE_EXTERNAL_STORAGE"]
     }
   }

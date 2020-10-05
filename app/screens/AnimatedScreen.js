@@ -44,6 +44,8 @@ function AnimatedScreen({ navigation }) {
   };
 
   const [state, setState] = React.useState(initialMapState);
+  const [search, setSearch] = React.useState("");
+  const [respondents, setRespondents] = React.useState();
   const [markers, setMarkers] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [moreinfo, setMoreinfo] = React.useState([]);
@@ -187,7 +189,10 @@ function AnimatedScreen({ navigation }) {
             "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
             "where tbl_enumerator_id_fk = ?",
           [user.idtbl_enumerator],
-          (_, { rows: { _array } }) => setMarkers(_array)
+          (_, { rows: { _array } }) => {
+            setMarkers(_array);
+            setRespondents(_array);
+          }
         );
       },
       (error) => {
@@ -491,6 +496,13 @@ function AnimatedScreen({ navigation }) {
     _scrollView.current.scrollTo({ x: x, y: 0, animated: true });
   };
 
+  const handleSearch = (txt) => {
+    const newRespondent = respondents.filter(
+      (respondent) =>
+        respondent.tbl_respondent.toUpperCase().indexOf(txt.toUpperCase()) > -1
+    );
+    setMarkers(newRespondent);
+  };
   return (
     <View style={styles.container}>
       <MapView
@@ -542,8 +554,15 @@ function AnimatedScreen({ navigation }) {
           placeholderTextColor="#000"
           autoCapitalize="none"
           style={{ flex: 1, padding: 0 }}
+          onChangeText={(text) => setSearch(text)}
         />
-        <Ionicons name="ios-search" size={20} />
+        <TouchableHighlight
+          onPress={() => {
+            handleSearch(search);
+          }}
+        >
+          <Ionicons name="ios-search" size={20} />
+        </TouchableHighlight>
       </View>
       <ScrollView
         horizontal

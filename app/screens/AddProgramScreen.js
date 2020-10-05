@@ -325,7 +325,9 @@ function AddProgramScreen({ navigation, route }) {
           <Form
             initialValues={{
               typeProgram: route.params.update
-                ? { id: program.typeofprogramid, label: program.lib_topname }
+                ? program.typeofprogramid
+                  ? { id: program.typeofprogramid, label: program.lib_topname }
+                  : ""
                 : "",
               otherTypeprogramval: "",
               programname: route.params.update ? program.lib_pname : "",
