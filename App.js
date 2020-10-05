@@ -3,7 +3,6 @@ import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
 import { AppLoading } from "expo";
-import * as Permissions from "expo-permissions";
 
 import navigationTheme from "./app/navigation/navigationTheme";
 import AppNavigator from "./app/navigation/AppNavigator";
@@ -21,23 +20,6 @@ export default function App() {
   const startup = () => {
     openDatabase();
     restoreUser();
-  };
-
-  useEffect(() => {
-    requestCameraPermission();
-    requestMediaLibraryPermission();
-  }, []);
-
-  const requestCameraPermission = async () => {
-    const { granted } = await Permissions.askAsync(Permissions.CAMERA);
-    if (!granted)
-      alert("You need to enable permission to access the Camera library.");
-  };
-
-  const requestMediaLibraryPermission = async () => {
-    const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-    if (!granted)
-      alert("You need to enable permission to access the Media library.");
   };
 
   const restoreUser = async () => {
