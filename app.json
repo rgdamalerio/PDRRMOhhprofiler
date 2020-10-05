@@ -14,7 +14,11 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "assets/animations/*",
+      "assets/database/*",
+      "assets/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -24,7 +28,12 @@
     "android": {
       "package": "com.pdrrmo.hhprofiler",
       "versionCode": 1,
-      "permissions": ["WRITE_EXTERNAL_STORAGE"]
-    }
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDigLpy8-xtpylWOeklpyoXal0K9AqgONc"
+        }
+      }
+    },
+    "description": "Mobile Application of Provincial Disaster Risk Reduction Management Office for Household Profiler "
   }
 }
