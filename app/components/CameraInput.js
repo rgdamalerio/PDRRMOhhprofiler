@@ -9,7 +9,6 @@ import {
   Modal,
   Image,
 } from "react-native";
-import * as Permissions from "expo-permissions";
 import { Camera } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -19,29 +18,20 @@ import ErrorPermission from "./ErrormPermission";
 
 function CameraInput({ imageUri, onChangeImage }) {
   const [hasPermission, setHasPermission] = useState(null);
-  const [rollPermision, setRollPermission] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
 
   useEffect(() => {
-    requestCameraPermission();
-    requestMediaLibraryPermission();
+    requestPermission();
   }, []);
 
-  const requestCameraPermission = async () => {
-    const { granted } = await Permissions.askAsync(Permissions.CAMERA);
-    if (!granted)
-      alert("You need to enable permission to access the Camera library.");
-    else setHasPermission(true);
+  const requestPermission = async () => {
+    await Camera.requestPermissionsAsync().then((returns) => {
+      if (returns.granted) setHasPermission(true);
+    });
   };
 
-  const requestMediaLibraryPermission = async () => {
-    const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-    if (!granted)
-      alert("You need to enable permission to access the Media library.");
-    else setRollPermission(true);
-  };
   const takePicture = async () => {
     if (cameraRef) {
       let photo = await cameraRef.takePictureAsync();
@@ -51,8 +41,7 @@ function CameraInput({ imageUri, onChangeImage }) {
   };
 
   const handlePress = () => {
-    requestCameraPermission();
-    requestMediaLibraryPermission();
+    requestPermission();
     if (!imageUri) setModalVisible(true);
     else
       Alert.alert(
@@ -101,7 +90,7 @@ function CameraInput({ imageUri, onChangeImage }) {
         </View>
       </TouchableWithoutFeedback>
       <Modal visible={modalVisible}>
-        {hasPermission === null || rollPermision === null ? (
+        {hasPermission === null ? (
           <View
             style={{
               flex: 1,

@@ -3,6 +3,7 @@ import * as FileSystem from "expo-file-system";
 import { Asset } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
 import { AppLoading } from "expo";
+import * as MediaLibrary from "expo-media-library";
 
 import navigationTheme from "./app/navigation/navigationTheme";
 import AppNavigator from "./app/navigation/AppNavigator";
@@ -18,14 +19,13 @@ export default function App() {
   const [loading, setLoading] = useState(false);
 
   const startup = () => {
+    requestPermission();
     openDatabase();
     restoreUser();
   };
 
-  const restoreUser = async () => {
-    const user = await authStorage.getUser();
-    if (!user) return;
-    setUser(user);
+  const requestPermission = async () => {
+    MediaLibrary.requestPermissionsAsync();
   };
 
   const openDatabase = async () => {
@@ -60,6 +60,12 @@ export default function App() {
       console.log("Error : " + error);
       setLoading(true);
     }
+  };
+
+  const restoreUser = async () => {
+    const user = await authStorage.getUser();
+    if (!user) return;
+    setUser(user);
   };
 
   if (!isReady)

@@ -9,19 +9,16 @@ import {
   Modal,
   Image,
 } from "react-native";
-import * as Permissions from "expo-permissions";
+import * as MediaLibrary from "expo-media-library";
 import { Camera } from "expo-camera";
 import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as SQLite from "expo-sqlite";
 import ActivityIndicator from "../components/ActivityIndicator";
-import LottieView from "lottie-react-native";
 
 import colors from "../config/colors";
 import ErrorPermission from "../components/ErrormPermission";
 
-import Screen from "../components/Screen";
 const db = SQLite.openDatabase("hhprofiler21.db");
 
 function AddImage({ navigation, route }) {
@@ -29,7 +26,6 @@ function AddImage({ navigation, route }) {
   const [householdHead, setHouseholdHead] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
-  const [rollPermision, setRollPermission] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [imageUri, setImageUri] = useState();
   const [cameraRef, setCameraRef] = useState(null);
@@ -40,22 +36,13 @@ function AddImage({ navigation, route }) {
   }, []);
 
   useEffect(() => {
-    requestCameraPermission();
-    requestMediaLibraryPermission();
+    requestPermission();
   }, []);
 
-  const requestCameraPermission = async () => {
-    const { granted } = await Permissions.askAsync(Permissions.CAMERA);
-    if (!granted)
-      alert("You need to enable permission to access the Camera library.");
-    else setHasPermission(true);
-  };
-
-  const requestMediaLibraryPermission = async () => {
-    const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
-    if (!granted)
-      alert("You need to enable permission to access the Media library.");
-    else setRollPermission(true);
+  const requestPermission = async () => {
+    await Camera.requestPermissionsAsync().then((returns) => {
+      if (returns.granted) setHasPermission(true);
+    });
   };
 
   const getHouseholdHead = () => {
@@ -128,8 +115,7 @@ function AddImage({ navigation, route }) {
   };
 
   const handlePress = () => {
-    requestCameraPermission();
-    requestMediaLibraryPermission();
+    requestPermission();
     if (!imageUri) setModalVisible(true);
     else
       Alert.alert(
@@ -262,7 +248,7 @@ function AddImage({ navigation, route }) {
         </TouchableOpacity>
       )}
       <Modal visible={modalVisible}>
-        {hasPermission === null || rollPermision === null ? (
+        {hasPermission === null ? (
           <View
             style={{
               flex: 1,

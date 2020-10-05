@@ -4,7 +4,6 @@ import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 import * as MediaLibrary from "expo-media-library";
 
-import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
 import ActivityIndicator from "../components/ActivityIndicator";
 import {
@@ -33,7 +32,6 @@ const db = SQLite.openDatabase("hhprofiler21.db");
 
 function RegisterScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
-  const [asset, setAsset] = useState();
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
