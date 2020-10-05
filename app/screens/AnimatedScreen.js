@@ -148,6 +148,7 @@ function AnimatedScreen({ navigation }) {
             "tbl_householdpuroksittio," +
             "tbl_hhimage," +
             "tbl_respondent," +
+            "tbl_uri," +
             "idtbl_psgc_brgy," + //tbl_psgc_brgy
             "tbl_psgc_brgyname," +
             "tbl_psgc_mun_id_fk," +
@@ -502,6 +503,7 @@ function AnimatedScreen({ navigation }) {
         respondent.tbl_respondent.toUpperCase().indexOf(txt.toUpperCase()) > -1
     );
     setMarkers(newRespondent);
+    console.log(markers);
   };
   return (
     <View style={styles.container}>
