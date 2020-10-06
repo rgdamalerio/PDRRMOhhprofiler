@@ -357,11 +357,17 @@ function ProfilerScreen({ navigation, route }) {
             "tbl_hhhasaccesstelecom," +
             "tbl_hasaccessdrillsandsimulations," +
             "tbl_householdpuroksittio," +
-            "tbl_respondent" +
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "tbl_respondent," +
+            "created_at," +
+            "updated_at," +
+            "created_by," +
+            "updatedy_by " +
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             uuid,
-            String(date),
+            String(
+              date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate()
+            ),
             data.coordinates != null ? data.coordinates.latitude : "",
             data.coordinates != null ? data.coordinates.longitude : "",
             data.yearconstract,
@@ -392,6 +398,10 @@ function ProfilerScreen({ navigation, route }) {
             data.accessdrillsimulation ? 1 : 0,
             data.purok,
             data.respondentname,
+            String(date),
+            String(date),
+            user.idtbl_enumerator,
+            user.idtbl_enumerator,
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {

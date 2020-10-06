@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import Constants from "expo-constants";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as SQLite from "expo-sqlite";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -23,6 +24,18 @@ import { useTheme } from "@react-navigation/native";
 
 import { mapDarkStyle, mapStandardStyle } from "../model/mapData";
 import useAuth from "../auth/useAuth";
+
+import {
+  AppForm as Form,
+  AppFormField as FormField,
+  FormPicker as Picker,
+  AddressPicker,
+  FormLocationPicker,
+  SubmitButton,
+} from "../components/forms";
+import SwitchInput from "../components/SwitchInput";
+import PickerItem from "../components/PickerItem";
+import colors from "../config/colors";
 
 const { width, height } = Dimensions.get("window");
 const CARD_HEIGHT = 220;
@@ -48,11 +61,18 @@ function AnimatedScreen({ navigation }) {
   const [respondents, setRespondents] = React.useState();
   const [markers, setMarkers] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
+  const [modalSearch, setModalSearch] = React.useState(false);
   const [moreinfo, setMoreinfo] = React.useState([]);
   const [programs, setPrograms] = React.useState([]);
+  const [dateInterviews, setDateInterviews] = React.useState([]);
   const [household, setHousehold] = React.useState([]);
   const [demographys, setDemographys] = React.useState([]);
   const [livelihoods, setLivelihoods] = React.useState([]);
+  const [mun, setMun] = React.useState();
+  const [brgy, setBrgy] = React.useState();
+  const [typebuilding, setTypebuilding] = React.useState();
+  const [tenuralStatus, settenuralStatus] = React.useState();
+  const [roofmaterials, setRoofmaterials] = React.useState();
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -63,7 +83,135 @@ function AnimatedScreen({ navigation }) {
 
   useEffect(() => {
     fetchHousehold();
+    fetchInterviewByGroup();
+    getMunicipality();
+    gettypeBuilding();
+    gettenuralStatus();
+    getBrgy();
+    getroofMaterials();
   }, []);
+
+  const getMunicipality = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select idtbl_psgc_mun AS id, tbl_psgc_munname AS label from tbl_psgc_mun where tbl_psgc_prov_id_fk=?`,
+          ["PH160200000"],
+          (_, { rows: { _array } }) => setMun(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Address Library, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const getBrgy = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select idtbl_psgc_brgy AS id, tbl_psgc_brgyname AS label from tbl_psgc_brgy`,
+          [],
+          (_, { rows: { _array } }) => setBrgy(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Address Library, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const handleMunChange = (brgyvalue) => {
+    setBrgy(brgyvalue);
+  };
+
+  const gettypeBuilding = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, lib_buildingtypedesc AS label from lib_hhtypeofbuilding`,
+          [],
+          (_, { rows: { _array } }) => setTypebuilding(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Type of Building Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const gettenuralStatus = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, lib_tenuralstatusdesc AS label from lib_hhtenuralstatus`,
+          [],
+          (_, { rows: { _array } }) => settenuralStatus(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Tenural status Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const getroofMaterials = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id, lib_roofmaterialsdesc AS label from lib_hhroofmaterials`,
+          [],
+          (_, { rows: { _array } }) => setRoofmaterials(_array)
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Roof materials Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
 
   useEffect(() => {
     mapAnimation.addListener(({ value }) => {
@@ -99,96 +247,127 @@ function AnimatedScreen({ navigation }) {
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       fetchHousehold();
+      fetchInterviewByGroup();
     });
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
 
-  const fetchHousehold = () => {
+  const fetchInterviewByGroup = () => {
     db.transaction(
       (tx) => {
         tx.executeSql(
-          "SELECT tbl_household_id," +
-            "tbl_hhissethead," +
-            "tbl_hhcontrolnumber," +
-            "tbl_hhdateinterview," +
-            "tbl_hhlatitude," +
-            "tbl_hhlongitude," +
-            "tbl_hhfield_editor," +
-            "tbl_hhyearconstruct," +
-            "tbl_hhyearconstruct," +
-            "tbl_hhyearconstruct," +
-            "tbl_hhnobedroms," +
-            "tbl_hhnostorey," +
-            "tbl_hhaelectricity," +
-            "tbl_hhainternet," +
-            "tbl_hhainternet," +
-            "tbl_enumerator_id_fk," +
-            "tbl_psgc_brgy_id," +
-            "tbl_psgc_mun_id," +
-            "tbl_psgc_pro_id," +
-            "lib_typeofbuilding_id," +
-            "tbl_hhecost," +
-            "tbl_tenuralstatus_id," +
-            "tbl_typeofconmaterials_id," +
-            "tbl_wallconmaterials_id," +
-            "tbl_hhaccesswater," +
-            "tbl_hhwaterpotable," +
-            "tbl_watertenuralstatus_id," +
-            "tbl_hhlvlwatersystem_id," +
-            "tbl_evacuation_areas_id," +
-            "tbl_hhhasaccesshealtmedicalfacility," +
-            "tbl_hhhasaccesshealtmedicalfacility," +
-            "tbl_hhhasaccesstelecom," +
-            "tbl_hasaccessdrillsandsimulations," +
-            "tbl_household.created_at," +
-            "tbl_household.updated_at," +
-            "tbl_household.created_by," +
-            "tbl_household.updatedy_by," +
-            "tbl_householdpuroksittio," +
-            "tbl_hhimage," +
-            "tbl_respondent," +
-            "tbl_uri," +
-            "idtbl_psgc_brgy," + //tbl_psgc_brgy
-            "tbl_psgc_brgyname," +
-            "tbl_psgc_mun_id_fk," +
-            "idtbl_psgc_mun," + //tbl_psgc_municipality
-            "tbl_psgc_munname," +
-            "tbl_psgc_prov_id_fk," +
-            "idtbl_psgc_prov," + //tbl_psgc_prov
-            "tbl_psgc_provname," +
-            "tbl_psgc_region_id_fk," +
-            "idtbl_enumerator," + //tbl_enumerator
-            "tbl_enumeratorfname," +
-            "tbl_enumeratorlname," +
-            "tbl_enumeratormname," +
-            "tbl_enumeratoremail," +
-            "tbl_enumeratorcontact," +
-            "tbl_enumeratorprov," +
-            "tbl_enumeratormun," +
-            "tbl_enumeratorbrgy," +
-            "tbl_imagepath," +
-            "lib_buildingtypedesc," + //lib_hhtypeofbuilding
-            "lib_tenuralstatusdesc," + //lib_hhtenuralstatus
-            "lib_roofmaterialsdesc," + //lib_hhroofmaterials
-            "lib_wallmaterialsdesc," + //lib_hhwallconmaterials
-            "lib_wtdesc," + //lib_hhwatertenuralstatus
-            "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
-            "lib_hhlvldesc," +
-            "lib_heaname " + //lib_hhevacuationarea
-            "FROM tbl_household " +
-            "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
-            "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
-            "LEFT JOIN tbl_psgc_prov ON tbl_household.tbl_psgc_pro_id=tbl_psgc_prov.idtbl_psgc_prov " + //tbl_psgc_prov
-            "LEFT JOIN tbl_enumerator ON tbl_household.tbl_enumerator_id_fk=tbl_enumerator.idtbl_enumerator " + //tbl_enumerator
-            "LEFT JOIN lib_hhtypeofbuilding ON tbl_household.lib_typeofbuilding_id=lib_hhtypeofbuilding.id " + //lib_hhtypeofbuilding
-            "LEFT JOIN lib_hhtenuralstatus ON tbl_household.tbl_tenuralstatus_id=lib_hhtenuralstatus.id " + //lib_hhtenuralstatus
-            "LEFT JOIN lib_hhroofmaterials ON tbl_household.tbl_typeofconmaterials_id=lib_hhroofmaterials.id " + //lib_hhroofmaterials
-            "LEFT JOIN lib_hhwallconmaterials ON tbl_household.tbl_wallconmaterials_id=lib_hhwallconmaterials.id " + //lib_hhwallconmaterials
-            "LEFT JOIN lib_hhwatertenuralstatus ON tbl_household.tbl_watertenuralstatus_id=lib_hhwatertenuralstatus.id " + //lib_hhwatertenuralstatus
-            "LEFT JOIN lib_hhlvlwatersystem ON tbl_household.tbl_hhlvlwatersystem_id=lib_hhlvlwatersystem.id " + //lib_hhlvlwatersystem
-            "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
-            "where tbl_enumerator_id_fk = ?",
+          "SELECT tbl_hhdateinterview FROM tbl_household WHERE tbl_enumerator_id_fk = ? GROUP BY tbl_hhdateinterview",
+          [user.idtbl_enumerator],
+          (_, { rows: { _array } }) => {
+            setDateInterviews(_array);
+          }
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Household data, Please contact developer, " + error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const fetchHousehold = (filterdate = null) => {
+    let query =
+      "SELECT tbl_household_id," +
+      "tbl_hhissethead," +
+      "tbl_hhcontrolnumber," +
+      "tbl_hhdateinterview," +
+      "tbl_hhlatitude," +
+      "tbl_hhlongitude," +
+      "tbl_hhfield_editor," +
+      "tbl_hhyearconstruct," +
+      "tbl_hhyearconstruct," +
+      "tbl_hhyearconstruct," +
+      "tbl_hhnobedroms," +
+      "tbl_hhnostorey," +
+      "tbl_hhaelectricity," +
+      "tbl_hhainternet," +
+      "tbl_hhainternet," +
+      "tbl_enumerator_id_fk," +
+      "tbl_psgc_brgy_id," +
+      "tbl_psgc_mun_id," +
+      "tbl_psgc_pro_id," +
+      "lib_typeofbuilding_id," +
+      "tbl_hhecost," +
+      "tbl_tenuralstatus_id," +
+      "tbl_typeofconmaterials_id," +
+      "tbl_wallconmaterials_id," +
+      "tbl_hhaccesswater," +
+      "tbl_hhwaterpotable," +
+      "tbl_watertenuralstatus_id," +
+      "tbl_hhlvlwatersystem_id," +
+      "tbl_evacuation_areas_id," +
+      "tbl_hhhasaccesshealtmedicalfacility," +
+      "tbl_hhhasaccesshealtmedicalfacility," +
+      "tbl_hhhasaccesstelecom," +
+      "tbl_hasaccessdrillsandsimulations," +
+      "tbl_household.created_at," +
+      "tbl_household.updated_at," +
+      "tbl_household.created_by," +
+      "tbl_household.updatedy_by," +
+      "tbl_householdpuroksittio," +
+      "tbl_hhimage," +
+      "tbl_respondent," +
+      "tbl_uri," +
+      "idtbl_psgc_brgy," + //tbl_psgc_brgy
+      "tbl_psgc_brgyname," +
+      "tbl_psgc_mun_id_fk," +
+      "idtbl_psgc_mun," + //tbl_psgc_municipality
+      "tbl_psgc_munname," +
+      "tbl_psgc_prov_id_fk," +
+      "idtbl_psgc_prov," + //tbl_psgc_prov
+      "tbl_psgc_provname," +
+      "tbl_psgc_region_id_fk," +
+      "idtbl_enumerator," + //tbl_enumerator
+      "tbl_enumeratorfname," +
+      "tbl_enumeratorlname," +
+      "tbl_enumeratormname," +
+      "tbl_enumeratoremail," +
+      "tbl_enumeratorcontact," +
+      "tbl_enumeratorprov," +
+      "tbl_enumeratormun," +
+      "tbl_enumeratorbrgy," +
+      "tbl_imagepath," +
+      "lib_buildingtypedesc," + //lib_hhtypeofbuilding
+      "lib_tenuralstatusdesc," + //lib_hhtenuralstatus
+      "lib_roofmaterialsdesc," + //lib_hhroofmaterials
+      "lib_wallmaterialsdesc," + //lib_hhwallconmaterials
+      "lib_wtdesc," + //lib_hhwatertenuralstatus
+      "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
+      "lib_hhlvldesc," +
+      "lib_heaname " + //lib_hhevacuationarea
+      "FROM tbl_household " +
+      "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
+      "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
+      "LEFT JOIN tbl_psgc_prov ON tbl_household.tbl_psgc_pro_id=tbl_psgc_prov.idtbl_psgc_prov " + //tbl_psgc_prov
+      "LEFT JOIN tbl_enumerator ON tbl_household.tbl_enumerator_id_fk=tbl_enumerator.idtbl_enumerator " + //tbl_enumerator
+      "LEFT JOIN lib_hhtypeofbuilding ON tbl_household.lib_typeofbuilding_id=lib_hhtypeofbuilding.id " + //lib_hhtypeofbuilding
+      "LEFT JOIN lib_hhtenuralstatus ON tbl_household.tbl_tenuralstatus_id=lib_hhtenuralstatus.id " + //lib_hhtenuralstatus
+      "LEFT JOIN lib_hhroofmaterials ON tbl_household.tbl_typeofconmaterials_id=lib_hhroofmaterials.id " + //lib_hhroofmaterials
+      "LEFT JOIN lib_hhwallconmaterials ON tbl_household.tbl_wallconmaterials_id=lib_hhwallconmaterials.id " + //lib_hhwallconmaterials
+      "LEFT JOIN lib_hhwatertenuralstatus ON tbl_household.tbl_watertenuralstatus_id=lib_hhwatertenuralstatus.id " + //lib_hhwatertenuralstatus
+      "LEFT JOIN lib_hhlvlwatersystem ON tbl_household.tbl_hhlvlwatersystem_id=lib_hhlvlwatersystem.id " + //lib_hhlvlwatersystem
+      "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
+      "WHERE tbl_enumerator_id_fk = ? ";
+
+    if (filterdate != null) query += " AND tbl_hhdateinterview='2020-9-6'";
+
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          query,
           [user.idtbl_enumerator],
           (_, { rows: { _array } }) => {
             setMarkers(_array);
@@ -197,7 +376,6 @@ function AnimatedScreen({ navigation }) {
         );
       },
       (error) => {
-        console.log(error);
         Alert.alert(
           "SQLITE ERROR",
           "Error loading Household data, Please contact developer, " + error,
@@ -503,7 +681,21 @@ function AnimatedScreen({ navigation }) {
         respondent.tbl_respondent.toUpperCase().indexOf(txt.toUpperCase()) > -1
     );
     setMarkers(newRespondent);
-    console.log(markers);
+    _map.current.fitToSuppliedMarkers(["mk1"], {
+      edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
+      animated: false,
+    });
+  };
+  const handleAdvanceSearch = (data) => {
+    const newRespondent = respondents.filter(
+      (respondent) =>
+        respondent.tbl_respondent.toUpperCase().indexOf(txt.toUpperCase()) > -1
+    );
+    setMarkers(newRespondent);
+    _map.current.fitToSuppliedMarkers(["mk1"], {
+      edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
+      animated: false,
+    });
   };
   return (
     <View style={styles.container}>
@@ -583,13 +775,27 @@ function AnimatedScreen({ navigation }) {
           paddingRight: Platform.OS === "android" ? 20 : 0,
         }}
       >
-        {/*state.categories.map((category, index) => (
-          <TouchableOpacity key={index} style={styles.chipsItem}>
-            {category.icon}
-            <Text>{category.name}</Text>
+        <TouchableOpacity
+          style={styles.chipsItem}
+          onPress={() => {
+            setModalSearch(true);
+          }}
+        >
+          <Text>Advance Search</Text>
+        </TouchableOpacity>
+        {dateInterviews.map((dateInterview, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.chipsItem}
+            onPress={() => {
+              fetchHousehold(dateInterview.tbl_hhdateinterview);
+            }}
+          >
+            <Text>{dateInterview.tbl_hhdateinterview}</Text>
           </TouchableOpacity>
-        ))*/}
+        ))}
       </ScrollView>
+
       <Animated.ScrollView
         ref={_scrollView}
         horizontal
@@ -677,7 +883,160 @@ function AnimatedScreen({ navigation }) {
           </View>
         ))}
       </Animated.ScrollView>
+      <Modal animationType="slide" transparent={true} visible={modalSearch}>
+        <View style={styles.modalView}>
+          <View style={{ marginBottom: 15 }}>
+            <Text style={{ fontWeight: "bold", color: colors.pdark }}>
+              ADVANCED SEARCH
+            </Text>
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                top: -20,
+                right: 0,
+                //alignSelf: "flex-end",
+                //alignItems: "center",
+                backgroundColor: "transparent",
+              }}
+              onPress={() => setModalSearch(false)}
+            >
+              <MaterialCommunityIcons
+                name="close-circle"
+                style={{ color: colors.danger, fontSize: 40 }}
+              />
+            </TouchableOpacity>
+          </View>
+          <ScrollView>
+            <Form
+              initialValues={{
+                tbl_respondent: "",
+              }}
+              onSubmit={(values, { resetForm }) => {
+                resetFormHolder = resetForm;
+                reviewInput(values);
+              }}
+              //</ScrollView>validationSchema={validationSchema}
+            >
+              <FormField
+                autoCorrect={false}
+                icon="account"
+                name="tbl_respondent"
+                placeholder="Respondent Name"
+              />
 
+              <AddressPicker
+                icon="earth"
+                items={mun}
+                name="tbl_psgc_mun_id"
+                PickerItemComponent={PickerItem}
+                placeholder="Municipality"
+                setBrgy={handleMunChange}
+              />
+
+              <AddressPicker
+                icon="earth"
+                items={brgy}
+                name="tbl_psgc_brgy_id"
+                PickerItemComponent={PickerItem}
+                placeholder="Barangay"
+                setbrgyValue
+                searchable
+              />
+
+              <FormField
+                autoCorrect={false}
+                icon="earth"
+                name="tbl_householdpuroksittio"
+                placeholder="Purok/Sitio"
+                width="70%"
+              />
+
+              <Picker
+                icon="warehouse"
+                items={typebuilding}
+                name="lib_typeofbuilding_id"
+                PickerItemComponent={PickerItem}
+                placeholder="Type of building"
+              />
+
+              <Picker
+                icon="alpha-t-box"
+                items={tenuralStatus}
+                name="tbl_tenuralstatus_id"
+                PickerItemComponent={PickerItem}
+                placeholder="Tenural Status"
+              />
+
+              <FormField
+                autoCorrect={false}
+                name="tbl_hhyearconstruct"
+                icon="calendar"
+                placeholder="Year construct"
+                width="75%"
+                keyboardType="number-pad"
+              />
+
+              <FormField
+                autoCorrect={false}
+                icon="cash"
+                name="tbl_hhecost"
+                placeholder="Estimated cost"
+                width="75%"
+                keyboardType="number-pad"
+              />
+
+              <FormField
+                autoCorrect={false}
+                icon="bed-empty"
+                name="tbl_hhnobedroms"
+                placeholder="Number of bedrooms"
+                width="75%"
+                keyboardType="number-pad"
+              />
+
+              <FormField
+                autoCorrect={false}
+                icon="office-building"
+                name="tbl_hhnostorey"
+                placeholder="Number of storeys"
+                width="75%"
+                keyboardType="number-pad"
+              />
+
+              <SwitchInput
+                icon="electric-switch"
+                name="tbl_hhaelectricity"
+                placeholder="Access to electricity"
+              />
+
+              <SwitchInput
+                icon="internet-explorer"
+                name="tbl_hhainternet"
+                placeholder="Access to internet"
+              />
+
+              <Picker
+                icon="material-ui"
+                items={roofmaterials}
+                name="tbl_typeofconmaterials_id"
+                PickerItemComponent={PickerItem}
+                placeholder="Roof material"
+              />
+
+              <SubmitButton title="Search" />
+            </Form>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "row",
+                alignContent: "space-between",
+                marginBottom: 15,
+                marginTop: 15,
+              }}
+            ></View>
+          </ScrollView>
+        </View>
+      </Modal>
       <Modal animationType="slide" transparent={true} visible={modalVisible}>
         <View style={styles.modalView}>
           <ScrollView>
