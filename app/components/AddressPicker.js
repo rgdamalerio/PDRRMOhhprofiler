@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     marginTop: -12,
-    marginBottom: 15,
+    marginBottom: 50,
   },
   icon: {
     marginRight: 10,
