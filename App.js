@@ -11,7 +11,10 @@ import AuthNavigator from "./app/navigation/AuthNavigator";
 import AuthContext from "./app/auth/context";
 import authStorage from "./app/auth/storage";
 import ActivityIndicator from "./app/components/ActivityIndicator";
+import logger from "./app/utility/logger";
+
 const databaseName = "hhprofiler.db";
+logger.start();
 
 export default function App() {
   const [user, setUser] = useState();
@@ -46,18 +49,16 @@ export default function App() {
           `${FileSystem.documentDirectory}SQLite/hhprofiler21.db`
         )
           .then(({ uri }) => {
-            console.log("Database copy to : " + uri);
             setLoading(true);
           })
           .catch((error) => {
-            console.log("Database copy error : " + error);
+            logger.log(new Error(error));
           });
       } else {
-        console.log("Database exist");
         setLoading(true);
       }
     } catch (error) {
-      console.log("Error : " + error);
+      logger.log(new Error(error));
       setLoading(true);
     }
   };

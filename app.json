@@ -14,11 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "assets/animations/*",
-      "assets/database/*",
-      "assets/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -34,6 +30,19 @@
         }
       }
     },
-    "description": "Mobile Application of Provincial Disaster Risk Reduction Management Office for Household Profiler "
+    "description": "Mobile Application of Provincial Disaster Risk Reduction Management Office for Household Profiler ",
+    "extra": {
+      "bugsnag": {
+        "apiKey": "5abd43dc7d7704f547986c920f2b6b4f"
+      }
+    },
+    "hooks": {
+      "postPublish": [
+        {
+          "file": "@bugsnag/expo/hooks/post-publish.js",
+          "config": {}
+        }
+      ]
+    }
   }
 }
