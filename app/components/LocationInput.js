@@ -68,8 +68,6 @@ function LocationInput({
             style={styles.mapStyle}
             mapType="satellite"
             region={region}
-            //showsUserLocation={true}
-            //followsUserLocation={true}
             onRegionChangeComplete={(region) => {
               setRegion(region);
             }}
