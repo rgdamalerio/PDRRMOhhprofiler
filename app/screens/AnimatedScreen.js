@@ -77,6 +77,7 @@ function AnimatedScreen({ navigation }) {
   const [watertenuralstatus, setWatertenuralstatus] = React.useState();
   const [lvlwatersystem, setLvlwatersystems] = React.useState();
   const [evacuationarea, setEvacuationarea] = React.useState();
+  const [query, setQuery] = React.useState();
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -469,6 +470,8 @@ function AnimatedScreen({ navigation }) {
     if (filterdate != null)
       query += " AND tbl_hhdateinterview = '" + filterdate + "'";
 
+    setQuery(query);
+
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -793,7 +796,6 @@ function AnimatedScreen({ navigation }) {
     });
   };
   const handleAdvanceSearch = (data) => {
-    //console.log(data);
     try {
       let query =
         "SELECT tbl_household_id," +
@@ -880,20 +882,67 @@ function AnimatedScreen({ navigation }) {
 
       if (data.tbl_respondent)
         query += " AND tbl_respondent LIKE '%" + data.tbl_respondent + "%'";
-      if (data.tbl_psgc_mun_id.id)
+      if (data.tbl_psgc_mun_id)
         query += " AND tbl_psgc_mun_id = '" + data.tbl_psgc_mun_id.id + "'";
-      if (data.tbl_psgc_brgy_id.id)
+      if (data.tbl_psgc_brgy_id)
         query += " AND tbl_psgc_brgy_id = '" + data.tbl_psgc_brgy_id.id + "'";
       if (data.tbl_householdpuroksittio)
         query +=
           " AND tbl_householdpuroksittio = '" +
           data.tbl_householdpuroksittio +
           "'";
-      if (data.lib_typeofbuilding_id.id)
+      if (data.lib_typeofbuilding_id)
         query +=
           " AND lib_typeofbuilding_id = " + data.lib_typeofbuilding_id.id;
+      if (data.tbl_tenuralstatus_id)
+        query += " AND tbl_tenuralstatus_id = " + data.tbl_tenuralstatus_id.id;
+      if (data.tbl_hhyearconstruct)
+        query +=
+          " AND tbl_hhyearconstruct = '" + data.tbl_hhyearconstruct + "'";
+      if (data.tbl_hhecost) query += " AND tbl_hhecost = " + data.tbl_hhecost;
+      if (data.tbl_hhnobedroms)
+        query += " AND tbl_hhnobedroms = " + data.tbl_hhnobedroms;
+      if (data.tbl_hhnostorey)
+        query += " AND tbl_hhnostorey = " + data.tbl_hhnostorey;
+      if (data.tbl_hhaelectricity) {
+        data.tbl_hhaelectricity == true
+          ? (query += " AND tbl_hhaelectricity = 1")
+          : (query += " AND tbl_hhaelectricity = 0");
+      }
+      if (data.tbl_hhainternet) {
+        data.tbl_hhainternet == true
+          ? (query += " AND tbl_hhainternet = 1")
+          : (query += " AND tbl_hhainternet = 0");
+      }
+      if (data.tbl_typeofconmaterials_id)
+        query +=
+          " AND tbl_typeofconmaterials_id = " +
+          data.tbl_typeofconmaterials_id.id;
+      if (data.tbl_wallconmaterials_id)
+        query +=
+          " AND tbl_wallconmaterials_id = " + data.tbl_wallconmaterials_id.id;
+      if (data.tbl_hhaccesswater) {
+        data.tbl_hhaccesswater == true
+          ? (query += " AND tbl_hhaccesswater = 1")
+          : (query += " AND tbl_hhaccesswater = 0");
+      }
+      if (data.tbl_hhwaterpotable) {
+        data.tbl_hhwaterpotable == true
+          ? (query += " AND tbl_hhwaterpotable = 1")
+          : (query += " AND tbl_hhwaterpotable = 0");
+      }
+      if (data.tbl_watertenuralstatus_id)
+        query +=
+          " AND tbl_watertenuralstatus_id = " +
+          data.tbl_watertenuralstatus_id.id;
+      if (data.tbl_hhlvlwatersystem_id)
+        query +=
+          " AND tbl_hhlvlwatersystem_id = " + data.tbl_hhlvlwatersystem_id.id;
+      if (data.tbl_evacuation_areas_id)
+        query +=
+          " AND tbl_evacuation_areas_id = " + data.tbl_evacuation_areas_id.id;
 
-      console.log(query);
+      setQuery(query);
 
       db.transaction(
         (tx) => {
@@ -919,6 +968,7 @@ function AnimatedScreen({ navigation }) {
         }
       );
     } catch (error) {
+      console.log(error);
       setModalSearch(false);
     }
 
