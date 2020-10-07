@@ -18,6 +18,9 @@ import Constants from "expo-constants";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as SQLite from "expo-sqlite";
+import * as FileSystem from "expo-file-system";
+import * as MediaLibrary from "expo-media-library";
+import { Notifications } from "expo";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTheme } from "@react-navigation/native";
@@ -30,7 +33,6 @@ import {
   AppFormField as FormField,
   FormPicker as Picker,
   AddressPicker,
-  FormLocationPicker,
   SubmitButton,
 } from "../components/forms";
 import SwitchInput from "../components/SwitchInput";
@@ -77,7 +79,7 @@ function AnimatedScreen({ navigation }) {
   const [watertenuralstatus, setWatertenuralstatus] = React.useState();
   const [lvlwatersystem, setLvlwatersystems] = React.useState();
   const [evacuationarea, setEvacuationarea] = React.useState();
-  const [query, setQuery] = React.useState();
+  const [filter, setFilter] = React.useState();
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -470,8 +472,6 @@ function AnimatedScreen({ navigation }) {
     if (filterdate != null)
       query += " AND tbl_hhdateinterview = '" + filterdate + "'";
 
-    setQuery(query);
-
     db.transaction(
       (tx) => {
         tx.executeSql(
@@ -796,6 +796,7 @@ function AnimatedScreen({ navigation }) {
     });
   };
   const handleAdvanceSearch = (data) => {
+    setFilter(data);
     try {
       let query =
         "SELECT tbl_household_id," +
@@ -942,8 +943,6 @@ function AnimatedScreen({ navigation }) {
         query +=
           " AND tbl_evacuation_areas_id = " + data.tbl_evacuation_areas_id.id;
 
-      setQuery(query);
-
       db.transaction(
         (tx) => {
           tx.executeSql(
@@ -968,7 +967,7 @@ function AnimatedScreen({ navigation }) {
         }
       );
     } catch (error) {
-      console.log(error);
+      logger.log(new Error(error));
       setModalSearch(false);
     }
 
@@ -977,6 +976,245 @@ function AnimatedScreen({ navigation }) {
       animated: false,
     });
     setModalSearch(false);
+  };
+
+  const exportcsv = async () => {
+    let data = filter;
+
+    try {
+      let query =
+        "SELECT tbl_household.tbl_household_id," +
+        "tbl_hhissethead," +
+        "tbl_hhcontrolnumber," +
+        "tbl_hhdateinterview," +
+        "tbl_hhlatitude," +
+        "tbl_hhlongitude," +
+        "tbl_hhfield_editor," +
+        "tbl_hhyearconstruct," +
+        "tbl_hhyearconstruct," +
+        "tbl_hhyearconstruct," +
+        "tbl_hhnobedroms," +
+        "tbl_hhnostorey," +
+        "tbl_hhaelectricity," +
+        "tbl_hhainternet," +
+        "tbl_hhainternet," +
+        "tbl_enumerator_id_fk," +
+        "tbl_psgc_brgy_id," +
+        "tbl_psgc_mun_id," +
+        "tbl_psgc_pro_id," +
+        "lib_typeofbuilding_id," +
+        "tbl_hhecost," +
+        "tbl_tenuralstatus_id," +
+        "tbl_typeofconmaterials_id," +
+        "tbl_wallconmaterials_id," +
+        "tbl_hhaccesswater," +
+        "tbl_hhwaterpotable," +
+        "tbl_watertenuralstatus_id," +
+        "tbl_hhlvlwatersystem_id," +
+        "tbl_evacuation_areas_id," +
+        "tbl_hhhasaccesshealtmedicalfacility," +
+        "tbl_hhhasaccesshealtmedicalfacility," +
+        "tbl_hhhasaccesstelecom," +
+        "tbl_hasaccessdrillsandsimulations," +
+        "tbl_household.created_at," +
+        "tbl_household.updated_at," +
+        "tbl_household.created_by," +
+        "tbl_household.updatedy_by," +
+        "tbl_householdpuroksittio," +
+        "tbl_hhimage," +
+        "tbl_respondent," +
+        "tbl_uri," +
+        "idtbl_psgc_brgy," + //tbl_psgc_brgy
+        "tbl_psgc_brgyname," +
+        "tbl_psgc_mun_id_fk," +
+        "idtbl_psgc_mun," + //tbl_psgc_municipality
+        "tbl_psgc_munname," +
+        "tbl_psgc_prov_id_fk," +
+        "idtbl_psgc_prov," + //tbl_psgc_prov
+        "tbl_psgc_provname," +
+        "tbl_psgc_region_id_fk," +
+        "idtbl_enumerator," + //tbl_enumerator
+        "tbl_enumeratorfname," +
+        "tbl_enumeratorlname," +
+        "tbl_enumeratormname," +
+        "tbl_enumeratoremail," +
+        "tbl_enumeratorcontact," +
+        "tbl_enumeratorprov," +
+        "tbl_enumeratormun," +
+        "tbl_enumeratorbrgy," +
+        "tbl_imagepath," +
+        "lib_buildingtypedesc," + //lib_hhtypeofbuilding
+        "lib_tenuralstatusdesc," + //lib_hhtenuralstatus
+        "lib_roofmaterialsdesc," + //lib_hhroofmaterials
+        "lib_wallmaterialsdesc," + //lib_hhwallconmaterials
+        "lib_wtdesc," + //lib_hhwatertenuralstatus
+        "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
+        "lib_hhlvldesc," +
+        "lib_heaname," + //lib_hhevacuationarea
+        "tbl_fname," + //tbl_hhdemography
+        "tbl_lname," +
+        "tbl_mname," +
+        "tbl_extension," +
+        "tbl_ishead," +
+        "lib_familybelongs_id," +
+        "lib_gender_id," + //tbl_hhdemography->lib_gender
+        "lib_gname," +
+        "tbl_relationshiphead_id," + //tbl_hhdemography->libl_relationshiphead
+        "lib_rhname," +
+        "tbl_datebirth," +
+        "lib_maritalstatus_id," + //lib_maritalstatus
+        "lib_msname " + //lib_maritalstatus
+        "FROM tbl_household " +
+        "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
+        "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
+        "LEFT JOIN tbl_psgc_prov ON tbl_household.tbl_psgc_pro_id=tbl_psgc_prov.idtbl_psgc_prov " + //tbl_psgc_prov
+        "LEFT JOIN tbl_enumerator ON tbl_household.tbl_enumerator_id_fk=tbl_enumerator.idtbl_enumerator " + //tbl_enumerator
+        "LEFT JOIN lib_hhtypeofbuilding ON tbl_household.lib_typeofbuilding_id=lib_hhtypeofbuilding.id " + //lib_hhtypeofbuilding
+        "LEFT JOIN lib_hhtenuralstatus ON tbl_household.tbl_tenuralstatus_id=lib_hhtenuralstatus.id " + //lib_hhtenuralstatus
+        "LEFT JOIN lib_hhroofmaterials ON tbl_household.tbl_typeofconmaterials_id=lib_hhroofmaterials.id " + //lib_hhroofmaterials
+        "LEFT JOIN lib_hhwallconmaterials ON tbl_household.tbl_wallconmaterials_id=lib_hhwallconmaterials.id " + //lib_hhwallconmaterials
+        "LEFT JOIN lib_hhwatertenuralstatus ON tbl_household.tbl_watertenuralstatus_id=lib_hhwatertenuralstatus.id " + //lib_hhwatertenuralstatus
+        "LEFT JOIN lib_hhlvlwatersystem ON tbl_household.tbl_hhlvlwatersystem_id=lib_hhlvlwatersystem.id " + //lib_hhlvlwatersystem
+        "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
+        "INNER JOIN tbl_hhdemography ON tbl_household.tbl_household_id=tbl_hhdemography.tbl_household_id " + //tbl_hhdemography
+        "LEFT JOIN lib_gender ON tbl_hhdemography.lib_gender_id=lib_gender.id " + //tbl_hhdemography->lib_gender
+        "LEFT JOIN libl_relationshiphead ON tbl_hhdemography.tbl_relationshiphead_id=libl_relationshiphead.id " + //tbl_hhdemography->libl_relationshiphead
+        "LEFT JOIN lib_maritalstatus ON tbl_hhdemography.lib_maritalstatus_id=lib_maritalstatus.id " + //tbl_hhdemography->lib_maritalstatus
+        "WHERE tbl_enumerator_id_fk = ? ";
+
+      if (data.tbl_respondent)
+        query += " AND tbl_respondent LIKE '%" + data.tbl_respondent + "%'";
+      if (data.tbl_psgc_mun_id)
+        query += " AND tbl_psgc_mun_id = '" + data.tbl_psgc_mun_id.id + "'";
+      if (data.tbl_psgc_brgy_id)
+        query += " AND tbl_psgc_brgy_id = '" + data.tbl_psgc_brgy_id.id + "'";
+      if (data.tbl_householdpuroksittio)
+        query +=
+          " AND tbl_householdpuroksittio = '" +
+          data.tbl_householdpuroksittio +
+          "'";
+      if (data.lib_typeofbuilding_id)
+        query +=
+          " AND lib_typeofbuilding_id = " + data.lib_typeofbuilding_id.id;
+      if (data.tbl_tenuralstatus_id)
+        query += " AND tbl_tenuralstatus_id = " + data.tbl_tenuralstatus_id.id;
+      if (data.tbl_hhyearconstruct)
+        query +=
+          " AND tbl_hhyearconstruct = '" + data.tbl_hhyearconstruct + "'";
+      if (data.tbl_hhecost) query += " AND tbl_hhecost = " + data.tbl_hhecost;
+      if (data.tbl_hhnobedroms)
+        query += " AND tbl_hhnobedroms = " + data.tbl_hhnobedroms;
+      if (data.tbl_hhnostorey)
+        query += " AND tbl_hhnostorey = " + data.tbl_hhnostorey;
+      if (data.tbl_hhaelectricity) {
+        data.tbl_hhaelectricity == true
+          ? (query += " AND tbl_hhaelectricity = 1")
+          : (query += " AND tbl_hhaelectricity = 0");
+      }
+      if (data.tbl_hhainternet) {
+        data.tbl_hhainternet == true
+          ? (query += " AND tbl_hhainternet = 1")
+          : (query += " AND tbl_hhainternet = 0");
+      }
+      if (data.tbl_typeofconmaterials_id)
+        query +=
+          " AND tbl_typeofconmaterials_id = " +
+          data.tbl_typeofconmaterials_id.id;
+      if (data.tbl_wallconmaterials_id)
+        query +=
+          " AND tbl_wallconmaterials_id = " + data.tbl_wallconmaterials_id.id;
+      if (data.tbl_hhaccesswater) {
+        data.tbl_hhaccesswater == true
+          ? (query += " AND tbl_hhaccesswater = 1")
+          : (query += " AND tbl_hhaccesswater = 0");
+      }
+      if (data.tbl_hhwaterpotable) {
+        data.tbl_hhwaterpotable == true
+          ? (query += " AND tbl_hhwaterpotable = 1")
+          : (query += " AND tbl_hhwaterpotable = 0");
+      }
+      if (data.tbl_watertenuralstatus_id)
+        query +=
+          " AND tbl_watertenuralstatus_id = " +
+          data.tbl_watertenuralstatus_id.id;
+      if (data.tbl_hhlvlwatersystem_id)
+        query +=
+          " AND tbl_hhlvlwatersystem_id = " + data.tbl_hhlvlwatersystem_id.id;
+      if (data.tbl_evacuation_areas_id)
+        query +=
+          " AND tbl_evacuation_areas_id = " + data.tbl_evacuation_areas_id.id;
+
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            query,
+            [user.idtbl_enumerator],
+            (_, { rows: { _array } }) => {
+              console.log(_array);
+            }
+          );
+        },
+        (error) => {
+          Alert.alert(
+            "SQLITE ERROR",
+            "Error loading Household data, Please contact developer, " + error,
+            [
+              {
+                text: "OK",
+              },
+            ]
+          );
+        }
+      );
+    } catch (error) {
+      logger.log(new Error(error));
+    }
+
+    let rows = [
+      ["종목명", "세트번호", "무게", "반복횟수", "휴식시간", "볼륨", "날짜"],
+    ];
+    let csvContent = "\uFEFF";
+    try {
+      rows.forEach((rowArray) => {
+        let row = rowArray.join(",");
+        csvContent += row + "\r\n";
+      });
+    } catch (e) {
+      console.log("Error in join" + e);
+    }
+
+    try {
+      const tempname = "filename";
+      const fileUri = FileSystem.documentDirectory + tempname + ".csv";
+      await FileSystem.writeAsStringAsync(fileUri, csvContent, {
+        encoding: `FileSystem.EncodingType.UTF8`,
+      })
+        .then(() => {
+          download(fileUri);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const download = async (fileUri) => {
+    const asset = await MediaLibrary.createAssetAsync(fileUri);
+    await MediaLibrary.createAlbumAsync("Download", asset, false)
+      .then(() => {
+        Notifications.presentLocalNotificationAsync({
+          title: "PDRRMO Profiler",
+          body: "Download csv file successfully",
+          data: {
+            _displayInForeground: true,
+          },
+        });
+      })
+      .catch((error) => {
+        alert("Error saving image, Error details: " + error);
+      });
   };
   return (
     <View style={styles.container}>
@@ -1039,6 +1277,15 @@ function AnimatedScreen({ navigation }) {
           <Ionicons name="ios-search" size={20} />
         </TouchableHighlight>
       </View>
+      <TouchableOpacity
+        onPress={() => {
+          //downloadCSV();
+          exportcsv();
+        }}
+        style={styles.fab}
+      >
+        <MaterialCommunityIcons name="cloud-download" style={styles.fabIcon} />
+      </TouchableOpacity>
       <ScrollView
         horizontal
         scrollEventThrottle={1}
@@ -1076,7 +1323,6 @@ function AnimatedScreen({ navigation }) {
           </TouchableOpacity>
         ))}
       </ScrollView>
-
       <Animated.ScrollView
         ref={_scrollView}
         horizontal
@@ -2057,6 +2303,23 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 1,
     padding: 5,
+  },
+  fab: {
+    position: "absolute",
+    width: 56,
+    height: 56,
+    alignItems: "center",
+    justifyContent: "center",
+    right: 20,
+    bottom: 20,
+    backgroundColor: "#03A9F4",
+    borderRadius: 30,
+    //elevation: 8,
+    zIndex: 1,
+  },
+  fabIcon: {
+    fontSize: 40,
+    color: "white",
   },
 });
 
