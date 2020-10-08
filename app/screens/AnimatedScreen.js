@@ -79,7 +79,8 @@ function AnimatedScreen({ navigation }) {
   const [watertenuralstatus, setWatertenuralstatus] = React.useState();
   const [lvlwatersystem, setLvlwatersystems] = React.useState();
   const [evacuationarea, setEvacuationarea] = React.useState();
-  const [filter, setFilter] = React.useState();
+  const [filter, setFilter] = React.useState(null);
+  const [exportdata, setExportdata] = React.useState(null);
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -1012,10 +1013,11 @@ function AnimatedScreen({ navigation }) {
         "tbl_watertenuralstatus_id," +
         "tbl_hhlvlwatersystem_id," +
         "tbl_evacuation_areas_id," +
+        "tbl_hhfloodsoccurinarea," +
+        "tbl_hhfloodsoccurinareayear," +
         "tbl_hhhasaccesshealtmedicalfacility," +
-        "tbl_hhhasaccesshealtmedicalfacility," +
+        "tbl_hhexperienceevacuationoncalamityyear," +
         "tbl_hhhasaccesstelecom," +
-        "tbl_hasaccessdrillsandsimulations," +
         "tbl_household.created_at," +
         "tbl_household.updated_at," +
         "tbl_household.created_by," +
@@ -1051,6 +1053,11 @@ function AnimatedScreen({ navigation }) {
         "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
         "lib_hhlvldesc," +
         "lib_heaname," + //lib_hhevacuationarea
+        "lib_typeofprogram_id," + //tbl_programs
+        "lib_topname," + //tbl_programs
+        "lib_pname," + //tbl_programs
+        "lib_pnumbeni," + //tbl_programs
+        "lib_pimplementor," + //tbl_programs
         "tbl_fname," + //tbl_hhdemography
         "tbl_lname," +
         "tbl_mname," +
@@ -1062,8 +1069,34 @@ function AnimatedScreen({ navigation }) {
         "tbl_relationshiphead_id," + //tbl_hhdemography->libl_relationshiphead
         "lib_rhname," +
         "tbl_datebirth," +
-        "lib_maritalstatus_id," + //lib_maritalstatus
-        "lib_msname " + //lib_maritalstatus
+        "lib_maritalstatus_id," + //tbl_hhdemography->lib_maritalstatus
+        "lib_msname," + //tbl_hhdemography->lib_maritalstatus
+        "lib_ethnicity_id," +
+        "lib_religion_id," +
+        "tbl_withspecialneeds," +
+        "lib_disability_id," + //tbl_hhdemography->lib_disability
+        "lib_dname," + //tbl_hhdemography->lib_disability
+        "tbl_isofw," +
+        "tbl_is3yrsinlocation," +
+        "lib_nutritioanalstatus_id," + //tbl_hhdemography->lib_nutritioanalstatus
+        "lib_nsname," + //tbl_hhdemography->lib_nutritioanalstatus
+        "tbl_iscurattschool," +
+        "lib_gradelvl_id," + //tbl_hhdemography->lib_gradelvl
+        "lvl.lib_glcode as lvlglcode," + //tbl_hhdemography->lib_gradelvl
+        "lvl.lib_glname as lvlglname," + //tbl_hhdemography->lib_gradelvl
+        "tbl_canreadwriteorhighschoolgrade," +
+        "tbl_primary_occupation," +
+        "lib_hea_id," + //tbl_hhdemography->lib_gradelvl
+        "hea.lib_glcode as heaglcode," + //tbl_hhdemography->lib_gradelvl
+        "hea.lib_glname as heaglname," + //tbl_hhdemography->lib_gradelvl
+        "lib_tscshvc_id," + //tbl_hhdemography->lib_tscshvc
+        "lib_tscshvcname," + //tbl_hhdemography->lib_tscshvc
+        "lib_monthlyincome_id," + //tbl_hhdemography->lib_monthlyincome
+        "lib_miname," + //tbl_hhdemography->lib_monthlyincome
+        "tbl_ismembersss," +
+        "tbl_ismembergsis," +
+        "tbl_ismemberphilhealth," +
+        "tbl_adependentofaphilhealthmember " +
         "FROM tbl_household " +
         "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
         "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
@@ -1076,73 +1109,84 @@ function AnimatedScreen({ navigation }) {
         "LEFT JOIN lib_hhwatertenuralstatus ON tbl_household.tbl_watertenuralstatus_id=lib_hhwatertenuralstatus.id " + //lib_hhwatertenuralstatus
         "LEFT JOIN lib_hhlvlwatersystem ON tbl_household.tbl_hhlvlwatersystem_id=lib_hhlvlwatersystem.id " + //lib_hhlvlwatersystem
         "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
+        "LEFT JOIN tbl_programs ON tbl_household.tbl_household_id=tbl_programs.tbl_household_id " + //tbl_programs
+        "LEFT JOIN lib_typeofprogram ON tbl_programs.lib_typeofprogram_id=lib_typeofprogram.id " + //tbl_programs->lib_typeofprogram
         "INNER JOIN tbl_hhdemography ON tbl_household.tbl_household_id=tbl_hhdemography.tbl_household_id " + //tbl_hhdemography
         "LEFT JOIN lib_gender ON tbl_hhdemography.lib_gender_id=lib_gender.id " + //tbl_hhdemography->lib_gender
         "LEFT JOIN libl_relationshiphead ON tbl_hhdemography.tbl_relationshiphead_id=libl_relationshiphead.id " + //tbl_hhdemography->libl_relationshiphead
         "LEFT JOIN lib_maritalstatus ON tbl_hhdemography.lib_maritalstatus_id=lib_maritalstatus.id " + //tbl_hhdemography->lib_maritalstatus
+        "LEFT JOIN lib_disability ON tbl_hhdemography.lib_disability_id=lib_disability.id " + //tbl_hhdemography->lib_disability
+        "LEFT JOIN lib_nutritioanalstatus ON tbl_hhdemography.lib_nutritioanalstatus_id=lib_nutritioanalstatus.id " + //tbl_hhdemography->lib_nutritioanalstatus
+        "LEFT JOIN lib_gradelvl as lvl ON tbl_hhdemography.lib_gradelvl_id=lvl.id " + //tbl_hhdemography->lib_gradelvl
+        "LEFT JOIN lib_gradelvl as hea ON tbl_hhdemography.lib_gradelvl_id=hea.id " + //tbl_hhdemography->lib_gradelvl
+        "LEFT JOIN lib_tscshvc ON tbl_hhdemography.lib_tscshvc_id=lib_tscshvc.id " + //tbl_hhdemography->lib_tscshvc
+        "LEFT JOIN lib_monthlyincome ON tbl_hhdemography.lib_monthlyincome_id=lib_monthlyincome.id " + //tbl_hhdemography->lib_monthlyincome
         "WHERE tbl_enumerator_id_fk = ? ";
 
-      if (data.tbl_respondent)
-        query += " AND tbl_respondent LIKE '%" + data.tbl_respondent + "%'";
-      if (data.tbl_psgc_mun_id)
-        query += " AND tbl_psgc_mun_id = '" + data.tbl_psgc_mun_id.id + "'";
-      if (data.tbl_psgc_brgy_id)
-        query += " AND tbl_psgc_brgy_id = '" + data.tbl_psgc_brgy_id.id + "'";
-      if (data.tbl_householdpuroksittio)
-        query +=
-          " AND tbl_householdpuroksittio = '" +
-          data.tbl_householdpuroksittio +
-          "'";
-      if (data.lib_typeofbuilding_id)
-        query +=
-          " AND lib_typeofbuilding_id = " + data.lib_typeofbuilding_id.id;
-      if (data.tbl_tenuralstatus_id)
-        query += " AND tbl_tenuralstatus_id = " + data.tbl_tenuralstatus_id.id;
-      if (data.tbl_hhyearconstruct)
-        query +=
-          " AND tbl_hhyearconstruct = '" + data.tbl_hhyearconstruct + "'";
-      if (data.tbl_hhecost) query += " AND tbl_hhecost = " + data.tbl_hhecost;
-      if (data.tbl_hhnobedroms)
-        query += " AND tbl_hhnobedroms = " + data.tbl_hhnobedroms;
-      if (data.tbl_hhnostorey)
-        query += " AND tbl_hhnostorey = " + data.tbl_hhnostorey;
-      if (data.tbl_hhaelectricity) {
-        data.tbl_hhaelectricity == true
-          ? (query += " AND tbl_hhaelectricity = 1")
-          : (query += " AND tbl_hhaelectricity = 0");
+      if (data != null) {
+        if (data.tbl_respondent)
+          query += " AND tbl_respondent LIKE '%" + data.tbl_respondent + "%'";
+        if (data.tbl_psgc_mun_id)
+          query += " AND tbl_psgc_mun_id = '" + data.tbl_psgc_mun_id.id + "'";
+        if (data.tbl_psgc_brgy_id)
+          query += " AND tbl_psgc_brgy_id = '" + data.tbl_psgc_brgy_id.id + "'";
+        if (data.tbl_householdpuroksittio)
+          query +=
+            " AND tbl_householdpuroksittio = '" +
+            data.tbl_householdpuroksittio +
+            "'";
+        if (data.lib_typeofbuilding_id)
+          query +=
+            " AND lib_typeofbuilding_id = " + data.lib_typeofbuilding_id.id;
+        if (data.tbl_tenuralstatus_id)
+          query +=
+            " AND tbl_tenuralstatus_id = " + data.tbl_tenuralstatus_id.id;
+        if (data.tbl_hhyearconstruct)
+          query +=
+            " AND tbl_hhyearconstruct = '" + data.tbl_hhyearconstruct + "'";
+        if (data.tbl_hhecost) query += " AND tbl_hhecost = " + data.tbl_hhecost;
+        if (data.tbl_hhnobedroms)
+          query += " AND tbl_hhnobedroms = " + data.tbl_hhnobedroms;
+        if (data.tbl_hhnostorey)
+          query += " AND tbl_hhnostorey = " + data.tbl_hhnostorey;
+        if (data.tbl_hhaelectricity) {
+          data.tbl_hhaelectricity == true
+            ? (query += " AND tbl_hhaelectricity = 1")
+            : (query += " AND tbl_hhaelectricity = 0");
+        }
+        if (data.tbl_hhainternet) {
+          data.tbl_hhainternet == true
+            ? (query += " AND tbl_hhainternet = 1")
+            : (query += " AND tbl_hhainternet = 0");
+        }
+        if (data.tbl_typeofconmaterials_id)
+          query +=
+            " AND tbl_typeofconmaterials_id = " +
+            data.tbl_typeofconmaterials_id.id;
+        if (data.tbl_wallconmaterials_id)
+          query +=
+            " AND tbl_wallconmaterials_id = " + data.tbl_wallconmaterials_id.id;
+        if (data.tbl_hhaccesswater) {
+          data.tbl_hhaccesswater == true
+            ? (query += " AND tbl_hhaccesswater = 1")
+            : (query += " AND tbl_hhaccesswater = 0");
+        }
+        if (data.tbl_hhwaterpotable) {
+          data.tbl_hhwaterpotable == true
+            ? (query += " AND tbl_hhwaterpotable = 1")
+            : (query += " AND tbl_hhwaterpotable = 0");
+        }
+        if (data.tbl_watertenuralstatus_id)
+          query +=
+            " AND tbl_watertenuralstatus_id = " +
+            data.tbl_watertenuralstatus_id.id;
+        if (data.tbl_hhlvlwatersystem_id)
+          query +=
+            " AND tbl_hhlvlwatersystem_id = " + data.tbl_hhlvlwatersystem_id.id;
+        if (data.tbl_evacuation_areas_id)
+          query +=
+            " AND tbl_evacuation_areas_id = " + data.tbl_evacuation_areas_id.id;
       }
-      if (data.tbl_hhainternet) {
-        data.tbl_hhainternet == true
-          ? (query += " AND tbl_hhainternet = 1")
-          : (query += " AND tbl_hhainternet = 0");
-      }
-      if (data.tbl_typeofconmaterials_id)
-        query +=
-          " AND tbl_typeofconmaterials_id = " +
-          data.tbl_typeofconmaterials_id.id;
-      if (data.tbl_wallconmaterials_id)
-        query +=
-          " AND tbl_wallconmaterials_id = " + data.tbl_wallconmaterials_id.id;
-      if (data.tbl_hhaccesswater) {
-        data.tbl_hhaccesswater == true
-          ? (query += " AND tbl_hhaccesswater = 1")
-          : (query += " AND tbl_hhaccesswater = 0");
-      }
-      if (data.tbl_hhwaterpotable) {
-        data.tbl_hhwaterpotable == true
-          ? (query += " AND tbl_hhwaterpotable = 1")
-          : (query += " AND tbl_hhwaterpotable = 0");
-      }
-      if (data.tbl_watertenuralstatus_id)
-        query +=
-          " AND tbl_watertenuralstatus_id = " +
-          data.tbl_watertenuralstatus_id.id;
-      if (data.tbl_hhlvlwatersystem_id)
-        query +=
-          " AND tbl_hhlvlwatersystem_id = " + data.tbl_hhlvlwatersystem_id.id;
-      if (data.tbl_evacuation_areas_id)
-        query +=
-          " AND tbl_evacuation_areas_id = " + data.tbl_evacuation_areas_id.id;
 
       db.transaction(
         (tx) => {
@@ -1150,7 +1194,7 @@ function AnimatedScreen({ navigation }) {
             query,
             [user.idtbl_enumerator],
             (_, { rows: { _array } }) => {
-              console.log(_array);
+              setExportdata(_array);
             }
           );
         },
@@ -1167,12 +1211,195 @@ function AnimatedScreen({ navigation }) {
         }
       );
     } catch (error) {
-      logger.log(new Error(error));
+      console.log(error);
     }
 
     let rows = [
-      ["종목명", "세트번호", "무게", "반복횟수", "휴식시간", "볼륨", "날짜"],
+      [
+        "PSGC Municipality",
+        "Municipality",
+        "PSGC Barangay",
+        "Barangay",
+        "Purok/Sitio",
+        "House Control Number",
+        "Latitude (Y)",
+        "Longitude (X)",
+        "Name of Respondent",
+        "Date of Interview",
+        "Name of Enumerators",
+        "Name of Field Editors",
+        "Date of Field Editing",
+        "In what type of building does the household reside (ID)",
+        "In what type of building does the household reside?",
+        "What is the tenural status of the building (ID)",
+        "What is the tenural status of the building?",
+        "Year of construction of the building",
+        "Estimated construction cost of the building",
+        "How many bedrooms does this housing unit have?",
+        "How many storeys does this housing unit have?",
+        "Do you have access to electricity?",
+        "Do you have access to internet?",
+        "What type of construction materials are the roofs made of (ID)",
+        "What type of construction materials are the roofs made of?",
+        "Did you or any member of the household avail of medical treatment for any serious illnesses?",
+        "Specification",
+        "Did you have access to water supply?",
+        "Is it potable?",
+        "What is the tenural status of the water supply? (ID)",
+        "What is the tenural status of the water supply?",
+        "Levels of water system (ID)",
+        "Levels of water system",
+        "Do floods occur in your area?",
+        "Year",
+        "Do you expeience evacuation during calamity",
+        "Year",
+        "Where was the evacuation center located inyour area (ID)",
+        "Where was the evacuation center located inyour area",
+        "Does the household has access to health and medical facilities?",
+        "Does the household has access to telecommunications?",
+        "Does the household has access to drills and simulations?",
+        "Type of Program (ID)",
+        "Type of Program",
+        "Name of Program",
+        "Number of Beneficiaries",
+        "Program Implementor",
+        "SURNAME",
+        "FIRST NAME",
+        "MIDDLE NAME",
+        "EXTENSION",
+        "In which nuclear family does belong?",
+        "What is relationship to the head of the household? (ID)",
+        "What is relationship to the head of the household?",
+        "Sex (ID)",
+        "Sex",
+        "Birthdate",
+        "Marital status (ID)",
+        "Marital status",
+        "Ethnicity by blood",
+        "Religion",
+        "Is a person with Special Needs?",
+        "Types of Disabilities (ID)",
+        "Types of Disabilities",
+        "Is an OFW?",
+        "Residence 3 years ago",
+        "Nutritional Status (0-5 years old children) ID",
+        "Nutritional Status (0-5 years old children)",
+        "Date recorded (for Nutritional status)",
+        "Currently attending school?",
+        "Grade/Year currently attending? (ID)",
+        "Grade/Year currently attending?",
+        "Highest Educational Attainment (ID)",
+        "Highest Educational Attainment",
+        "Track/strand/course completed (for senior high school/vocational/College (ID)",
+        "Track/strand/course completed (for senior high school/vocational/College",
+        "Can read & write? (If not at least high school graduate)",
+        "Primary Occupation (e.g elementary teacher, rice farmers)",
+        "Monthly Income/M",
+        "SSS Member",
+        "GSIS Member",
+        "Philhealth Member",
+        "A dependent of a Philhealth member",
+      ],
     ];
+
+    //console.log(exportdata);
+    //return;
+    exportdata.forEach((rowArray) => {
+      const arrayOne = [
+        `${rowArray.tbl_psgc_mun_id}`,
+        `${rowArray.tbl_psgc_munname}`,
+        `${rowArray.tbl_psgc_brgy_id}`,
+        `${rowArray.tbl_psgc_brgyname}`,
+        `${rowArray.tbl_householdpuroksittio}`,
+        `${rowArray.tbl_hhcontrolnumber}`,
+        `${rowArray.tbl_hhlatitude}`,
+        `${rowArray.tbl_hhlongitude}`,
+        `${rowArray.tbl_respondent}`,
+        `${rowArray.tbl_hhdateinterview}`,
+        `${rowArray.tbl_enumeratorfname}` +
+          " " +
+          `${rowArray.tbl_enumeratorlname}` +
+          " " +
+          `${rowArray.tbl_enumeratormname}`,
+        `${rowArray.tbl_enumeratorfname}` +
+          " " +
+          `${rowArray.tbl_enumeratorlname}` +
+          " " +
+          `${rowArray.tbl_enumeratormname}`,
+        `${rowArray.tbl_hhdateinterview}`,
+        `${rowArray.lib_typeofbuilding_id}`,
+        `${rowArray.lib_buildingtypedesc}`,
+        `${rowArray.tbl_tenuralstatus_id}`,
+        `${rowArray.lib_tenuralstatusdesc}`,
+        `${rowArray.tbl_hhyearconstruct}`,
+        `${rowArray.tbl_hhecost}`,
+        `${rowArray.tbl_hhnobedroms}`,
+        `${rowArray.tbl_hhnostorey}`,
+        `${rowArray.tbl_hhaelectricity == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_hhainternet == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_typeofconmaterials_id}`,
+        `${rowArray.lib_roofmaterialsdesc}`,
+        `${rowArray.tbl_lname}`,
+        `${rowArray.tbl_fname}`,
+        `${rowArray.tbl_hhaccesswater == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_tenuralstatus_id}`,
+        `${rowArray.lib_wtdesc}`,
+        `${rowArray.tbl_hhlvlwatersystem_id}`,
+        `${rowArray.lib_hhlvldesc}`,
+        `${rowArray.tbl_hhfloodsoccurinarea == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_hhfloodsoccurinareayear}`,
+        `${rowArray.tbl_hhexperienceevacuationoncalamity == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_hhexperienceevacuationoncalamityyear}`,
+        `${rowArray.tbl_evacuation_areas_id}`,
+        `${rowArray.lib_heaname}`,
+        `${rowArray.tbl_hhhasaccesshealtmedicalfacility}`,
+        `${rowArray.tbl_hhhasaccesstelecom}`,
+        `${rowArray.tbl_hasaccessdrillsandsimulations}`,
+        `${rowArray.lib_typeofprogram_id}`,
+        `${rowArray.lib_topname}`,
+        `${rowArray.lib_pname}`,
+        `${rowArray.lib_pnumbeni}`,
+        `${rowArray.lib_pimplementor}`,
+        `${rowArray.tbl_lname}`,
+        `${rowArray.tbl_fname}`,
+        `${rowArray.tbl_mname}`,
+        `${rowArray.tbl_extension}`,
+        `${rowArray.lib_familybelongs_id}`,
+        `${rowArray.tbl_relationshiphead_id}`,
+        `${rowArray.lib_rhname}`,
+        `${rowArray.lib_gender_id}`,
+        `${rowArray.lib_gname}`,
+        `${rowArray.tbl_datebirth}`,
+        `${rowArray.lib_maritalstatus_id}`,
+        `${rowArray.lib_msname}`,
+        `${rowArray.lib_ethnicity_id}`,
+        `${rowArray.lib_religion_id}`,
+        `${rowArray.tbl_withspecialneeds == 1 ? "Yes" : "No"}`,
+        `${rowArray.lib_disability_id}`,
+        `${rowArray.lib_dname}`,
+        `${rowArray.tbl_isofw == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_is3yrsinlocation == 1 ? "Yes" : "No"}`,
+        `${rowArray.lib_nutritioanalstatus_id}`,
+        `${rowArray.lib_nsname}`,
+        ``, //Date recorded
+        `${rowArray.tbl_iscurattschool}`,
+        `${rowArray.lvlglcode}`,
+        `${rowArray.lvlglname}`,
+        `${rowArray.heaglcode}`,
+        `${rowArray.heaglname}`,
+        `${rowArray.lib_tscshvc_id}`,
+        `${rowArray.lib_tscshvcname}`,
+        `${rowArray.tbl_canreadwriteorhighschoolgrade == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_primary_occupation}`,
+        `${rowArray.lib_monthlyincome_id}`,
+        `${rowArray.tbl_ismembersss == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_ismembergsis == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_ismemberphilhealth == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_adependentofaphilhealthmember == 1 ? "Yes" : "No"}`,
+      ];
+      rows.push(arrayOne);
+    });
+
     let csvContent = "\uFEFF";
     try {
       rows.forEach((rowArray) => {
@@ -1204,6 +1431,7 @@ function AnimatedScreen({ navigation }) {
     const asset = await MediaLibrary.createAssetAsync(fileUri);
     await MediaLibrary.createAlbumAsync("Download", asset, false)
       .then(() => {
+        console.log("DOne");
         Notifications.presentLocalNotificationAsync({
           title: "PDRRMO Profiler",
           body: "Download csv file successfully",
