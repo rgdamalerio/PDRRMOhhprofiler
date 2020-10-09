@@ -80,7 +80,6 @@ function AnimatedScreen({ navigation }) {
   const [lvlwatersystem, setLvlwatersystems] = React.useState();
   const [evacuationarea, setEvacuationarea] = React.useState();
   const [filter, setFilter] = React.useState(null);
-  const [exportdata, setExportdata] = React.useState(null);
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -1111,7 +1110,7 @@ function AnimatedScreen({ navigation }) {
         "LEFT JOIN lib_hhlvlwatersystem ON tbl_household.tbl_hhlvlwatersystem_id=lib_hhlvlwatersystem.id " + //lib_hhlvlwatersystem
         "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
         "LEFT JOIN tbl_programs ON tbl_household.tbl_household_id=tbl_programs.tbl_household_id " + //tbl_programs
-        "LEFT JOIN lib_typeofprogram ON tbl_programs.lib_typeofprogram_id=lib_typeofprogram.id " + //tbl_programs->lib_typeofprogram
+        "INNER JOIN lib_typeofprogram ON tbl_programs.lib_typeofprogram_id=lib_typeofprogram.id " + //tbl_programs->lib_typeofprogram
         "INNER JOIN tbl_hhdemography ON tbl_household.tbl_household_id=tbl_hhdemography.tbl_household_id " + //tbl_hhdemography
         "LEFT JOIN lib_gender ON tbl_hhdemography.lib_gender_id=lib_gender.id " + //tbl_hhdemography->lib_gender
         "LEFT JOIN libl_relationshiphead ON tbl_hhdemography.tbl_relationshiphead_id=libl_relationshiphead.id " + //tbl_hhdemography->libl_relationshiphead
@@ -1122,7 +1121,8 @@ function AnimatedScreen({ navigation }) {
         "LEFT JOIN lib_gradelvl as hea ON tbl_hhdemography.lib_gradelvl_id=hea.id " + //tbl_hhdemography->lib_gradelvl
         "LEFT JOIN lib_tscshvc ON tbl_hhdemography.lib_tscshvc_id=lib_tscshvc.id " + //tbl_hhdemography->lib_tscshvc
         "LEFT JOIN lib_monthlyincome ON tbl_hhdemography.lib_monthlyincome_id=lib_monthlyincome.id " + //tbl_hhdemography->lib_monthlyincome
-        "WHERE tbl_enumerator_id_fk = ? ";
+        "WHERE tbl_enumerator_id_fk = ? " +
+        "GROUP BY tbl_hhdemography.id";
 
       if (data != null) {
         if (data.tbl_respondent)
@@ -1195,7 +1195,7 @@ function AnimatedScreen({ navigation }) {
             query,
             [user.idtbl_enumerator],
             (_, { rows: { _array } }) => {
-              setExportdata(_array);
+              parseData(_array);
             }
           );
         },
@@ -1214,7 +1214,11 @@ function AnimatedScreen({ navigation }) {
     } catch (error) {
       console.log(error);
     }
+  };
 
+  const parseData = async (data) => {
+    //console.log(data.length);
+    //return;
     let rows = [
       [
         "PSGC Municipality",
@@ -1294,44 +1298,84 @@ function AnimatedScreen({ navigation }) {
         "Track/strand/course completed (for senior high school/vocational/College (ID)",
         "Track/strand/course completed (for senior high school/vocational/College",
         "Can read & write? (If not at least high school graduate)",
-        "Primary Occupation (e.g elementary teacher, rice farmers)",
+        "Primary Occupation (e.g elementary teacher rice farmers)",
         "Monthly Income/M",
         "SSS Member",
         "GSIS Member",
         "Philhealth Member",
         "A dependent of a Philhealth member",
+        "Type of Program (ID)",
+        "Type of Program",
       ],
     ];
 
-    //console.log(exportdata);
-    //return;
-    exportdata.forEach((rowArray) => {
+    data.forEach((rowArray) => {
       const arrayOne = [
         `${rowArray.tbl_psgc_mun_id}`,
         `${rowArray.tbl_psgc_munname}`,
         `${rowArray.tbl_psgc_brgy_id}`,
         `${rowArray.tbl_psgc_brgyname}`,
-        `${rowArray.tbl_householdpuroksittio}`,
+        `${
+          rowArray.tbl_householdpuroksittio
+            ? rowArray.tbl_householdpuroksittio.replace(/,/g, " ")
+            : rowArray.tbl_householdpuroksittio
+        }`,
         `${rowArray.tbl_hhcontrolnumber}`,
         `${rowArray.tbl_hhlatitude}`,
         `${rowArray.tbl_hhlongitude}`,
-        `${rowArray.tbl_respondent}`,
+        `${
+          rowArray.tbl_respondent
+            ? rowArray.tbl_householdpuroksittio.replace(/,/g, " ")
+            : rowArray.tbl_householdpuroksittio
+        }`,
         `${rowArray.tbl_hhdateinterview}`,
-        `${rowArray.tbl_enumeratorfname}` +
+        `${
+          rowArray.tbl_enumeratorfname
+            ? rowArray.tbl_householdpuroksittio.replace(/,/g, " ")
+            : rowArray.tbl_householdpuroksittio
+        }` +
           " " +
-          `${rowArray.tbl_enumeratorlname}` +
+          `${
+            rowArray.tbl_enumeratorlname
+              ? rowArray.tbl_householdpuroksittio.replace(/,/g, " ")
+              : rowArray.tbl_householdpuroksittio
+          }` +
           " " +
-          `${rowArray.tbl_enumeratormname}`,
-        `${rowArray.tbl_enumeratorfname}` +
+          `${
+            rowArray.tbl_enumeratormname
+              ? rowArray.tbl_householdpuroksittio.replace(/,/g, " ")
+              : rowArray.tbl_householdpuroksittio
+          }`,
+        `${
+          rowArray.tbl_enumeratorfname
+            ? rowArray.tbl_enumeratorfname.replace(/,/g, " ")
+            : rowArray.tbl_enumeratorfname
+        }` +
           " " +
-          `${rowArray.tbl_enumeratorlname}` +
+          `${
+            rowArray.tbl_enumeratorlname
+              ? rowArray.tbl_enumeratorlname.replace(/,/g, " ")
+              : rowArray.tbl_enumeratorlname
+          }` +
           " " +
-          `${rowArray.tbl_enumeratormname}`,
+          `${
+            rowArray.tbl_enumeratormname
+              ? rowArray.tbl_enumeratormname.replace(/,/g, " ")
+              : rowArray.tbl_enumeratormname
+          }`,
         `${rowArray.tbl_hhdateinterview}`,
         `${rowArray.lib_typeofbuilding_id}`,
-        `${rowArray.lib_buildingtypedesc}`,
+        `${
+          rowArray.lib_buildingtypedesc
+            ? rowArray.lib_buildingtypedesc.replace(/,/g, " ")
+            : rowArray.lib_buildingtypedesc
+        }`,
         `${rowArray.tbl_tenuralstatus_id}`,
-        `${rowArray.lib_tenuralstatusdesc}`,
+        `${
+          rowArray.lib_tenuralstatusdesc
+            ? rowArray.lib_tenuralstatusdesc.replace(/,/g, " ")
+            : rowArray.lib_tenuralstatusdesc
+        }`,
         `${rowArray.tbl_hhyearconstruct}`,
         `${rowArray.tbl_hhecost}`,
         `${rowArray.tbl_hhnobedroms}`,
@@ -1339,15 +1383,27 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.tbl_hhaelectricity == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hhainternet == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_typeofconmaterials_id}`,
-        `${rowArray.lib_roofmaterialsdesc.replace(/,/g, " ")}`,
+        `${
+          rowArray.lib_roofmaterialsdesc
+            ? rowArray.lib_roofmaterialsdesc.replace(/,/g, " ")
+            : rowArray.lib_roofmaterialsdesc
+        }`,
         ``,
         ``,
         `${rowArray.tbl_hhaccesswater == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hhwaterpotable == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_tenuralstatus_id}`,
-        `${rowArray.lib_wtdesc}`,
+        `${
+          rowArray.lib_wtdesc
+            ? rowArray.lib_wtdesc.replace(/,/g, " ")
+            : rowArray.lib_wtdesc
+        }`,
         `${rowArray.tbl_hhlvlwatersystem_id}`,
-        `${rowArray.lib_hhlvldesc.replace(/,/g, " ")}`,
+        `${
+          rowArray.lib_hhlvldesc
+            ? rowArray.lib_hhlvldesc.replace(/,/g, " ")
+            : rowArray.lib_hhlvldesc
+        }`,
         `${rowArray.tbl_hhfloodsoccurinarea == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hhfloodsoccurinareayear}`,
         `${rowArray.tbl_hhexperienceevacuationoncalamity == 1 ? "Yes" : "No"}`,
@@ -1358,39 +1414,103 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.tbl_hhhasaccesstelecom == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hasaccessdrillsandsimulations == 1 ? "Yes" : "No"}`,
         `${rowArray.lib_typeofprogram_id}`,
-        `${rowArray.lib_topname}`,
-        `${rowArray.lib_pname}`,
+        `${
+          rowArray.lib_topname
+            ? rowArray.lib_topname.replace(/,/g, " ")
+            : rowArray.lib_topname
+        }`,
+        `${
+          rowArray.lib_pname
+            ? rowArray.lib_pname.replace(/,/g, " ")
+            : rowArray.lib_pname
+        }`,
         `${rowArray.lib_pnumbeni}`,
-        `${rowArray.lib_pimplementor}`,
-        `${rowArray.tbl_lname}`,
-        `${rowArray.tbl_fname}`,
-        `${rowArray.tbl_mname}`,
+        `${
+          rowArray.lib_pimplementor
+            ? rowArray.lib_pimplementor.replace(/,/g, " ")
+            : rowArray.lib_pimplementor
+        }`,
+        `${
+          rowArray.tbl_lname
+            ? rowArray.tbl_lname.replace(/,/g, " ")
+            : rowArray.tbl_lname
+        }`,
+        `${
+          rowArray.tbl_fname
+            ? rowArray.tbl_fname.replace(/,/g, " ")
+            : rowArray.tbl_fname
+        }`,
+        `${
+          rowArray.tbl_mname
+            ? rowArray.tbl_mname.replace(/,/g, " ")
+            : rowArray.tbl_mname
+        }`,
         `${rowArray.tbl_extension}`,
         `${rowArray.lib_familybelongs_id}`,
         `${rowArray.tbl_relationshiphead_id}`,
-        `${rowArray.lib_rhname}`,
+        `${
+          rowArray.lib_rhname
+            ? rowArray.lib_rhname.replace(/,/g, " ")
+            : rowArray.lib_rhname
+        }`,
         `${rowArray.lib_gender_id}`,
-        `${rowArray.lib_gname}`,
+        `${
+          rowArray.lib_gname
+            ? rowArray.lib_gname.replace(/,/g, " ")
+            : rowArray.lib_gname
+        }`,
         `${rowArray.tbl_datebirth}`,
         `${rowArray.lib_maritalstatus_id}`,
-        `${rowArray.lib_msname}`,
-        `${rowArray.lib_ethnicity_id}`,
-        `${rowArray.lib_religion_id}`,
+        `${
+          rowArray.lib_msname
+            ? rowArray.lib_msname.replace(/,/g, " ")
+            : rowArray.lib_msname
+        }`,
+        `${
+          rowArray.lib_ethnicity_id
+            ? rowArray.lib_ethnicity_id.replace(/,/g, " ")
+            : rowArray.lib_ethnicity_id
+        }`,
+        `${
+          rowArray.lib_religion_id
+            ? rowArray.lib_religion_id.replace(/,/g, " ")
+            : rowArray.lib_religion_id
+        }`,
         `${rowArray.tbl_withspecialneeds == 1 ? "Yes" : "No"}`,
         `${rowArray.lib_disability_id}`,
-        `${rowArray.lib_dname}`,
+        `${
+          rowArray.lib_dname
+            ? rowArray.lib_dname.replace(/,/g, " ")
+            : rowArray.lib_dname
+        }`,
         `${rowArray.tbl_isofw == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_is3yrsinlocation == 1 ? "Yes" : "No"}`,
         `${rowArray.lib_nutritioanalstatus_id}`,
-        `${rowArray.lib_nsname}`,
+        `${
+          rowArray.lib_nsname
+            ? rowArray.lib_nsname.replace(/,/g, " ")
+            : rowArray.lib_nsname
+        }`,
         ``, //Date recorded
         `${rowArray.tbl_iscurattschool == 1 ? "Yes" : "No"}`,
         `${rowArray.lvlglcode}`,
-        `${rowArray.lvlglname}`,
+        `${
+          rowArray.lvlglname
+            ? rowArray.lvlglname.replace(/,/g, " ")
+            : rowArray.lvlglname
+        }`,
         `${rowArray.heaglcode}`,
-        `${rowArray.heaglname}`,
+        `${
+          rowArray.heaglname
+            ? rowArray.heaglname.replace(/,/g, " ")
+            : rowArray.heaglname
+        }`,
         `${rowArray.lib_tscshvc_id}`,
-        `${rowArray.lib_tscshvcname}`,
+        `${
+          rowArray.lib_tscshvcname
+            ? rowArray.lib_tscshvcname.replace(/,/g, " ")
+            : rowArray.lib_tscshvcname
+        }`,
         `${rowArray.tbl_canreadwriteorhighschoolgrade == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_primary_occupation}`,
         `${rowArray.lib_monthlyincome_id}`,
@@ -1398,6 +1518,12 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.tbl_ismembergsis == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_ismemberphilhealth == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_adependentofaphilhealthmember == 1 ? "Yes" : "No"}`,
+        `${rowArray.lib_typeofprogram_id}`,
+        `${
+          rowArray.lib_topname
+            ? rowArray.lib_topname.replace(/,/g, " ")
+            : rowArray.lib_topname
+        }`,
       ];
       rows.push(arrayOne);
     });
