@@ -1017,6 +1017,7 @@ function AnimatedScreen({ navigation }) {
         "tbl_hhfloodsoccurinareayear," +
         "tbl_hhhasaccesshealtmedicalfacility," +
         "tbl_hhexperienceevacuationoncalamityyear," +
+        "tbl_hasaccessdrillsandsimulations," +
         "tbl_hhhasaccesstelecom," +
         "tbl_household.created_at," +
         "tbl_household.updated_at," +
@@ -1338,23 +1339,24 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.tbl_hhaelectricity == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hhainternet == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_typeofconmaterials_id}`,
-        `${rowArray.lib_roofmaterialsdesc}`,
-        `${rowArray.tbl_lname}`,
-        `${rowArray.tbl_fname}`,
+        `${rowArray.lib_roofmaterialsdesc.replace(/,/g, " ")}`,
+        ``,
+        ``,
         `${rowArray.tbl_hhaccesswater == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_hhwaterpotable == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_tenuralstatus_id}`,
         `${rowArray.lib_wtdesc}`,
         `${rowArray.tbl_hhlvlwatersystem_id}`,
-        `${rowArray.lib_hhlvldesc}`,
+        `${rowArray.lib_hhlvldesc.replace(/,/g, " ")}`,
         `${rowArray.tbl_hhfloodsoccurinarea == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hhfloodsoccurinareayear}`,
         `${rowArray.tbl_hhexperienceevacuationoncalamity == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hhexperienceevacuationoncalamityyear}`,
         `${rowArray.tbl_evacuation_areas_id}`,
         `${rowArray.lib_heaname}`,
-        `${rowArray.tbl_hhhasaccesshealtmedicalfacility}`,
-        `${rowArray.tbl_hhhasaccesstelecom}`,
-        `${rowArray.tbl_hasaccessdrillsandsimulations}`,
+        `${rowArray.tbl_hhhasaccesshealtmedicalfacility == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_hhhasaccesstelecom == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_hasaccessdrillsandsimulations == 1 ? "Yes" : "No"}`,
         `${rowArray.lib_typeofprogram_id}`,
         `${rowArray.lib_topname}`,
         `${rowArray.lib_pname}`,
@@ -1382,7 +1384,7 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.lib_nutritioanalstatus_id}`,
         `${rowArray.lib_nsname}`,
         ``, //Date recorded
-        `${rowArray.tbl_iscurattschool}`,
+        `${rowArray.tbl_iscurattschool == 1 ? "Yes" : "No"}`,
         `${rowArray.lvlglcode}`,
         `${rowArray.lvlglname}`,
         `${rowArray.heaglcode}`,
