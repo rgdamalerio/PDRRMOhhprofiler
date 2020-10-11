@@ -51,10 +51,11 @@ function DateInput({
           {datevalue ? (
             <Text style={styles.text}>
               {year && datevalue.getFullYear()}
-              {month && datevalue.getMonth()}
+              {month && datevalue.getMonth() + 1}
               {day && datevalue.getDate()}
               {fullDate &&
                 datevalue.getMonth() +
+                  1 +
                   "/" +
                   datevalue.getDate() +
                   "/" +
