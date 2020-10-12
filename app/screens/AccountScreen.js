@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, View, FlatList } from "react-native";
+import * as FileSystem from "expo-file-system";
 
 import { ListItem, ListItemSeparator } from "../components/lists";
 import colors from "../config/colors";
@@ -29,13 +30,29 @@ const menuItems = [
 function AccountScreen({ navigation }) {
   const [filename, setFilename] = useState();
   const { user, logOut } = useAuth();
+  const [albumCreated, setAlbumCreated] = React.useState(false);
 
   useEffect(() => {
     if (user.tbl_imagepath != null) {
       const res = user.tbl_imagepath.split("/");
       setFilename(res[res.length - 1]);
     } else setFilename("");
+    checkAlbum();
   }, []);
+
+  const checkAlbum = async () => {
+    try {
+      FileSystem.getInfoAsync("file:///storage/emulated/0/PDRRMOProfiler/")
+        .then((result) => {
+          result.exists ? setAlbumCreated(true) : setAlbumCreated(false);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    } catch (error) {
+      Alert(error);
+    }
+  };
 
   return (
     <Screen style={styles.screen}>
@@ -47,7 +64,9 @@ function AccountScreen({ navigation }) {
             user.tbl_imagepath === null
               ? require("../assets/user.png")
               : {
-                  uri: "file:///storage/emulated/0/PDRRMOProfiler/" + filename,
+                  uri: albumCreated
+                    ? "file:///storage/emulated/0/PDRRMOProfiler/" + filename
+                    : user.tbl_imagepath,
                 }
           }
         />

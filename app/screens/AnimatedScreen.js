@@ -82,6 +82,7 @@ function AnimatedScreen({ navigation }) {
   const [evacuationarea, setEvacuationarea] = React.useState();
   const [filter, setFilter] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+  const [albumCreated, setAlbumCreated] = React.useState(false);
 
   let mapIndex = 0;
   let mapAnimation = new Animated.Value(0);
@@ -361,6 +362,24 @@ function AnimatedScreen({ navigation }) {
     // Return the function to unsubscribe from the event so it gets removed on unmount
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    checkAlbum();
+  }, []);
+
+  const checkAlbum = async () => {
+    try {
+      FileSystem.getInfoAsync("file:///storage/emulated/0/PDRRMOProfiler/")
+        .then((result) => {
+          result.exists ? setAlbumCreated(true) : setAlbumCreated(false);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    } catch (error) {
+      Alert(error);
+    }
+  };
 
   const fetchInterviewByGroup = () => {
     db.transaction(
@@ -2944,11 +2963,11 @@ function AnimatedScreen({ navigation }) {
                 >
                   <Image
                     source={{
-                      uri:
-                        "file:///storage/emulated/0/PDRRMOProfiler/" +
-                        moreinfo.tbl_hhimage,
+                      uri: albumCreated
+                        ? "file:///storage/emulated/0/PDRRMOProfiler/" +
+                          moreinfo.tbl_hhimage
+                        : moreinfo.uri,
                     }}
-                    // style={styles.cardImage}
                     resizeMode="cover"
                   />
                 </TouchableHighlight>
