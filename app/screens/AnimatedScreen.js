@@ -1232,7 +1232,7 @@ function AnimatedScreen({ navigation }) {
       "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
       "lib_hhlvldesc," +
       "lib_heaname," + //lib_hhevacuationarea
-      "tbl_programs.id as counterid," + //tbl_programs
+      "tbl_household.tbl_household_id as counterid," + //tbl_programs
       "lib_typeofprogram_id," + //tbl_programs
       "lib_topname," + //tbl_programs
       "lib_pname," + //tbl_programs
@@ -1393,7 +1393,7 @@ function AnimatedScreen({ navigation }) {
       "tbl_ismembergsis," +
       "tbl_ismemberphilhealth," +
       "tbl_adependentofaphilhealthmember," +
-      "tbl_hhdemography.tbl_household_id AS counterid " + //counterid
+      "tbl_household.tbl_household_id AS counterid " + //counterid
       "FROM tbl_household " +
       "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
       "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
@@ -1526,7 +1526,7 @@ function AnimatedScreen({ navigation }) {
       "lib_tenuralstatus_id," + //tbl_livelihood
       "tbl_tsname," + //tbl_livelihood
       "tbl_livelihoodiswithinsurance," + //tbl_livelihood
-      "tbl_livelihood.tbl_household_id AS counterid " + //counterid
+      "tbl_household.tbl_household_id AS counterid " + //counterid
       "FROM tbl_household " +
       "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
       "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
@@ -1620,6 +1620,8 @@ function AnimatedScreen({ navigation }) {
         "Does the household has access to health and medical facilities?",
         "Does the household has access to telecommunications?",
         "Does the household has access to drills and simulations?",
+        "Image filename",
+        "Image uri",
       ],
     ];
 
@@ -1703,8 +1705,12 @@ function AnimatedScreen({ navigation }) {
             ? rowArray.lib_roofmaterialsdesc.replace(/,/g, " ")
             : rowArray.lib_roofmaterialsdesc
         }`,
-        ``,
-        ``,
+        `${rowArray.tbl_availmedicaltreatment == 1 ? "Yes" : "No"}`,
+        `${
+          rowArray.tbl_treatmentspecification
+            ? rowArray.tbl_treatmentspecification.replace(/,/g, " ")
+            : rowArray.tbl_treatmentspecification
+        }`,
         `${rowArray.tbl_hhaccesswater == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hhwaterpotable == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_tenuralstatus_id}`,
@@ -1728,6 +1734,16 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.tbl_hhhasaccesshealtmedicalfacility == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hhhasaccesstelecom == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_hasaccessdrillsandsimulations == 1 ? "Yes" : "No"}`,
+        `${
+          rowArray.tbl_hhimage
+            ? rowArray.tbl_hhimage.replace(/,/g, " ")
+            : rowArray.tbl_hhimage
+        }`,
+        `${
+          rowArray.tbl_uri
+            ? rowArray.tbl_uri.replace(/,/g, " ")
+            : rowArray.tbl_uri
+        }`,
       ];
       rows.push(arrayOne);
     });

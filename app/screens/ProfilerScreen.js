@@ -61,6 +61,13 @@ const validationSchema = Yup.object().shape({
       ),
     }
   ),
+  tbl_availmedicaltreatment: Yup.boolean(),
+  tbl_treatmentspecification: Yup.string().when("tbl_availmedicaltreatment", {
+    is: true,
+    then: Yup.string().required(
+      "Treatment specification is required when availed medical treatment is selected as true"
+    ),
+  }),
 });
 
 const db = SQLite.openDatabase("hhprofiler21.db");
@@ -344,6 +351,8 @@ function ProfilerScreen({ navigation, route }) {
             "tbl_tenuralstatus_id," +
             "tbl_typeofconmaterials_id," +
             "tbl_wallconmaterials_id," +
+            "tbl_availmedicaltreatment," +
+            "tbl_treatmentspecification," +
             "tbl_hhaccesswater," +
             "tbl_hhwaterpotable," +
             "tbl_watertenuralstatus_id," +
@@ -362,11 +371,15 @@ function ProfilerScreen({ navigation, route }) {
             "updated_at," +
             "created_by," +
             "updatedy_by " +
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             uuid,
             String(
-              date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate()
+              date.getFullYear() +
+                "-" +
+                (date.getMonth() + 1) +
+                "-" +
+                date.getDate()
             ),
             data.coordinates != null ? data.coordinates.latitude : "",
             data.coordinates != null ? data.coordinates.longitude : "",
@@ -384,6 +397,8 @@ function ProfilerScreen({ navigation, route }) {
             data.tenuralstatus.id ? data.tenuralstatus.id : 0,
             data.roofmaterial.id ? data.roofmaterial.id : 0,
             data.wallmaterial.id ? data.wallmaterial.id : 0,
+            data.tbl_availmedicaltreatment ? 1 : 0,
+            data.tbl_treatmentspecification,
             data.awater ? 1 : 0,
             data.wpotable ? 1 : 0,
             data.wtenuralstatus.id ? data.wtenuralstatus.id : 0,
@@ -509,6 +524,8 @@ function ProfilerScreen({ navigation, route }) {
             "tbl_tenuralstatus_id =? ," +
             "tbl_typeofconmaterials_id =? ," +
             "tbl_wallconmaterials_id =? ," +
+            "tbl_availmedicaltreatment," +
+            "tbl_treatmentspecification," +
             "tbl_hhaccesswater =? ," +
             "tbl_hhwaterpotable =? ," +
             "tbl_watertenuralstatus_id =? ," +
@@ -542,6 +559,8 @@ function ProfilerScreen({ navigation, route }) {
             data.tenuralstatus.id ? data.tenuralstatus.id : 0,
             data.roofmaterial.id ? data.roofmaterial.id : 0,
             data.wallmaterial.id ? data.wallmaterial.id : 0,
+            data.tbl_availmedicaltreatment ? 1 : 0,
+            data.tbl_treatmentspecification,
             data.awater ? 1 : 0,
             data.wpotable ? 1 : 0,
             data.wtenuralstatus.id ? data.wtenuralstatus.id : 0,
@@ -715,6 +734,19 @@ function ProfilerScreen({ navigation, route }) {
                   }
                 : ""
               : 0,
+            tbl_availmedicaltreatment: route.params.update
+              ? hhinfo[0].tbl_availmedicaltreatment == 1
+                ? true
+                : false
+              : false,
+            tbl_treatmentspecification: route.params.update
+              ? hhinfo[0].tbl_treatmentspecification
+                ? {
+                    id: hhinfo[0].tbl_treatmentspecification,
+                    label: hhinfo[0].tbl_treatmentspecification,
+                  }
+                : ""
+              : "",
             wallmaterial: route.params.update
               ? hhinfo[0].tbl_typeofconmaterials_id
                 ? {
@@ -723,6 +755,7 @@ function ProfilerScreen({ navigation, route }) {
                   }
                 : ""
               : 0,
+
             awater: route.params.update
               ? hhinfo[0].tbl_hhaccesswater == 1
                 ? true
@@ -910,6 +943,19 @@ function ProfilerScreen({ navigation, route }) {
             name="wallmaterial"
             PickerItemComponent={PickerItem}
             placeholder="Wall material"
+          />
+
+          <SwitchInput
+            icon="medical-bag"
+            name="tbl_availmedicaltreatment"
+            placeholder="Did you or any member of the household avail of medical treatment for any serious illnesses?"
+          />
+
+          <FormField
+            autoCorrect={false}
+            icon="medical-bag"
+            name="tbl_treatmentspecification"
+            placeholder="Specification"
           />
 
           <SwitchInput
@@ -1238,6 +1284,41 @@ function ProfilerScreen({ navigation, route }) {
                 >
                   <Text style={styles.moreInforDataTxt}>
                     {tempData.wallmaterial.label}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>
+                    Did you or any member of the household avail of medical
+                    treatment for any serious illnesses?
+                  </Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_availmedicaltreatment ? "Yes" : "No"}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Specification</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_treatmentspecification}
                   </Text>
                 </View>
               </View>
