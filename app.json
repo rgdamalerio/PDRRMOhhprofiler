@@ -2,11 +2,7 @@
   "expo": {
     "name": "PDRRMOhhprofiler",
     "slug": "PDRRMOhhprofiler",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./app/assets/icon.png",
@@ -18,9 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
@@ -34,7 +28,8 @@
         "googleMaps": {
           "apiKey": "AIzaSyDigLpy8-xtpylWOeklpyoXal0K9AqgONc"
         }
-      }
+      },
+      "useNextNotificationsApi": true
     },
     "description": "Mobile Application of Provincial Disaster Risk Reduction Management Office for Household Profiler ",
     "extra": {
