@@ -133,6 +133,7 @@ function RegisterScreen({ navigation }) {
   const createAlbum = async (uri) => {
     try {
       const asset = await MediaLibrary.createAssetAsync(uri);
+      console.log(asset);
       MediaLibrary.createAlbumAsync("PDRRMOProfiler", asset, false)
         .then(() => {})
         .catch((error) => {

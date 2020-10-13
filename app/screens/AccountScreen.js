@@ -46,9 +46,7 @@ function AccountScreen({ navigation }) {
         .then((result) => {
           result.exists ? setAlbumCreated(true) : setAlbumCreated(false);
         })
-        .catch((error) => {
-          alert(error);
-        });
+        .catch((error) => {});
     } catch (error) {
       Alert(error);
     }
