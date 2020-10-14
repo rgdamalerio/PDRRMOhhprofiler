@@ -20,7 +20,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as SQLite from "expo-sqlite";
 import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
-import { Notifications } from "expo";
 
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useTheme } from "@react-navigation/native";
@@ -2084,6 +2083,9 @@ function AnimatedScreen({ navigation }) {
         .then(() => {
           setLoading(false);
           download(fileUri);
+          alert(
+            "Export data success, open download folder to see exported data"
+          );
         })
         .catch((error) => {
           setLoading(false);
@@ -2098,16 +2100,7 @@ function AnimatedScreen({ navigation }) {
   const download = async (fileUri) => {
     const asset = await MediaLibrary.createAssetAsync(fileUri);
     await MediaLibrary.createAlbumAsync("Download", asset, false)
-      .then(() => {
-        console.log("DOne");
-        Notifications.presentLocalNotificationAsync({
-          title: "PDRRMO Profiler",
-          body: "Download csv file successfully",
-          data: {
-            _displayInForeground: true,
-          },
-        });
-      })
+      .then(() => {})
       .catch((error) => {
         setLoading(false);
         alert("Error saving image, Error details: " + error);

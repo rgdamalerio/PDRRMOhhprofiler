@@ -137,7 +137,6 @@ function AddImage({ navigation, route }) {
   const createAlbum = async (uri) => {
     //Initialize asset from uri
     const asset = await MediaLibrary.createAssetAsync(uri);
-
     //Remove existing image if available
     MediaLibrary.getAlbumAsync("PDRRMOProfiler").then((album) => {
       if (album) {
