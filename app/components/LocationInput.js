@@ -1,28 +1,31 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
   View,
   StyleSheet,
   Modal,
   Dimensions,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import Constants from "expo-constants";
-import {
-  MaterialIcons,
-  MaterialCommunityIcons,
-  FontAwesome,
-} from "@expo/vector-icons";
-import MapView from "react-native-maps";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
+import MapView, { UrlTile, Region, MapTypes } from "react-native-maps";
+import * as FileSystem from "expo-file-system";
+import { Button } from "react-native-elements";
 
+import { AppConstants } from "../constants";
+import { DownloadSettings } from "./DownloadSettings";
 import defaultStyles from "../config/styles";
 import Text from "./Text";
 
-const intialRegion = {
+const INITIALREGION = {
   latitude: 9.190489360418237,
   latitudeDelta: 2.239664674768459,
   longitude: 125.57549066841602,
   longitudeDelta: 1.365918293595314,
 };
+
+const MAP_TYPE = Platform.OS == "android" ? "none" : "standard";
 
 function LocationInput({
   coordinates,
@@ -33,12 +36,45 @@ function LocationInput({
 }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [isOffline, setIsOffline] = useState(false);
-  const [region, setRegion] = useState(intialRegion);
+  const [visisbleSettings, setVisisbleSettings] = useState(false);
+  const [mapRegion, setMapRegion] = useState(INITIALREGION);
   const mapRef = useRef(null);
 
   const onChangeCoord = () => {
-    onChangeCoordinates(region);
+    onChangeCoordinates(mapRegion);
   };
+
+  const urlTemplate = useMemo(
+    () =>
+      isOffline
+        ? `${AppConstants.TILE_FOLDER}/{z}/{x}/{y}.png`
+        : `${AppConstants.MAP_URL}/{z}/{x}/{y}.png`,
+    [isOffline]
+  );
+
+  const clearTiles = async () => {
+    try {
+      await FileSystem.deleteAsync(AppConstants.TILE_FOLDER);
+      alert("Deleted all tiles");
+    } catch (error) {
+      console.warn(error);
+    }
+  };
+
+  const toggleOffline = () => {
+    setIsOffline(!isOffline);
+  };
+
+  const toggeleDownloadSettings = () => {
+    setVisisbleSettings(!visisbleSettings);
+  };
+
+  const onDownloadComplete = () => {
+    setIsOffline(true);
+    setVisisbleSettings(false);
+  };
+
+  const toggleOfflineText = isOffline ? "Go online" : "Go offline";
 
   return (
     <>
@@ -66,17 +102,17 @@ function LocationInput({
           <MapView
             ref={mapRef}
             style={styles.mapStyle}
-            mapType="satellite"
-            region={region}
-            onRegionChangeComplete={(region) => {
-              setRegion(region);
-            }}
+            mapType={MAP_TYPE}
+            initialRegion={INITIALREGION}
+            onRegionChange={setMapRegion}
           >
+            <UrlTile urlTemplate={urlTemplate} zIndex={1} />
+
             <MapView.Marker
               draggable
               coordinate={{
-                latitude: region.latitude,
-                longitude: region.longitude,
+                latitude: mapRegion.latitude,
+                longitude: mapRegion.longitude,
               }}
               //onDragStart={() => this.setMarkerPosition()}
               onDragEnd={(e) => {
@@ -84,7 +120,7 @@ function LocationInput({
                   latitudeDelta,
                   longitudeDelta,
                 } = mapRef.current.__lastRegion;
-                setRegion({
+                setMapRegion({
                   latitude: e.nativeEvent.coordinate.latitude,
                   longitude: e.nativeEvent.coordinate.longitude,
                   latitudeDelta: latitudeDelta,
@@ -127,7 +163,7 @@ function LocationInput({
             <TouchableOpacity
               style={styles.cameraControl}
               onPress={() => {
-                onChangeCoord(region);
+                onChangeCoord(mapRegion);
                 setModalVisible(false);
               }}
             >
@@ -154,6 +190,22 @@ function LocationInput({
               />
             </TouchableOpacity>
           </View>
+
+          <View style={styles.actionContainer}>
+            <Button
+              raised
+              title={"Download"}
+              onPress={toggeleDownloadSettings}
+            />
+            <Button raised title={"Clear tiles"} onPress={clearTiles} />
+            <Button raised title={toggleOfflineText} onPress={toggleOffline} />
+          </View>
+          {visisbleSettings && (
+            <DownloadSettings
+              mapRegion={mapRegion}
+              onFinish={onDownloadComplete}
+            />
+          )}
         </View>
       </Modal>
     </>
@@ -161,6 +213,17 @@ function LocationInput({
 }
 
 const styles = StyleSheet.create({
+  actionContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    padding: 15,
+    paddingTop: Constants.statusBarHeight + 15,
+    zIndex: 999,
+    justifyContent: "space-around",
+  },
   container: {
     backgroundColor: defaultStyles.colors.secondary,
     borderRadius: 25,
