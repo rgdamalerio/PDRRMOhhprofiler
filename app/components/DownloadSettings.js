@@ -1,12 +1,21 @@
-import React, { useState, useMemo } from "react";
-import { StyleSheet, Text, Slider, ActivityIndicator } from "react-native";
+import React, { useState, useMemo, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  Slider,
+  ActivityIndicator,
+  View,
+} from "react-native";
 import * as FileSystem from "expo-file-system";
 import { Card, Button } from "react-native-elements";
 import { tileGridForRegion } from "../utility/TileGrid";
 import { AppConstants } from "../constants";
-import { Region } from "react-native-maps";
 
-export default DownloadSettings = ({ mapRegion, onFinish }) => {
+const calcZoom = (longitudeDelta) => {
+  return Math.round(Math.log(360 / longitudeDelta) / Math.LN2);
+};
+
+function DownloadSettings({ mapRegion, onFinish }) {
   const [numZoomLevels, setZoomLevels] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,10 +64,6 @@ export default DownloadSettings = ({ mapRegion, onFinish }) => {
     onFinish();
   };
 
-  const calcZoom = (longitudeDelta) => {
-    return Math.round(Math.log(360 / longitudeDelta) / Math.LN2);
-  };
-
   return (
     <Card
       title={"Select number of zoom levels to download"}
@@ -85,7 +90,7 @@ export default DownloadSettings = ({ mapRegion, onFinish }) => {
       )}
     </Card>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -107,3 +112,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
+
+export default DownloadSettings;

@@ -1,6 +1,6 @@
 import { Region } from "react-native-maps";
 
-export default tileGridForRegion = (region, minZoom, maxZoom) => {
+export const tileGridForRegion = (region, minZoom, maxZoom) => {
   let tiles = [];
 
   for (let zoom = minZoom; zoom <= maxZoom; zoom++) {

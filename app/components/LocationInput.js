@@ -14,7 +14,7 @@ import * as FileSystem from "expo-file-system";
 import { Button } from "react-native-elements";
 
 import { AppConstants } from "../constants";
-import { DownloadSettings } from "./DownloadSettings";
+import DownloadSettings from "./DownloadSettings";
 import defaultStyles from "../config/styles";
 import Text from "./Text";
 
@@ -57,7 +57,7 @@ function LocationInput({
       await FileSystem.deleteAsync(AppConstants.TILE_FOLDER);
       alert("Deleted all tiles");
     } catch (error) {
-      console.warn(error);
+      alert(error);
     }
   };
 
@@ -108,7 +108,7 @@ function LocationInput({
           >
             <UrlTile urlTemplate={urlTemplate} zIndex={1} />
 
-            <MapView.Marker
+            {/*<MapView.Marker
               draggable
               coordinate={{
                 latitude: mapRegion.latitude,
@@ -127,7 +127,7 @@ function LocationInput({
                   longitudeDelta: longitudeDelta,
                 });
               }}
-            />
+            />*/}
           </MapView>
           <View
             style={{
