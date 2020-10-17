@@ -363,6 +363,14 @@ function AnimatedScreen({ navigation }) {
   }, [navigation]);
 
   useEffect(() => {
+    _map.current.fitToSuppliedMarkers(["mk1"], {
+      edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
+      animated: false,
+    });
+    console.log("gitawag");
+  }, [markers]);
+
+  useEffect(() => {
     checkAlbum();
   }, []);
 
@@ -617,7 +625,6 @@ function AnimatedScreen({ navigation }) {
         );
       },
       (error) => {
-        console.log(error);
         Alert.alert(
           "SQLITE ERROR",
           "Error loading Household data, Please contact developer, " + error,
@@ -650,7 +657,6 @@ function AnimatedScreen({ navigation }) {
         );
       },
       (error) => {
-        console.log(error);
         Alert.alert(
           "SQLITE ERROR",
           "Error loading availed program, Please contact developer, " + error,
@@ -723,7 +729,6 @@ function AnimatedScreen({ navigation }) {
         );
       },
       (error) => {
-        console.log(error);
         Alert.alert(
           "SQLITE ERROR",
           "Error loading Demography, Please contact developer, " + error,
@@ -759,7 +764,6 @@ function AnimatedScreen({ navigation }) {
         );
       },
       (error) => {
-        console.log(error);
         Alert.alert(
           "SQLITE ERROR",
           "Error loading Livelihood details, Please contact developer, " +
@@ -807,11 +811,6 @@ function AnimatedScreen({ navigation }) {
         respondent.tbl_respondent.toUpperCase().indexOf(txt.toUpperCase()) > -1
     );
     setMarkers(newRespondent);
-
-    _map.current.fitToSuppliedMarkers(["mk1"], {
-      edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
-      animated: false,
-    });
   };
   const handleAdvanceSearch = (data) => {
     setFilter(data);
@@ -989,10 +988,6 @@ function AnimatedScreen({ navigation }) {
       setModalSearch(false);
     }
 
-    _map.current.fitToSuppliedMarkers(["mk1"], {
-      edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
-      animated: false,
-    });
     setModalSearch(false);
   };
 
@@ -1771,7 +1766,7 @@ function AnimatedScreen({ navigation }) {
         csvContent += row + "\r\n";
       });
     } catch (e) {
-      console.log("Error in join" + e);
+      alert("Error in join" + e);
     }
 
     try {
@@ -1784,10 +1779,10 @@ function AnimatedScreen({ navigation }) {
           download(fileUri);
         })
         .catch((error) => {
-          console.log(error);
+          alert(error);
         });
     } catch (e) {
-      console.log(e);
+      alert(e);
     }
   };
 
@@ -1829,7 +1824,6 @@ function AnimatedScreen({ navigation }) {
         csvContent += row + "\r\n";
       });
     } catch (e) {
-      console.log(false);
       alert("Error in join" + e);
     }
 
@@ -2003,7 +1997,6 @@ function AnimatedScreen({ navigation }) {
         csvContent += row + "\r\n";
       });
     } catch (e) {
-      console.log(false);
       alert("Error in join" + e);
     }
 
@@ -2070,7 +2063,6 @@ function AnimatedScreen({ navigation }) {
         csvContent += row + "\r\n";
       });
     } catch (e) {
-      console.log(false);
       alert("Error in join" + e);
     }
 
@@ -3054,7 +3046,7 @@ const styles = StyleSheet.create({
   },
   chipsScrollView: {
     position: "absolute",
-    top: Platform.OS === "ios" ? 90 : 80,
+    top: Platform.OS === "ios" ? 90 : 100,
     paddingHorizontal: 10,
   },
   chipsIcon: {

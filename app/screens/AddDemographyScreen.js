@@ -92,7 +92,6 @@ function AddDemographyScreen({ navigation, route }) {
     _income();
     _setNuclearfamily();
     _sethasHead();
-    console.log(demograpy);
   }, []);
 
   const _sethasHead = () => {

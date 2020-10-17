@@ -114,7 +114,6 @@ function ProfilerScreen({ navigation, route }) {
     getEvacuationareas();
     getRandomBytes();
     getDate();
-    console.log(hhinfo);
   }, []);
 
   const getMunicipality = () => {

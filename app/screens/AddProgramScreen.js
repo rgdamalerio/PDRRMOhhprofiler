@@ -311,7 +311,6 @@ function AddProgramScreen({ navigation, route }) {
       },
       (error) => {
         setLoading(false);
-        console.log(error);
         alert("Database Error: " + error.message);
       }
     );

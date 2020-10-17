@@ -7,11 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Constants from "expo-constants";
-import {
-  MaterialIcons,
-  MaterialCommunityIcons,
-  FontAwesome,
-} from "@expo/vector-icons";
+import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
 import MapView from "react-native-maps";
 
 import defaultStyles from "../config/styles";
@@ -32,7 +28,7 @@ function LocationInput({
   width,
 }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const [isOffline, setIsOffline] = useState(false);
+  const [addMarker, setAddMarker] = useState(false);
   const [region, setRegion] = useState(intialRegion);
   const mapRef = useRef(null);
 
@@ -68,30 +64,31 @@ function LocationInput({
             style={styles.mapStyle}
             mapType="satellite"
             region={region}
-            onRegionChangeComplete={(region) => {
-              setRegion(region);
-            }}
+            //onRegionChangeComplete={(region) => {
+            //  setRegion(region);
+            //}}
           >
-            <MapView.Marker
-              draggable
-              coordinate={{
-                latitude: region.latitude,
-                longitude: region.longitude,
-              }}
-              //onDragStart={() => this.setMarkerPosition()}
-              onDragEnd={(e) => {
-                const {
-                  latitudeDelta,
-                  longitudeDelta,
-                } = mapRef.current.__lastRegion;
-                setRegion({
-                  latitude: e.nativeEvent.coordinate.latitude,
-                  longitude: e.nativeEvent.coordinate.longitude,
-                  latitudeDelta: latitudeDelta,
-                  longitudeDelta: longitudeDelta,
-                });
-              }}
-            />
+            {addMarker && (
+              <MapView.Marker
+                draggable
+                coordinate={{
+                  latitude: region.latitude,
+                  longitude: region.longitude,
+                }}
+                onDragEnd={(e) => {
+                  const {
+                    latitudeDelta,
+                    longitudeDelta,
+                  } = mapRef.current.__lastRegion;
+                  setRegion({
+                    latitude: e.nativeEvent.coordinate.latitude,
+                    longitude: e.nativeEvent.coordinate.longitude,
+                    latitudeDelta: latitudeDelta,
+                    longitudeDelta: longitudeDelta,
+                  });
+                }}
+              />
+            )}
           </MapView>
           <View
             style={{
@@ -110,16 +107,13 @@ function LocationInput({
             <TouchableOpacity
               style={styles.cameraControl}
               onPress={() => {
-                selectImage();
-                setModalVisible(false);
+                setAddMarker(true);
               }}
             >
               <MaterialCommunityIcons
-                name="toggle-switch"
+                name="map-marker-plus"
                 style={{
-                  color: isOffline
-                    ? defaultStyles.colors.green
-                    : defaultStyles.colors.danger,
+                  color: defaultStyles.colors.primary,
                   fontSize: 40,
                 }}
               />
@@ -132,7 +126,7 @@ function LocationInput({
               }}
             >
               <MaterialCommunityIcons
-                name="map-marker-plus"
+                name="check-circle"
                 style={{
                   color: defaultStyles.colors.green,
                   fontSize: 40,
