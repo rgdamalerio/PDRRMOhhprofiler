@@ -91,6 +91,9 @@ function ProfilerScreen({ navigation, route }) {
   const [lvlwatersystem, setLvlwatersystems] = useState();
   const [evacuationarea, setEvacuationarea] = useState();
   const [otherEvacuation, setOtherEvacuation] = useState(false);
+  const [availtreatment, setAvailtreatment] = useState(false);
+  const [floodsoccured, setFloodsoccured] = useState(false);
+  const [expevacuation, setExpevacuation] = useState(false);
   const [randomBtyes, setRandomBtyes] = useState();
   const [date, setDate] = useState();
   const [uuid, setUuid] = useState(
@@ -104,6 +107,7 @@ function ProfilerScreen({ navigation, route }) {
     route.params.update
       ? navigation.setOptions({ title: "Update Household info" })
       : "";
+    setHhinfo(route.params.update ? route.params.hhinfo : []);
     getMunicipality();
     gettypeBuilding();
     gettenuralStatus();
@@ -114,6 +118,19 @@ function ProfilerScreen({ navigation, route }) {
     getEvacuationareas();
     getRandomBytes();
     getDate();
+    if (route.params.update) {
+      setAvailtreatment(
+        route.params.hhinfo[0].tbl_availmedicaltreatment == 1 ? true : false
+      );
+      setFloodsoccured(
+        route.params.hhinfo[0].tbl_hhfloodsoccurinarea == 1 ? true : false
+      );
+      setExpevacuation(
+        route.params.hhinfo[0].tbl_hhexperienceevacuationoncalamity == 1
+          ? true
+          : false
+      );
+    }
   }, []);
 
   const getMunicipality = () => {
@@ -523,8 +540,8 @@ function ProfilerScreen({ navigation, route }) {
             "tbl_tenuralstatus_id =? ," +
             "tbl_typeofconmaterials_id =? ," +
             "tbl_wallconmaterials_id =? ," +
-            "tbl_availmedicaltreatment," +
-            "tbl_treatmentspecification," +
+            "tbl_availmedicaltreatment = ?," +
+            "tbl_treatmentspecification = ?," +
             "tbl_hhaccesswater =? ," +
             "tbl_hhwaterpotable =? ," +
             "tbl_watertenuralstatus_id =? ," +
@@ -540,7 +557,7 @@ function ProfilerScreen({ navigation, route }) {
             "tbl_householdpuroksittio =? ," +
             "tbl_respondent = ? ," +
             "updated_at = ?," +
-            "updatedy_by= ?  WHERE tbl_household_id = ?",
+            "updatedy_by= ?  WHERE tbl_household_id = ? ",
           [
             data.coordinates != null ? data.coordinates.latitude : "",
             data.coordinates != null ? data.coordinates.longitude : "",
@@ -653,6 +670,7 @@ function ProfilerScreen({ navigation, route }) {
       (error) => {
         setLoading(false);
         alert("Database Error: " + error.message);
+        console.log(error);
       }
     );
   };
@@ -740,11 +758,6 @@ function ProfilerScreen({ navigation, route }) {
               : false,
             tbl_treatmentspecification: route.params.update
               ? hhinfo[0].tbl_treatmentspecification
-                ? {
-                    id: hhinfo[0].tbl_treatmentspecification,
-                    label: hhinfo[0].tbl_treatmentspecification,
-                  }
-                : ""
               : "",
             wallmaterial: route.params.update
               ? hhinfo[0].tbl_typeofconmaterials_id
@@ -948,14 +961,18 @@ function ProfilerScreen({ navigation, route }) {
             icon="medical-bag"
             name="tbl_availmedicaltreatment"
             placeholder="Did you or any member of the household avail of medical treatment for any serious illnesses?"
+            setAvail={setAvailtreatment}
+            initavail={availtreatment}
           />
 
-          <FormField
-            autoCorrect={false}
-            icon="medical-bag"
-            name="tbl_treatmentspecification"
-            placeholder="Specification"
-          />
+          {availtreatment && (
+            <FormField
+              autoCorrect={false}
+              icon="medical-bag"
+              name="tbl_treatmentspecification"
+              placeholder="Specification"
+            />
+          )}
 
           <SwitchInput
             icon="water-pump"
@@ -989,31 +1006,39 @@ function ProfilerScreen({ navigation, route }) {
             icon="water-percent"
             name="tbl_hhfloodsoccurinarea"
             placeholder="Do floods occure in your area?"
+            setAvail={setFloodsoccured}
+            initavail={floodsoccured}
           />
 
-          <FormField
-            autoCorrect={false}
-            name="tbl_hhfloodsoccurinareayear"
-            icon="calendar"
-            placeholder="Year occured"
-            width="75%"
-            keyboardType="number-pad"
-          />
+          {floodsoccured && (
+            <FormField
+              autoCorrect={false}
+              name="tbl_hhfloodsoccurinareayear"
+              icon="calendar"
+              placeholder="Year occured"
+              width="75%"
+              keyboardType="number-pad"
+            />
+          )}
 
           <SwitchInput
             icon="home-flood"
             name="tbl_hhexperienceevacuationoncalamity"
             placeholder="Do you experience evacuation during calamity ?"
+            setAvail={setExpevacuation}
+            initavail={expevacuation}
           />
 
-          <FormField
-            autoCorrect={false}
-            name="tbl_hhexperienceevacuationoncalamityyear"
-            icon="calendar"
-            placeholder="Year experienced"
-            width="75%"
-            keyboardType="number-pad"
-          />
+          {expevacuation && (
+            <FormField
+              autoCorrect={false}
+              name="tbl_hhexperienceevacuationoncalamityyear"
+              icon="calendar"
+              placeholder="Year experienced"
+              width="75%"
+              keyboardType="number-pad"
+            />
+          )}
 
           <Picker
             icon="home-flood"

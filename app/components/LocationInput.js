@@ -63,10 +63,10 @@ function LocationInput({
             ref={mapRef}
             style={styles.mapStyle}
             mapType="satellite"
-            region={region}
-            //onRegionChangeComplete={(region) => {
-            //  setRegion(region);
-            //}}
+            initialRegion={region}
+            onRegionChangeComplete={(region) => {
+              setRegion(region);
+            }}
           >
             {addMarker && (
               <MapView.Marker
@@ -121,8 +121,12 @@ function LocationInput({
             <TouchableOpacity
               style={styles.cameraControl}
               onPress={() => {
-                onChangeCoord(region);
-                setModalVisible(false);
+                if (!addMarker) {
+                  alert("Add marker first to select location in the map");
+                } else {
+                  onChangeCoord(region);
+                  setModalVisible(false);
+                }
               }}
             >
               <MaterialCommunityIcons

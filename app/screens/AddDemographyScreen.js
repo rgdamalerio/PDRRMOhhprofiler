@@ -82,6 +82,7 @@ function AddDemographyScreen({ navigation, route }) {
     route.params.update
       ? navigation.setOptions({ title: "Update Demograpy info" })
       : "";
+    setDemograpy(route.params.update ? route.params.memberinfo : []);
     _setRelationship();
     _gender();
     _setMaritalStatus();
@@ -994,21 +995,14 @@ function AddDemographyScreen({ navigation, route }) {
             placeholder="Name extension"
           />
 
-          {!hasHead && (
-            <SwitchInput
-              icon="account"
-              name="tbl_ishead"
-              placeholder="Is person head of the family?"
-            />
-          )}
-
-          {route.params.update && (
-            <SwitchInput
-              icon="account"
-              name="tbl_ishead"
-              placeholder="Is person head of the family?"
-            />
-          )}
+          {route.params.update ||
+            (!hasHead && (
+              <SwitchInput
+                icon="account"
+                name="tbl_ishead"
+                placeholder="Is person head of the family?"
+              />
+            ))}
 
           <Picker
             icon="account-group"

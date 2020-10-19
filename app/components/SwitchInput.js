@@ -6,7 +6,14 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import defaultStyles from "../config/styles";
 import ErrorMessage from "../components/forms/ErrorMessage";
 
-function SwitchInput({ name, icon, width = "100%", placeholder }) {
+function SwitchInput({
+  name,
+  icon,
+  width = "100%",
+  placeholder,
+  setAvail,
+  initavail,
+}) {
   const { setFieldValue, values, errors, touched } = useFormikContext();
 
   return (
@@ -24,7 +31,10 @@ function SwitchInput({ name, icon, width = "100%", placeholder }) {
         trackColor={{ false: "#767577", true: "#c3fdff" }}
         thumbColor={values[name] ? "#81b0ff" : "#f4f3f4"}
         ios_backgroundColor="#3e3e3e"
-        onValueChange={(value) => setFieldValue(name, value)}
+        onValueChange={(value) => {
+          setFieldValue(name, value);
+          setAvail ? setAvail(!initavail) : "";
+        }}
         value={values[name]}
       />
       <ErrorMessage error={errors[name]} visible={touched[name]} />

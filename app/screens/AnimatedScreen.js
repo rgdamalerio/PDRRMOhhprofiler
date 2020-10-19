@@ -367,7 +367,6 @@ function AnimatedScreen({ navigation }) {
       edgePadding: { top: 10, right: 10, bottom: 10, left: 10 },
       animated: false,
     });
-    console.log("gitawag");
   }, [markers]);
 
   useEffect(() => {
@@ -437,6 +436,8 @@ function AnimatedScreen({ navigation }) {
       "tbl_tenuralstatus_id," +
       "tbl_typeofconmaterials_id," +
       "tbl_wallconmaterials_id," +
+      "tbl_availmedicaltreatment," +
+      "tbl_treatmentspecification," +
       "tbl_hhaccesswater," +
       "tbl_hhwaterpotable," +
       "tbl_watertenuralstatus_id," +
@@ -560,6 +561,8 @@ function AnimatedScreen({ navigation }) {
             "tbl_tenuralstatus_id," +
             "tbl_typeofconmaterials_id," +
             "tbl_wallconmaterials_id," +
+            "tbl_availmedicaltreatment," +
+            "tbl_treatmentspecification," +
             "tbl_hhaccesswater," +
             "tbl_hhwaterpotable," +
             "tbl_watertenuralstatus_id," +
@@ -2556,7 +2559,7 @@ function AnimatedScreen({ navigation }) {
             </View>
             <View style={styles.moreInfoTable}>
               <View style={styles.moreInfolabel}>
-                <Text style={styles.moreInfolabeltxt}>Enumarator</Text>
+                <Text style={styles.moreInfolabeltxt}>Enumerator</Text>
               </View>
               <View style={styles.moreInforData}>
                 <Text style={styles.moreInforDataTxt}>
