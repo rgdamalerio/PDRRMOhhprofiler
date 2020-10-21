@@ -62,7 +62,9 @@ function AccountScreen({ navigation }) {
             navigation.navigate("Updateuser", { enumerator: user });
           }}
           image={
-            user.tbl_imagepath === null
+            user.idtbl_enumerator === 1
+              ? require("../assets/rgd.jpg")
+              : user.tbl_imagepath === null
               ? require("../assets/user.png")
               : {
                   uri: albumCreated
@@ -70,6 +72,7 @@ function AccountScreen({ navigation }) {
                     : user.tbl_imagepath,
                 }
           }
+          chevron
         />
       </View>
       <View style={styles.container}>
@@ -89,11 +92,12 @@ function AccountScreen({ navigation }) {
               onPress={() =>
                 navigation.navigate(item.route, { id: "", update: false })
               }
+              chevron
             />
           )}
         />
       </View>
-      {user.idtbl_enumerator === 0 && (
+      {user.idtbl_enumerator === 1 && (
         <View style={styles.container}>
           <ListItem
             title="Manage enumerator"
@@ -107,6 +111,7 @@ function AccountScreen({ navigation }) {
                 backgroundColor={colors.primary}
               />
             }
+            chevron
           />
         </View>
       )}

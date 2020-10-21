@@ -13,6 +13,7 @@ function ListItem({
   IconComponent,
   onPress,
   renderRightActions,
+  chevron,
 }) {
   return (
     <Swipeable renderRightActions={renderRightActions}>
@@ -30,11 +31,13 @@ function ListItem({
               </Text>
             )}
           </View>
-          <MaterialCommunityIcons
-            color={colors.medium}
-            name="chevron-right"
-            size={25}
-          />
+          {chevron && (
+            <MaterialCommunityIcons
+              color={colors.medium}
+              name="chevron-right"
+              size={25}
+            />
+          )}
         </View>
       </TouchableHighlight>
     </Swipeable>
