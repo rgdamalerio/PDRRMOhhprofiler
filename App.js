@@ -49,6 +49,7 @@ export default function App() {
           `${FileSystem.documentDirectory}SQLite/hhprofiler22.db`
         )
           .then(({ uri }) => {
+            console.log("download success " + uri);
             setLoading(true);
           })
           .catch((error) => {
