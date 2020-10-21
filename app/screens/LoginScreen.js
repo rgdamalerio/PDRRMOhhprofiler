@@ -13,7 +13,7 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required().min(4).label("Password"),
 });
 
-const db = SQLite.openDatabase("hhprofiler21.db");
+const db = SQLite.openDatabase("hhprofiler22.db");
 
 function LoginScreen({ navigation }) {
   const auth = useAuth();
@@ -21,7 +21,31 @@ function LoginScreen({ navigation }) {
   const handleSubmit = async ({ email, password }) => {
     db.transaction((tx) => {
       tx.executeSql(
-        "select * from tbl_enumerator where tbl_enumeratoremail = ? and password = ?;",
+        "select idtbl_enumerator," +
+          "tbl_enumeratorfname," +
+          "tbl_enumeratorlname," +
+          "tbl_enumeratormname," +
+          "tbl_enumeratoremail," +
+          "password," +
+          "tbl_enumeratorcontact," +
+          "tbl_enumeratorprov," +
+          "tbl_enumeratormun," +
+          "tbl_enumeratorbrgy," +
+          "tbl_imagepath," +
+          "tbl_imagepath," +
+          "idtbl_psgc_prov," + //tbl_psgc_prov
+          "tbl_psgc_prov_id_fk," +
+          "tbl_psgc_provname," +
+          "idtbl_psgc_mun," + //tbl_psgc_municipality
+          "tbl_psgc_mun_id_fk," +
+          "tbl_psgc_munname," +
+          "idtbl_psgc_brgy," + //tbl_psgc_brgy
+          "tbl_psgc_brgyname " +
+          "from tbl_enumerator " +
+          "LEFT JOIN tbl_psgc_prov ON tbl_enumerator.tbl_enumeratorprov=tbl_psgc_prov.idtbl_psgc_prov " + //tbl_psgc_prov
+          "LEFT JOIN tbl_psgc_mun ON tbl_enumerator.tbl_enumeratormun=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
+          "LEFT JOIN tbl_psgc_brgy ON tbl_enumerator.tbl_enumeratorbrgy=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
+          "where tbl_enumeratoremail = ? and password = ?;",
         [email, password],
         (tx, results) => {
           if (results.rows.length > 0) {
@@ -29,6 +53,18 @@ function LoginScreen({ navigation }) {
           } else {
             alert("Enumerator not found! please check email and password");
           }
+        },
+        (error) => {
+          console.log(error.message);
+          Alert.alert(
+            "SQLITE ERROR",
+            "Database error, Please contact developer, " + error.message,
+            [
+              {
+                text: "OK",
+              },
+            ]
+          );
         }
       );
     });

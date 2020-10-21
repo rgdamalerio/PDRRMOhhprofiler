@@ -3,7 +3,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 
 import AccountScreen from "../screens/AccountScreen";
 import Profiler from "../screens/ProfilerScreen";
-//import Household from "../screens/HouseholdScreen";
+import Enumeratorlist from "../screens/EnumeratorListScreen";
+import Updateuser from "../screens/RegisterScreen";
 import Animated from "../screens/AnimatedScreen";
 import Program from "../screens/AddProgramScreen";
 import Demography from "../screens/AddDemographyScreen";
@@ -21,6 +22,17 @@ const AppNavigator = () => (
       options={{ title: "Add Household profile" }}
       component={Profiler}
     />
+    <Stack.Screen
+      name="Enumeratorlist"
+      options={{ title: "List of enumerator" }}
+      component={Enumeratorlist}
+    />
+    <Stack.Screen
+      name="Updateuser"
+      options={{ title: "Update enumerator info" }}
+      component={Updateuser}
+    />
+
     <Stack.Screen
       name="AnimatedMap"
       options={{ headerShown: false }}

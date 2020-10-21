@@ -5,6 +5,7 @@ import * as SQLite from "expo-sqlite";
 import * as MediaLibrary from "expo-media-library";
 
 import PickerItem from "../components/PickerItem";
+import useAuth from "../auth/useAuth";
 import ActivityIndicator from "../components/ActivityIndicator";
 import {
   AppForm as Form,
@@ -28,13 +29,17 @@ const validationSchema = Yup.object().shape({
   email: Yup.string().required().email().label("Email"),
   password: Yup.string().required().min(4).label("Password"),
 });
-const db = SQLite.openDatabase("hhprofiler21.db");
+const db = SQLite.openDatabase("hhprofiler22.db");
 
-function RegisterScreen({ navigation }) {
+function RegisterScreen({ navigation, route }) {
+  const [enumerator, setEnumerator] = useState(
+    route.params ? route.params.enumerator : []
+  );
   const [loading, setLoading] = useState(false);
   const [pro, setPro] = useState();
   const [mun, setMun] = useState();
   const [brgy, setBrgy] = useState();
+  const { logOut } = useAuth();
 
   useEffect(() => {
     getProvince();
@@ -71,7 +76,7 @@ function RegisterScreen({ navigation }) {
     setBrgy(brgyvalue);
   };
 
-  const handleSubmit = (data) => {
+  const handleSubmitNew = (data) => {
     setLoading(true);
     db.transaction(
       (tx) => {
@@ -124,7 +129,67 @@ function RegisterScreen({ navigation }) {
         );
       },
       (error) => {
-        Alert.alert("Success", "Error: " + error.message);
+        Alert.alert("Error", "Error: " + error.message);
+        setLoading(false);
+      }
+    );
+  };
+
+  const handleSubmitUpdate = (data) => {
+    setLoading(true);
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          "UPDATE  tbl_enumerator SET " +
+            "tbl_enumeratorfname =?," +
+            "tbl_enumeratorlname =?," +
+            "tbl_enumeratormname =?," +
+            "tbl_enumeratoremail =?," +
+            "password =?," +
+            "tbl_enumeratorcontact =?," +
+            "tbl_enumeratorprov =?," +
+            "tbl_enumeratormun =?," +
+            "tbl_enumeratorbrgy =?," +
+            "tbl_imagepath =? " +
+            "WHERE idtbl_enumerator = ? ",
+          [
+            data.fname,
+            data.lname,
+            data.mname,
+            data.email,
+            data.password,
+            data.phoneNumber,
+            data.prov.id,
+            data.mun.id,
+            data.brgy.id,
+            data.image,
+            route.params.enumerator.idtbl_enumerator,
+          ],
+          (tx, results) => {
+            if (results.rowsAffected > 0) {
+              if (data.image) createAlbum(data.image);
+              Alert.alert(
+                "Success",
+                "Update enumerator information successfully",
+                [
+                  {
+                    text: "OK",
+                    onPress: () => {
+                      setLoading(false);
+                      logOut();
+                    },
+                  },
+                ]
+              );
+            } else {
+              alert("Update information Failed");
+              setLoading(false);
+            }
+          }
+        );
+      },
+      (error) => {
+        Alert.alert("Error", "Error: " + error.message);
         setLoading(false);
       }
     );
@@ -147,18 +212,52 @@ function RegisterScreen({ navigation }) {
       <ScrollView style={styles.container}>
         <Form
           initialValues={{
-            image: null,
-            fname: "",
-            lname: "",
-            mname: "",
-            phoneNumber: "",
-            prov: "",
-            mun: "",
-            brgy: "",
-            email: "",
-            password: "",
+            image: route.params ? route.params.enumerator.tbl_imagepath : null,
+            fname: route.params
+              ? route.params.enumerator.tbl_enumeratorfname
+              : "",
+            lname: route.params
+              ? route.params.enumerator.tbl_enumeratorlname
+              : "",
+            mname: route.params
+              ? route.params.enumerator.tbl_enumeratormname
+              : "",
+            phoneNumber: route.params
+              ? route.params.enumerator.tbl_enumeratorcontact
+              : "",
+            prov: route.params
+              ? route.params.enumerator.tbl_enumeratorprov
+                ? {
+                    id: route.params.enumerator.tbl_enumeratorprov,
+                    label: route.params.enumerator.tbl_psgc_provname,
+                  }
+                : ""
+              : "",
+            mun: route.params
+              ? route.params.enumerator.tbl_enumeratormun
+                ? {
+                    id: route.params.enumerator.tbl_enumeratormun,
+                    label: route.params.enumerator.tbl_psgc_munname,
+                  }
+                : ""
+              : "",
+            brgy: route.params
+              ? route.params.enumerator.tbl_enumeratorbrgy
+                ? {
+                    id: route.params.enumerator.tbl_enumeratorbrgy,
+                    label: route.params.enumerator.tbl_psgc_brgyname,
+                  }
+                : ""
+              : "",
+            email: route.params
+              ? route.params.enumerator.tbl_enumeratoremail
+              : "",
+            password: route.params ? route.params.enumerator.password : "",
           }}
-          onSubmit={handleSubmit}
+          onSubmit={(values) => {
+            if (route.params) handleSubmitUpdate(values);
+            else handleSubmitNew(values);
+          }}
           validationSchema={validationSchema}
         >
           <FormCameraPicker name="image" />
@@ -231,7 +330,11 @@ function RegisterScreen({ navigation }) {
             secureTextEntry
             textContentType="password"
           />
-          <SubmitButton title="Register" />
+          {route.params ? (
+            <SubmitButton title="Update" />
+          ) : (
+            <SubmitButton title="Register" />
+          )}
         </Form>
       </ScrollView>
     </>

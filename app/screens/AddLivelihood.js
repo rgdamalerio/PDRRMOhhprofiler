@@ -33,7 +33,7 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler21.db");
+const db = SQLite.openDatabase("hhprofiler22.db");
 let resetFormHolder;
 
 function AddLivelihood({ navigation, route }) {
@@ -42,8 +42,9 @@ function AddLivelihood({ navigation, route }) {
     route.params.update ? route.params.hhlivelihood : []
   );
   const [loading, setLoading] = useState(false);
-  const [typelivelihood, setTypelivelihood] = useState([]);
-  const [tenuralStatus, setTenuralStatus] = useState([]);
+  const [typelivelihood, setTypelivelihood] = useState();
+  const [tenuralStatus, setTenuralStatus] = useState();
+  const [othertstatus, setOthertstatus] = useState(false);
   const [date, setDate] = useState(new Date());
   const { user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
@@ -430,15 +431,17 @@ function AddLivelihood({ navigation, route }) {
             name="lib_tenuralstatus_id"
             PickerItemComponent={PickerItem}
             placeholder="Tenural status"
-            //setOther={setOtherTenuralstatus}
+            setOther={setOthertstatus}
           />
 
-          <FormField
-            autoCorrect={false}
-            icon="home-import-outline"
-            name="otherTenuralStatusval"
-            placeholder="Add other type of program"
-          />
+          {othertstatus && (
+            <FormField
+              autoCorrect={false}
+              icon="home-import-outline"
+              name="otherTenuralStatusval"
+              placeholder="Add other type of program"
+            />
+          )}
 
           <FormField
             autoCorrect={false}

@@ -58,6 +58,9 @@ function AccountScreen({ navigation }) {
         <ListItem
           title={user.tbl_enumeratorfname + " " + user.tbl_enumeratorlname}
           subTitle={user.tbl_enumeratoremail}
+          onPress={() => {
+            navigation.navigate("Updateuser", { enumerator: user });
+          }}
           image={
             user.tbl_imagepath === null
               ? require("../assets/user.png")
@@ -90,6 +93,23 @@ function AccountScreen({ navigation }) {
           )}
         />
       </View>
+      {user.idtbl_enumerator === 0 && (
+        <View style={styles.container}>
+          <ListItem
+            title="Manage enumerator"
+            subTitle="list of enumerator register on this phone"
+            onPress={() => {
+              navigation.navigate("Enumeratorlist");
+            }}
+            IconComponent={
+              <Icon
+                name="format-list-bulleted"
+                backgroundColor={colors.primary}
+              />
+            }
+          />
+        </View>
+      )}
       <ListItem
         title="Log Out"
         IconComponent={<Icon name="logout" backgroundColor={colors.danger} />}

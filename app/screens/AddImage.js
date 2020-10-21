@@ -19,7 +19,7 @@ import ActivityIndicator from "../components/ActivityIndicator";
 import colors from "../config/colors";
 import ErrorPermission from "../components/ErrormPermission";
 
-const db = SQLite.openDatabase("hhprofiler21.db");
+const db = SQLite.openDatabase("hhprofiler22.db");
 
 function AddImage({ navigation, route }) {
   const [householdid, sethouseholdid] = useState(route.params.id);

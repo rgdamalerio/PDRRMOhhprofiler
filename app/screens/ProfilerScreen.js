@@ -70,7 +70,7 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler21.db");
+const db = SQLite.openDatabase("hhprofiler22.db");
 let resetFormHolder;
 
 function ProfilerScreen({ navigation, route }) {
@@ -469,6 +469,9 @@ function ProfilerScreen({ navigation, route }) {
                                   if (results.rowsAffected > 0) {
                                     getEvacuationareas();
                                     setOtherEvacuation(false);
+                                    setAvailtreatment(false);
+                                    setFloodsoccured(false);
+                                    setExpevacuation(false);
                                   } else {
                                     Alert.alert(
                                       "Error",
@@ -630,6 +633,9 @@ function ProfilerScreen({ navigation, route }) {
                                   if (results.rowsAffected > 0) {
                                     getEvacuationareas();
                                     setOtherEvacuation(false);
+                                    setAvailtreatment(false);
+                                    setFloodsoccured(false);
+                                    setExpevacuation(false);
                                   } else {
                                     Alert.alert(
                                       "Error",

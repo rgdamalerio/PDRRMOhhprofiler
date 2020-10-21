@@ -33,7 +33,7 @@ const validationSchema = Yup.object().shape({
   programEmplementer: Yup.string().required().label("Program emplementer"),
 });
 
-const db = SQLite.openDatabase("hhprofiler21.db");
+const db = SQLite.openDatabase("hhprofiler22.db");
 let resetFormHolder;
 
 function AddProgramScreen({ navigation, route }) {
