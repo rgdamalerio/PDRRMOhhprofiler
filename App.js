@@ -40,13 +40,13 @@ export default function App() {
         }
       );
       const localDatabase = await FileSystem.getInfoAsync(
-        `${FileSystem.documentDirectory}SQLite/hhprofiler22.db`
+        `${FileSystem.documentDirectory}SQLite/hhprofiler23.db`
       );
       if (!localDatabase.exists) {
         FileSystem.downloadAsync(
           Asset.fromModule(require("./app/assets/database/" + databaseName))
             .uri,
-          `${FileSystem.documentDirectory}SQLite/hhprofiler22.db`
+          `${FileSystem.documentDirectory}SQLite/hhprofiler23.db`
         )
           .then(({ uri }) => {
             console.log("download success " + uri);

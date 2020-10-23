@@ -8,7 +8,7 @@ import {
   ListItemSeparator,
 } from "../components/lists";
 
-const db = SQLite.openDatabase("hhprofiler22.db");
+const db = SQLite.openDatabase("hhprofiler23.db");
 
 function EnumeratorListScreen({ navigation }) {
   const [enumerators, setenumerator] = useState([]);

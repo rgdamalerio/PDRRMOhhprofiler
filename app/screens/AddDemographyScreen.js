@@ -52,7 +52,7 @@ const validationSchema = Yup.object().shape({
   }),
 });
 
-const db = SQLite.openDatabase("hhprofiler22.db");
+const db = SQLite.openDatabase("hhprofiler23.db");
 let resetFormHolder;
 
 function AddDemographyScreen({ navigation, route }) {
