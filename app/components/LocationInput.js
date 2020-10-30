@@ -1,14 +1,15 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   View,
   StyleSheet,
   Modal,
   Dimensions,
   TouchableOpacity,
+  PermissionsAndroid,
 } from "react-native";
 import Constants from "expo-constants";
 import { MaterialIcons, MaterialCommunityIcons } from "@expo/vector-icons";
-import MapView from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 
 import defaultStyles from "../config/styles";
 import Text from "./Text";
@@ -30,10 +31,22 @@ function LocationInput({
   const [modalVisible, setModalVisible] = useState(false);
   const [addMarker, setAddMarker] = useState(false);
   const [region, setRegion] = useState(intialRegion);
+  const [isMapReady, setMapReady] = useState(false);
   const mapRef = useRef(null);
 
   const onChangeCoord = () => {
     onChangeCoordinates(region);
+  };
+
+  const handleMapReady = useCallback(() => {
+    setMapReady(true);
+  }, [mapRef, setMapReady]);
+
+  // Request geolocation in Android since it's not done automatically
+  const requestGeoLocationPermission = () => {
+    PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+    );
   };
 
   return (
@@ -61,12 +74,20 @@ function LocationInput({
         <View style={styles.mapContainer}>
           <MapView
             ref={mapRef}
-            style={styles.mapStyle}
-            mapType="satellite"
+            style={isMapReady ? styles.mapStyle : {}}
+            provider={PROVIDER_GOOGLE}
+            mapType="hybrid"
+            showsUserLocation={true}
+            showsMyLocationButton={true}
+            followsUserLocation={true}
             initialRegion={region}
             onRegionChangeComplete={(region) => {
               setRegion(region);
             }}
+            onMapReady={() => {
+              requestGeoLocationPermission();
+            }}
+            onMapReady={handleMapReady}
           >
             {addMarker && (
               <MapView.Marker
@@ -171,12 +192,12 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
   },
   mapStyle: {
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
+    height: "100%",
+    width: "100%",
   },
   placeholder: {
     color: defaultStyles.colors.medium,

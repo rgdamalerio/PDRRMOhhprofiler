@@ -27,6 +27,11 @@ import SwitchInput from "../components/SwitchInput";
 const validationSchema = Yup.object().shape({
   tbl_fname: Yup.string().required().label("First Name"),
   tbl_lname: Yup.string().required().label("Middle Name"),
+  tbl_datebirth: Yup.string().required().label("Date of Birth"),
+  lib_gender_id: Yup.number().required().label("Gender"),
+  lib_maritalstatus_id: Yup.number().required().label("Marital Status"),
+  tbl_primary_occupation: Yup.string().required().label("Primary Occupation"),
+  lib_monthlyincome_id: Yup.number().required().label("Monthly Income"),
   lib_disability_id: Yup.string().when("tbl_withspecialneeds", {
     is: true,
     then: Yup.string().required(
