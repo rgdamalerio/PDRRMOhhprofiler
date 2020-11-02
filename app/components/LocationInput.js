@@ -31,6 +31,8 @@ function LocationInput({
   const [modalVisible, setModalVisible] = useState(false);
   const [addMarker, setAddMarker] = useState(false);
   const [region, setRegion] = useState(intialRegion);
+  const [latitude, setLatitude] = useState(intialRegion.latitude);
+  const [longitude, setLongitude] = useState(intialRegion.longitude);
   const [isMapReady, setMapReady] = useState(false);
   const mapRef = useRef(null);
 
@@ -46,6 +48,28 @@ function LocationInput({
   const requestGeoLocationPermission = () => {
     PermissionsAndroid.request(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+    );
+  };
+
+  /**
+   * Sets the overall lat long of the map viewport and thus the animation engages
+   */
+  getCurrentPosition = () => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+        mapRef.animateToCoordinate(
+          {
+            latitude: latitude,
+            longitude: longitude,
+          },
+          1000
+        );
+      },
+      (error) => {
+        alert(error.message);
+      }
     );
   };
 
@@ -173,6 +197,14 @@ function LocationInput({
               />
             </TouchableOpacity>
           </View>
+          {/*<TouchableOpacity
+            style={styles.myLocationButton}
+            onPress={() => {
+              getCurrentPosition();
+            }}
+          >
+            <MaterialCommunityIcons name="crosshairs-gps" size={24} />
+          </TouchableOpacity>*/}
         </View>
       </Modal>
     </>
@@ -206,6 +238,18 @@ const styles = StyleSheet.create({
   text: {
     color: defaultStyles.colors.medium,
     flex: 1,
+  },
+  myLocationButton: {
+    backgroundColor: defaultStyles.colors.secondary,
+    position: "absolute",
+    top: 10,
+    right: 5,
+    padding: 8,
+    elevation: 3,
+    alignItems: "center",
+    alignSelf: "flex-end",
+    justifyContent: "center",
+    borderRadius: 50,
   },
 });
 
