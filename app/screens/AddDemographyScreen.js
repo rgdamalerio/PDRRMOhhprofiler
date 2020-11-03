@@ -28,10 +28,10 @@ const validationSchema = Yup.object().shape({
   tbl_fname: Yup.string().required().label("First Name"),
   tbl_lname: Yup.string().required().label("Middle Name"),
   tbl_datebirth: Yup.string().required().label("Date of Birth"),
-  lib_gender_id: Yup.number().required().label("Gender"),
-  lib_maritalstatus_id: Yup.number().required().label("Marital Status"),
+  lib_gender_id: Yup.object().required().label("Gender"),
+  lib_maritalstatus_id: Yup.object().required().label("Marital Status"),
   tbl_primary_occupation: Yup.string().required().label("Primary Occupation"),
-  lib_monthlyincome_id: Yup.number().required().label("Monthly Income"),
+  lib_monthlyincome_id: Yup.object().required().label("Monthly Income"),
   lib_disability_id: Yup.string().when("tbl_withspecialneeds", {
     is: true,
     then: Yup.string().required(
@@ -829,8 +829,8 @@ function AddDemographyScreen({ navigation, route }) {
             lib_gender_id: route.params.update
               ? demograpy.lib_gender_id
                 ? { id: demograpy.lib_gender_id, label: demograpy.lib_gname }
-                : 0
-              : 0,
+                : ""
+              : "",
             otherRelationship: "",
             tbl_datebirth: route.params.update
               ? new Date(demograpy.tbl_datebirth)
@@ -841,8 +841,8 @@ function AddDemographyScreen({ navigation, route }) {
                     id: demograpy.lib_maritalstatus_id,
                     label: demograpy.lib_msname,
                   }
-                : 0
-              : 0,
+                : ""
+              : "",
             lib_ethnicity_id: route.params.update
               ? demograpy.lib_ethnicity_id
               : "",
@@ -924,8 +924,8 @@ function AddDemographyScreen({ navigation, route }) {
                     id: demograpy.lib_monthlyincome_id,
                     label: demograpy.lib_miname,
                   }
-                : 0
-              : 0,
+                : ""
+              : "",
             tbl_ismembersss: route.params.update
               ? demograpy.tbl_ismembersss == 1
                 ? true
@@ -1041,14 +1041,14 @@ function AddDemographyScreen({ navigation, route }) {
             items={gender}
             name="lib_gender_id"
             PickerItemComponent={PickerItem}
-            placeholder="Gender"
+            placeholder="Gender *"
           />
 
           <FormDatePicker
             name="tbl_datebirth"
             icon="date"
-            placeholder="Date of birth"
-            width="50%"
+            placeholder="Date of birth *"
+            width="60%"
             display="spinner"
             fullDate
             mode="date"
@@ -1059,7 +1059,7 @@ function AddDemographyScreen({ navigation, route }) {
             items={maritalStatus}
             name="lib_maritalstatus_id"
             PickerItemComponent={PickerItem}
-            placeholder="Marital status"
+            placeholder="Marital status *"
           />
 
           <FormField
@@ -1160,7 +1160,7 @@ function AddDemographyScreen({ navigation, route }) {
             autoCorrect={false}
             icon="worker"
             name="tbl_primary_occupation"
-            placeholder="Primary occupation"
+            placeholder="Primary occupation *"
           />
 
           <Picker
@@ -1168,7 +1168,7 @@ function AddDemographyScreen({ navigation, route }) {
             items={income}
             name="lib_monthlyincome_id"
             PickerItemComponent={PickerItem}
-            placeholder="Monthly income"
+            placeholder="Monthly income *"
           />
 
           <SwitchInput

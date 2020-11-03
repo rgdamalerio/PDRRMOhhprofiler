@@ -38,9 +38,9 @@ const validationSchema = Yup.object().shape({
   cost: Yup.number().required().label("Estimated Cost"),
   beadroom: Yup.number().label("Number of bedrooms"),
   storeys: Yup.number().required().label("Number of Storey"),
-  wallmaterial: Yup.string().required().label("Wall material"),
+  wallmaterial: Yup.object().required().label("Wall material"),
   evacuationarea: Yup.object().nullable(),
-  roofmaterial: Yup.object().required("Roof Material is a required field"),
+  roofmaterial: Yup.object().required().label("Roof Material"),
   otherevacuation: Yup.string().when("evacuationarea.label", {
     is: "Other, Please specify",
     then: Yup.string().required().label("Add other evacuation"),
@@ -734,8 +734,8 @@ function ProfilerScreen({ navigation, route }) {
               : "",
             yearconstract: route.params.update
               ? hhinfo[0].tbl_hhyearconstruct
-              : 0,
-            cost: route.params.update ? String(hhinfo[0].tbl_hhecost) : 0,
+              : "",
+            cost: route.params.update ? String(hhinfo[0].tbl_hhecost) : "",
             beadroom: route.params.update
               ? String(hhinfo[0].tbl_hhnobedroms)
               : 0,
@@ -757,7 +757,7 @@ function ProfilerScreen({ navigation, route }) {
                     label: hhinfo[0].lib_roofmaterialsdesc,
                   }
                 : ""
-              : 0,
+              : "",
             tbl_availmedicaltreatment: route.params.update
               ? hhinfo[0].tbl_availmedicaltreatment == 1
                 ? true
@@ -773,7 +773,7 @@ function ProfilerScreen({ navigation, route }) {
                     label: hhinfo[0].lib_wallmaterialsdesc,
                   }
                 : ""
-              : 0,
+              : "",
 
             awater: route.params.update
               ? hhinfo[0].tbl_hhaccesswater == 1
@@ -905,7 +905,7 @@ function ProfilerScreen({ navigation, route }) {
             autoCorrect={false}
             name="yearconstract"
             icon="calendar"
-            placeholder="Year construct"
+            placeholder="Year construct *"
             width="75%"
             keyboardType="number-pad"
           />
@@ -914,7 +914,7 @@ function ProfilerScreen({ navigation, route }) {
             autoCorrect={false}
             icon="cash"
             name="cost"
-            placeholder="Estimated cost"
+            placeholder="Estimated cost *"
             width="75%"
             keyboardType="number-pad"
           />
@@ -954,14 +954,14 @@ function ProfilerScreen({ navigation, route }) {
             items={roofmaterials}
             name="roofmaterial"
             PickerItemComponent={PickerItem}
-            placeholder="Roof material"
+            placeholder="Roof material *"
           />
           <Picker
             icon="wall"
             items={wallmaterials}
             name="wallmaterial"
             PickerItemComponent={PickerItem}
-            placeholder="Wall material"
+            placeholder="Wall material *"
           />
 
           <SwitchInput

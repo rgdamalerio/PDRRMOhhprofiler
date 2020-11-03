@@ -59,13 +59,14 @@ function LocationInput({
       (position) => {
         setLatitude(position.coords.latitude);
         setLongitude(position.coords.longitude);
-        mapRef.animateToCoordinate(
-          {
+        mapRef.current.animateCamera({
+          center: {
             latitude: latitude,
             longitude: longitude,
           },
-          1000
-        );
+          heading: 0,
+          zoom: 15,
+        });
       },
       (error) => {
         alert(error.message);
@@ -102,8 +103,8 @@ function LocationInput({
             provider={PROVIDER_GOOGLE}
             mapType="hybrid"
             showsUserLocation={true}
-            showsMyLocationButton={true}
-            followsUserLocation={true}
+            showsMyLocationButton={false}
+            followsUserLocation={false}
             initialRegion={region}
             onRegionChangeComplete={(region) => {
               setRegion(region);
@@ -197,14 +198,16 @@ function LocationInput({
               />
             </TouchableOpacity>
           </View>
-          {/*<TouchableOpacity
-            style={styles.myLocationButton}
-            onPress={() => {
-              getCurrentPosition();
-            }}
-          >
-            <MaterialCommunityIcons name="crosshairs-gps" size={24} />
-          </TouchableOpacity>*/}
+          {
+            <TouchableOpacity
+              style={styles.myLocationButton}
+              onPress={() => {
+                getCurrentPosition();
+              }}
+            >
+              <MaterialCommunityIcons name="crosshairs-gps" size={24} />
+            </TouchableOpacity>
+          }
         </View>
       </Modal>
     </>
