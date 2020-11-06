@@ -3,7 +3,6 @@ import {
   View,
   StyleSheet,
   Modal,
-  Dimensions,
   TouchableOpacity,
   PermissionsAndroid,
 } from "react-native";
@@ -103,16 +102,16 @@ function LocationInput({
             provider={PROVIDER_GOOGLE}
             mapType="hybrid"
             showsUserLocation={true}
-            showsMyLocationButton={false}
-            followsUserLocation={false}
+            showsMyLocationButton={true}
+            followsUserLocation={true}
             initialRegion={region}
             onRegionChangeComplete={(region) => {
               setRegion(region);
             }}
             onMapReady={() => {
+              handleMapReady();
               requestGeoLocationPermission();
             }}
-            onMapReady={handleMapReady}
           >
             {addMarker && (
               <MapView.Marker

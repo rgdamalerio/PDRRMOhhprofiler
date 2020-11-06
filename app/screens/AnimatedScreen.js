@@ -2108,7 +2108,7 @@ function AnimatedScreen({ navigation }) {
         initialRegion={state.region}
         style={styles.container}
         provider={PROVIDER_GOOGLE}
-        mapType="satellite"
+        mapType="hybrid"
         customMapStyle={theme.dark ? mapDarkStyle : mapStandardStyle}
         onMapReady={() => {
           _map.current.fitToSuppliedMarkers(["mk1"], {
