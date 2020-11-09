@@ -130,6 +130,8 @@ function HouseholdListScreen({ navigation }) {
         }
       );
     });
+
+    getHouseholdinfo();
   };
 
   return (
