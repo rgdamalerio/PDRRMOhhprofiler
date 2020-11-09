@@ -197,7 +197,7 @@ function LocationInput({
               />
             </TouchableOpacity>
           </View>
-          {
+          {/*
             <TouchableOpacity
               style={styles.myLocationButton}
               onPress={() => {
@@ -206,7 +206,7 @@ function LocationInput({
             >
               <MaterialCommunityIcons name="crosshairs-gps" size={24} />
             </TouchableOpacity>
-          }
+            */}
         </View>
       </Modal>
     </>

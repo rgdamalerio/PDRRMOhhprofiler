@@ -25,6 +25,14 @@ const menuItems = [
     },
     route: "Profiler",
   },
+  {
+    title: "List Respondent",
+    icon: {
+      name: "format-list-bulleted",
+      backgroundColor: colors.dark,
+    },
+    route: "Householdlist",
+  },
 ];
 
 function AccountScreen({ navigation }) {
@@ -129,7 +137,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.slight,
   },
   container: {
-    marginVertical: 20,
+    marginVertical: 10,
   },
 });
 
