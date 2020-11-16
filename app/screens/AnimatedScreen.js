@@ -646,6 +646,7 @@ function AnimatedScreen({ navigation }) {
       (tx) => {
         tx.executeSql(
           "SELECT lib_pname," +
+            "tbl_programs.id AS programid," +
             "tbl_household_id," +
             "lib_pname," +
             "lib_pnumbeni," +
@@ -751,6 +752,7 @@ function AnimatedScreen({ navigation }) {
         tx.executeSql(
           "SELECT tbl_livelihood.id," +
             "lib_typeoflivelihood," +
+            "tbl_livelihood.id AS livelihoodid," +
             "lib_desc," +
             "tbl_livelihoodmarketvalue," +
             "tbl_livelihoodtotalarea," +

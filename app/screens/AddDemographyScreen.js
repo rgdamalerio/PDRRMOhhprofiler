@@ -7,10 +7,13 @@ import {
   TouchableHighlight,
   Modal,
   View,
+  TouchableWithoutFeedback,
 } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import colors from "../config/colors";
 import useAuth from "../auth/useAuth";
 import PickerItem from "../components/PickerItem";
 import ActivityIndicator from "../components/ActivityIndicator";
@@ -100,6 +103,33 @@ function AddDemographyScreen({ navigation, route }) {
     _sethasHead();
   }, []);
 
+  const deleteDemograpy = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM tbl_hhdemography WHERE id = ?;",
+        [route.params.memberinfo.id],
+        (tx, results) => {
+          if (results.rowsAffected > 0) {
+            navigation.navigate("Done", { screen: "AnimatedMap" });
+          }
+        },
+        (error) => {
+          console.log(error);
+          Alert.alert(
+            "SQLITE ERROR",
+            "Database error deleting demography information, Please contact developer, " +
+              error,
+            [
+              {
+                text: "OK",
+              },
+            ]
+          );
+        }
+      );
+    });
+  };
+
   const _sethasHead = () => {
     db.transaction(
       (tx) => {
@@ -155,7 +185,10 @@ function AddDemographyScreen({ navigation, route }) {
         tx.executeSql(
           `select id AS id, lib_rhname AS label from libl_relationshiphead`,
           [],
-          (_, { rows: { _array } }) => setRelationship(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setRelationship(_array);
+          }
         );
       },
       (error) => {
@@ -226,7 +259,10 @@ function AddDemographyScreen({ navigation, route }) {
         tx.executeSql(
           `select id AS id, lib_dname AS label from lib_disability`,
           [],
-          (_, { rows: { _array } }) => setDisability(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setDisability(_array);
+          }
         );
       },
       (error) => {
@@ -250,7 +286,10 @@ function AddDemographyScreen({ navigation, route }) {
         tx.executeSql(
           `select id AS id, lib_nsname AS label from lib_nutritioanalstatus`,
           [],
-          (_, { rows: { _array } }) => setNutrituonal(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setNutrituonal(_array);
+          }
         );
       },
       (error) => {
@@ -274,7 +313,10 @@ function AddDemographyScreen({ navigation, route }) {
         tx.executeSql(
           `select id AS id, lib_glname AS label from lib_gradelvl`,
           [],
-          (_, { rows: { _array } }) => setGradelvl(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setGradelvl(_array);
+          }
         );
       },
       (error) => {
@@ -298,7 +340,10 @@ function AddDemographyScreen({ navigation, route }) {
         tx.executeSql(
           `select id AS id, lib_tscshvcname AS label from lib_tscshvc`,
           [],
-          (_, { rows: { _array } }) => setTscshvc(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setTscshvc(_array);
+          }
         );
       },
       (error) => {
@@ -322,7 +367,10 @@ function AddDemographyScreen({ navigation, route }) {
         tx.executeSql(
           `select id AS id, lib_miname AS label from lib_monthlyincome`,
           [],
-          (_, { rows: { _array } }) => setIncome(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "No Income" });
+            setIncome(_array);
+          }
         );
       },
       (error) => {
@@ -588,9 +636,6 @@ function AddDemographyScreen({ navigation, route }) {
     if (data.tbl_datebirth) {
       _date = new Date(data.tbl_datebirth);
     }
-    //console.log(data);
-    //console.log(_date);
-    //return;
     setLoading(true);
     db.transaction(
       (tx) => {
@@ -657,7 +702,7 @@ function AddDemographyScreen({ navigation, route }) {
             data.tbl_adependentofaphilhealthmember ? 1 : 0,
             String(date),
             user.idtbl_enumerator,
-            householdid,
+            route.params.memberinfo.id,
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
@@ -786,14 +831,14 @@ function AddDemographyScreen({ navigation, route }) {
               navigation.navigate("Done", { screen: "AnimatedMap" });
             } else {
               setLoading(false);
-              alert("Adding Program information Failed");
+              alert("Update Demography information Failed");
             }
           }
         );
       },
       (error) => {
         setLoading(false);
-        alert("Adding Demography Database Error: " + error.message);
+        alert("Update Demography Database Error: " + error.message);
       }
     );
   };
@@ -973,6 +1018,44 @@ function AddDemographyScreen({ navigation, route }) {
             >
               <Text style={styles.textStyle}>Skip</Text>
             </TouchableHighlight>
+          )}
+
+          {route.params.update && (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                Alert.alert(
+                  "Warning",
+                  "Are you sure you want to delete this member of demography? action cannot be undone!!!",
+                  [
+                    {
+                      text: "No",
+                    },
+                    {
+                      text: "Yes",
+                      onPress: () => {
+                        deleteDemograpy();
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: colors.danger,
+                  width: 50,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 10,
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="trash-can"
+                  size={35}
+                  color={colors.white}
+                />
+              </View>
+            </TouchableWithoutFeedback>
           )}
 
           <FormField
@@ -1194,6 +1277,7 @@ function AddDemographyScreen({ navigation, route }) {
             name="tbl_adependentofaphilhealthmember"
             placeholder="Dependent of Phil-health member"
           />
+
           {route.params.update ? (
             <SubmitButton title="Update Demography" />
           ) : (

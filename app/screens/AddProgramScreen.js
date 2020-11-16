@@ -7,10 +7,13 @@ import {
   TouchableHighlight,
   Modal,
   View,
+  TouchableWithoutFeedback,
 } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import colors from "../config/colors";
 import useAuth from "../auth/useAuth";
 import Screen from "../components/Screen";
 import PickerItem from "../components/PickerItem";
@@ -78,6 +81,35 @@ function AddProgramScreen({ navigation, route }) {
         );
       }
     );
+  };
+
+  const deleteProgram = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM tbl_programs WHERE id = ?;",
+        [route.params.program.programid],
+        (tx, results) => {
+          if (results.rowsAffected > 0) {
+            navigation.navigate("Done", { screen: "AnimatedMap" });
+          } else {
+            alert("Error deleting");
+          }
+        },
+        (error) => {
+          console.log(error);
+          Alert.alert(
+            "SQLITE ERROR",
+            "Database error deleting program information, Please contact developer, " +
+              error,
+            [
+              {
+                text: "OK",
+              },
+            ]
+          );
+        }
+      );
+    });
   };
 
   const reviewInput = (data) => {
@@ -236,7 +268,7 @@ function AddProgramScreen({ navigation, route }) {
             data.programEmplementer,
             String(date),
             user.idtbl_enumerator,
-            route.params.id,
+            route.params.program.programid,
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
@@ -304,7 +336,7 @@ function AddProgramScreen({ navigation, route }) {
               navigation.navigate("Done", { screen: "AnimatedMap" });
             } else {
               setLoading(false);
-              alert("Adding Program information Failed");
+              alert("Update Program information Failed");
             }
           }
         );
@@ -363,6 +395,44 @@ function AddProgramScreen({ navigation, route }) {
               >
                 <Text style={styles.textStyle}>Skip</Text>
               </TouchableHighlight>
+            )}
+
+            {route.params.update && (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  Alert.alert(
+                    "Warning",
+                    "Are you sure you want to delete this availed program? action cannot be undone!!!",
+                    [
+                      {
+                        text: "No",
+                      },
+                      {
+                        text: "Yes",
+                        onPress: () => {
+                          deleteProgram();
+                        },
+                      },
+                    ]
+                  );
+                }}
+              >
+                <View
+                  style={{
+                    backgroundColor: colors.danger,
+                    width: 50,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginTop: 10,
+                  }}
+                >
+                  <MaterialCommunityIcons
+                    name="trash-can"
+                    size={35}
+                    color={colors.white}
+                  />
+                </View>
+              </TouchableWithoutFeedback>
             )}
 
             <Picker

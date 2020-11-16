@@ -7,10 +7,13 @@ import {
   TouchableHighlight,
   Modal,
   View,
+  TouchableWithoutFeedback,
 } from "react-native";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import colors from "../config/colors";
 import useAuth from "../auth/useAuth";
 import PickerItem from "../components/PickerItem";
 import ActivityIndicator from "../components/ActivityIndicator";
@@ -88,7 +91,10 @@ function AddLivelihood({ navigation, route }) {
         tx.executeSql(
           `select id AS id, tbl_tsname AS label from libl_tenuralstatus`,
           [],
-          (_, { rows: { _array } }) => setTenuralStatus(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setTenuralStatus(_array);
+          }
         );
       },
       (error) => {
@@ -104,6 +110,35 @@ function AddLivelihood({ navigation, route }) {
         );
       }
     );
+  };
+
+  const deleteLivelihood = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        "DELETE FROM tbl_livelihood WHERE id = ?;",
+        [route.params.hhlivelihood.livelihoodid],
+        (tx, results) => {
+          if (results.rowsAffected > 0) {
+            navigation.navigate("Done", { screen: "AnimatedMap" });
+          } else {
+            alert("Error Deleting");
+          }
+        },
+        (error) => {
+          console.log(error);
+          Alert.alert(
+            "SQLITE ERROR",
+            "Database error deleting program information, Please contact developer, " +
+              error,
+            [
+              {
+                text: "OK",
+              },
+            ]
+          );
+        }
+      );
+    });
   };
 
   const reviewInput = (data) => {
@@ -268,7 +303,7 @@ function AddLivelihood({ navigation, route }) {
             data.tbl_livelihoodiswithinsurance,
             String(date),
             user.idtbl_enumerator,
-            route.params.id,
+            route.params.hhlivelihood.livelihoodid,
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
@@ -415,6 +450,44 @@ function AddLivelihood({ navigation, route }) {
             >
               <Text style={styles.textStyle}>Skip</Text>
             </TouchableHighlight>
+          )}
+
+          {route.params.update && (
+            <TouchableWithoutFeedback
+              onPress={() => {
+                Alert.alert(
+                  "Warning",
+                  "Are you sure you want to delete this Livelihood? action cannot be undone!!!",
+                  [
+                    {
+                      text: "No",
+                    },
+                    {
+                      text: "Yes",
+                      onPress: () => {
+                        deleteLivelihood();
+                      },
+                    },
+                  ]
+                );
+              }}
+            >
+              <View
+                style={{
+                  backgroundColor: colors.danger,
+                  width: 50,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginTop: 10,
+                }}
+              >
+                <MaterialCommunityIcons
+                  name="trash-can"
+                  size={35}
+                  color={colors.white}
+                />
+              </View>
+            </TouchableWithoutFeedback>
           )}
 
           <Picker

@@ -191,7 +191,10 @@ function ProfilerScreen({ navigation, route }) {
         tx.executeSql(
           `select id, lib_tenuralstatusdesc AS label from lib_hhtenuralstatus`,
           [],
-          (_, { rows: { _array } }) => settenuralStatus(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            settenuralStatus(_array);
+          }
         );
       },
       (error) => {
@@ -263,7 +266,10 @@ function ProfilerScreen({ navigation, route }) {
         tx.executeSql(
           `select id, lib_wtdesc AS label from lib_hhwatertenuralstatus`,
           [],
-          (_, { rows: { _array } }) => setWatertenuralstatus(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setWatertenuralstatus(_array);
+          }
         );
       },
       (error) => {
@@ -287,7 +293,10 @@ function ProfilerScreen({ navigation, route }) {
         tx.executeSql(
           'select id, lib_hhwatersystemlvl || " : " || lib_hhlvldesc AS label from lib_hhlvlwatersystem',
           [],
-          (_, { rows: { _array } }) => setLvlwatersystems(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setLvlwatersystems(_array);
+          }
         );
       },
       (error) => {
@@ -311,7 +320,10 @@ function ProfilerScreen({ navigation, route }) {
         tx.executeSql(
           `select id, lib_heaname AS label from lib_hhevacuationarea`,
           [],
-          (_, { rows: { _array } }) => setEvacuationarea(_array)
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setEvacuationarea(_array);
+          }
         );
       },
       (error) => {
