@@ -1429,7 +1429,7 @@ function AnimatedScreen({ navigation }) {
       "LEFT JOIN lib_disability ON tbl_hhdemography.lib_disability_id=lib_disability.id " + //tbl_hhdemography->lib_disability
       "LEFT JOIN lib_nutritioanalstatus ON tbl_hhdemography.lib_nutritioanalstatus_id=lib_nutritioanalstatus.id " + //tbl_hhdemography->lib_nutritioanalstatus
       "LEFT JOIN lib_gradelvl as lvl ON tbl_hhdemography.lib_gradelvl_id=lvl.id " + //tbl_hhdemography->lib_gradelvl
-      "LEFT JOIN lib_gradelvl as hea ON tbl_hhdemography.lib_gradelvl_id=hea.id " + //tbl_hhdemography->lib_gradelvl
+      "LEFT JOIN lib_gradelvl as hea ON tbl_hhdemography.lib_hea_id=hea.id " + //tbl_hhdemography->lib_gradelvl
       "LEFT JOIN lib_tscshvc ON tbl_hhdemography.lib_tscshvc_id=lib_tscshvc.id " + //tbl_hhdemography->lib_tscshvc
       "LEFT JOIN lib_monthlyincome ON tbl_hhdemography.lib_monthlyincome_id=lib_monthlyincome.id " + //tbl_hhdemography->lib_monthlyincome
       "WHERE tbl_enumerator_id_fk = ? ";
