@@ -34,10 +34,11 @@ const validationSchema = Yup.object().shape({
   brgy: Yup.string().required().label("Barangay"),
   coordinates: Yup.string().required().nullable().label("Coordinates"),
   typebuilding: Yup.string().required().label("Type of building"),
+  tenuralstatus: Yup.string().required().label("Tenural status"),
   yearconstract: Yup.string().required().label("Year constract"),
   cost: Yup.number().required().label("Estimated Cost"),
-  beadroom: Yup.number().label("Number of bedrooms"),
-  storeys: Yup.number().required().label("Number of Storey"),
+  beadroom: Yup.number().required().moreThan(0).label("Number of bedrooms"),
+  storeys: Yup.number().required().moreThan(0).label("Number of Storey"),
   wallmaterial: Yup.object().required().label("Wall material"),
   evacuationarea: Yup.object().nullable(),
   roofmaterial: Yup.object().required().label("Roof Material"),
@@ -69,6 +70,19 @@ const validationSchema = Yup.object().shape({
       "Treatment specification is required when availed medical treatment is selected as true"
     ),
   }),
+  wtenuralstatus: Yup.string().when("awater",{
+    is:true,
+    then:Yup.string().required(
+      "Water tenural status is required when access to water is selected as true"
+    ),
+  }),
+  wlvlsystem: Yup.string().when("awater",{
+    is:true,
+    then:Yup.string().required(
+      "Level of water is required when access to water is selected as true"
+    ),
+  }),
+  evacuationarea: Yup.string().required().label("location of Evacuation center")
 });
 
 const db = SQLite.openDatabase("hhprofiler23.db");
@@ -1080,7 +1094,7 @@ function ProfilerScreen({ navigation, route }) {
           <SwitchInput
             icon="medical-bag"
             name="accessmedfacility"
-            placeholder="Access to health/medical Fac"
+            placeholder="Access to health/medical Facility"
           />
 
           <SwitchInput
