@@ -32,7 +32,7 @@ const validationSchema = Yup.object().shape({
     then: Yup.string().required().label("Add other type of program"),
   }),
   programname: Yup.string().required().label("Program name"),
-  numberBenificiaries: Yup.number().required().label("Number of Benificiaries"),
+  numberBenificiaries: Yup.number().required().moreThan(0).label("Number of Benificiaries"),
   programEmplementer: Yup.string().required().label("Program emplementer"),
 });
 

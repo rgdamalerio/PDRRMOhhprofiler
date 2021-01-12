@@ -29,12 +29,16 @@ import SwitchInput from "../components/SwitchInput";
 
 const validationSchema = Yup.object().shape({
   tbl_fname: Yup.string().required().label("First Name"),
-  tbl_lname: Yup.string().required().label("Middle Name"),
+  tbl_lname: Yup.string().required().label("Last Name"),
+  tbl_mname: Yup.string().required().label("Middle Name"),
   tbl_datebirth: Yup.string().required().label("Date of Birth"),
   lib_gender_id: Yup.object().required().label("Gender"),
   lib_maritalstatus_id: Yup.object().required().label("Marital Status"),
+  lib_ethnicity_id: Yup.string().required().label("Ethnicity/Tribe"),
+  lib_religion_id: Yup.string().required().label("Religion"),
   tbl_primary_occupation: Yup.string().required().label("Primary Occupation"),
   lib_monthlyincome_id: Yup.object().required().label("Monthly Income"),
+  lib_hea_id: Yup.object().required().label("Highest educational attainment"),
   lib_disability_id: Yup.string().when("tbl_withspecialneeds", {
     is: true,
     then: Yup.string().required(
@@ -44,16 +48,16 @@ const validationSchema = Yup.object().shape({
   lib_gradelvl_id: Yup.string().when("tbl_iscurattschool", {
     is: true,
     then: Yup.string().required(
-      'Year/Grade currently attending is required when crrently in school is "Yes"'
+      'Year/Grade currently attending is required when currently in school is "Yes"'
     ),
   }),
-  tbl_relationshiphead_id: Yup.object().nullable(),
+  tbl_relationshiphead_id: Yup.object().required().label("Relationship to head"),
   otherRelationship: Yup.string().when("tbl_relationshiphead_id.label", {
     is: "Other, Please specify",
     then: Yup.string().required().label("Add other relationship"),
   }),
 
-  lib_disability_id: Yup.object().nullable(),
+  //lib_disability_id: Yup.object().nullable(),
   otherDisabilityval: Yup.string().when("lib_disability_id.label", {
     is: "Other, Please specify",
     then: Yup.string().required().label("Add other type of disability"),
@@ -85,6 +89,8 @@ function AddDemographyScreen({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [tempData, settemData] = useState();
   const [hasHead, setHasHead] = useState(false);
+  const [withspecialneeds, setWithspecialneeds] = useState(false);
+  const [currentlyinschool, setCurrentlyinschool] = useState(false);
 
   useEffect(() => {
     route.params.update
@@ -869,8 +875,8 @@ function AddDemographyScreen({ navigation, route }) {
                     id: demograpy.tbl_relationshiphead_id,
                     label: demograpy.lib_rhname,
                   }
-                : 0
-              : 0,
+                : ""
+              : "",
             lib_gender_id: route.params.update
               ? demograpy.lib_gender_id
                 ? { id: demograpy.lib_gender_id, label: demograpy.lib_gname }
@@ -893,20 +899,20 @@ function AddDemographyScreen({ navigation, route }) {
               : "",
             lib_religion_id: route.params.update
               ? demograpy.lib_religion_id
-              : 0,
+              : "",
             tbl_withspecialneeds: route.params.update
               ? demograpy.tbl_withspecialneeds == 1
-                ? true
-                : false
-              : false,
+                ? 1
+                : 0
+              : 0,
             lib_disability_id: route.params.update
               ? demograpy.lib_disability_id
                 ? {
                     id: demograpy.lib_disability_id,
                     label: demograpy.lib_dname,
                   }
-                : 0
-              : 0,
+                : ""
+              : "",
             otherDisabilityval: "",
             tbl_isofw: route.params.update
               ? demograpy.tbl_isofw == 1
@@ -945,8 +951,8 @@ function AddDemographyScreen({ navigation, route }) {
                     id: demograpy.lib_hea_id,
                     label: demograpy.healib_glname,
                   }
-                : 0
-              : 0,
+                : ""
+              : "",
             lib_tscshvc_id: route.params.update
               ? demograpy.lib_tscshvc_id
                 ? {
@@ -1163,16 +1169,18 @@ function AddDemographyScreen({ navigation, route }) {
             icon="doctor"
             name="tbl_withspecialneeds"
             placeholder="Is person with special needs"
+            setAvail={setWithspecialneeds}
+            initavail={withspecialneeds}
           />
 
-          <Picker
+          {withspecialneeds && (<Picker
             icon="alpha-d-box"
             items={disability}
             name="lib_disability_id"
             PickerItemComponent={PickerItem}
             placeholder="Type of Disability"
             setOther={setOtherDisability}
-          />
+          />)}
 
           {otherDisability && (
             <FormField
@@ -1206,16 +1214,18 @@ function AddDemographyScreen({ navigation, route }) {
           <SwitchInput
             icon="school"
             name="tbl_iscurattschool"
-            placeholder="Is currently in school?"
+            placeholder="Is currently in school?" 
+            setAvail={setCurrentlyinschool}
+            initavail={currentlyinschool}
           />
 
-          <Picker
+          {currentlyinschool && (<Picker
             icon="alpha-r-box"
             items={gradelvl}
             name="lib_gradelvl_id"
             PickerItemComponent={PickerItem}
             placeholder="Year/Grade currently attending"
-          />
+          />)}
 
           <Picker
             icon="alpha-r-box"
