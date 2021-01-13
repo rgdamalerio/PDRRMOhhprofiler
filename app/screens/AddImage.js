@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback,useFocusEffect } from "react";
 import {
   Text,
   View,
@@ -8,6 +8,7 @@ import {
   Alert,
   Modal,
   Image,
+  BackHandler,
 } from "react-native";
 import * as MediaLibrary from "expo-media-library";
 import { Camera } from "expo-camera";
@@ -44,6 +45,21 @@ function AddImage({ navigation, route }) {
       if (returns.granted) setHasPermission(true);
     });
   };
+
+  useEffect(() => {
+    const onBackPress = () => {
+      if (!route.params.update) {
+        return true;
+      } else {
+        return false;
+      }
+    };
+
+    BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+    return () =>
+      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+  });
 
   const getHouseholdHead = () => {
     db.transaction(

@@ -34,7 +34,6 @@ const validationSchema = Yup.object().shape({
   tbl_datebirth: Yup.string().required().label("Date of Birth"),
   lib_gender_id: Yup.object().required().label("Gender"),
   lib_maritalstatus_id: Yup.object().required().label("Marital Status"),
-  lib_ethnicity_id: Yup.string().required().label("Ethnicity/Tribe"),
   lib_religion_id: Yup.string().required().label("Religion"),
   tbl_primary_occupation: Yup.string().required().label("Primary Occupation"),
   lib_monthlyincome_id: Yup.object().required().label("Monthly Income"),

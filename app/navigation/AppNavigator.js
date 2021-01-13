@@ -64,6 +64,7 @@ const AppNavigator = () => (
       options={{ headerShown: false }}
       name="AddImage"
       component={AddImage}
+      //options={{headerLeft: () => null}}
     />
 
     <Stack.Screen

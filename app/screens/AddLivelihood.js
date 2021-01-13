@@ -29,7 +29,9 @@ import SwitchInput from "../components/SwitchInput";
 const validationSchema = Yup.object().shape({
   lib_typeoflivelihood: Yup.string().required().label("Type of livelihood"),
   tbl_livelihoodproducts: Yup.string().required().label("Product name"),
-  lib_tenuralstatus_id: Yup.object().nullable(),
+  tbl_livelihoodtotalarea: Yup.string().required().label("Estimated livelihood total area"),
+  tbl_livelihoodmarketvalue: Yup.number().required().moreThan(0).label("Estimated livelihood market value"),
+  lib_tenuralstatus_id: Yup.string().required().label("Tenural status of livelihood"),
   otherTenuralStatusval: Yup.string().when("lib_tenuralstatus_id.label", {
     is: "Other, Please specify",
     then: Yup.string().required().label("Add other Tenural status"),
@@ -46,7 +48,7 @@ function AddLivelihood({ navigation, route }) {
   );
   const [loading, setLoading] = useState(false);
   const [typelivelihood, setTypelivelihood] = useState();
-  const [tenuralStatus, setTenuralStatus] = useState();
+  const [tenuralStatus, setTenuralStatus] = useState([]);
   const [othertstatus, setOthertstatus] = useState(false);
   const [date, setDate] = useState(new Date());
   const { user } = useAuth();
@@ -401,7 +403,7 @@ function AddLivelihood({ navigation, route }) {
               : 0,
             tbl_livelihoodtotalarea: route.params.update
               ? String(livelihod.tbl_livelihoodtotalarea)
-              : 0,
+              : "",
             tbl_livelihoodproducts: route.params.update
               ? livelihod.tbl_livelihoodproducts
               : "",
@@ -411,8 +413,8 @@ function AddLivelihood({ navigation, route }) {
                     id: livelihod.lib_tenuralstatus_id,
                     label: livelihod.tbl_tsname,
                   }
-                : 0
-              : 0,
+                : ""
+              : "",
             otherTenuralStatusval: "",
             tbl_livelihoodiswithinsurance: route.params.update
               ? livelihod.tbl_livelihoodiswithinsurance == 1
@@ -520,8 +522,8 @@ function AddLivelihood({ navigation, route }) {
             autoCorrect={false}
             icon="cash"
             name="tbl_livelihoodmarketvalue"
-            placeholder="Livelihood market value"
-            width="75%"
+            placeholder="Estimated Livelihood market value"
+            width="100%"
             keyboardType="number-pad"
           />
 
@@ -529,8 +531,8 @@ function AddLivelihood({ navigation, route }) {
             autoCorrect={false}
             icon="bookmark-plus-outline"
             name="tbl_livelihoodtotalarea"
-            placeholder="Livelihood total area"
-            width="75%"
+            placeholder="Estimated Livelihood total area"
+            width="100%"
             keyboardType="number-pad"
           />
 
