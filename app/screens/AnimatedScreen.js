@@ -1000,7 +1000,7 @@ function AnimatedScreen({ navigation }) {
     let data = filter;
     let query = "";
 
-    let query1 =
+    let query1 = //parseHhinfo
       "SELECT tbl_household.tbl_household_id," +
       "tbl_hhissethead," +
       "tbl_hhcontrolnumber," +
@@ -1177,7 +1177,7 @@ function AnimatedScreen({ navigation }) {
       alert(error);
     }
 
-    let query2 =
+    let query2 = //parsePrograms
       "SELECT tbl_household.tbl_household_id," +
       "tbl_hhissethead," +
       "tbl_hhcontrolnumber," +
@@ -1299,7 +1299,7 @@ function AnimatedScreen({ navigation }) {
       alert(error);
     }
 
-    let query3 =
+    let query3 = //parseDemography
       "SELECT tbl_household.tbl_household_id," +
       "tbl_hhissethead," +
       "tbl_hhcontrolnumber," +
@@ -1463,7 +1463,7 @@ function AnimatedScreen({ navigation }) {
       alert(error);
     }
 
-    let query4 =
+    let query4 = //parseLivelihood
       "SELECT tbl_household.tbl_household_id," +
       "tbl_hhissethead," +
       "tbl_hhcontrolnumber," +
@@ -2100,7 +2100,7 @@ function AnimatedScreen({ navigation }) {
       .then(() => {})
       .catch((error) => {
         setLoading(false);
-        alert("Error saving image, Error details: " + error);
+        alert("Error download, Error details: " + error);
       });
   };
   return (

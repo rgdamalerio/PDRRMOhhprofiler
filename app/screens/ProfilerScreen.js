@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect  } from "react";
 import {
   StyleSheet,
   ScrollView,
@@ -118,7 +118,10 @@ function ProfilerScreen({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [tempData, settemData] = useState();
 
+  
   useEffect(() => {
+    setUuid(Constants.installationId + "-" + new Date().getTime())
+    console.log(uuid);
     route.params.update
       ? navigation.setOptions({ title: "Update Household info" })
       : "";
