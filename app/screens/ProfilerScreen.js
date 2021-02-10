@@ -413,11 +413,12 @@ function ProfilerScreen({ navigation, route }) {
             "tbl_hasaccessdrillsandsimulations," +
             "tbl_householdpuroksittio," +
             "tbl_respondent," +
+            "extracted," +
             "created_at," +
             "updated_at," +
             "created_by," +
             "updatedy_by " +
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             uuid,
             String(
@@ -459,6 +460,7 @@ function ProfilerScreen({ navigation, route }) {
             data.accessdrillsimulation ? 1 : 0,
             data.purok,
             data.respondentname,
+            0,
             String(date),
             String(date),
             user.idtbl_enumerator,
@@ -589,6 +591,7 @@ function ProfilerScreen({ navigation, route }) {
             "tbl_hasaccessdrillsandsimulations =? ," +
             "tbl_householdpuroksittio =? ," +
             "tbl_respondent = ? ," +
+            "extracted = ? ," +
             "updated_at = ?," +
             "updatedy_by= ?  WHERE tbl_household_id = ? ",
           [
@@ -624,6 +627,7 @@ function ProfilerScreen({ navigation, route }) {
             data.accessdrillsimulation ? 1 : 0,
             data.purok,
             data.respondentname,
+            0,
             String(date),
             user.idtbl_enumerator,
             route.params.id,
