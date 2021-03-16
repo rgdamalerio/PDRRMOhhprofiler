@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   StyleSheet,
@@ -106,6 +106,7 @@ function AddDemographyScreen({ navigation, route }) {
     _income();
     _setNuclearfamily();
     _sethasHead();
+    console.log(route.params.memberinfo);
   }, []);
 
   const deleteDemograpy = () => {
@@ -419,6 +420,8 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_datebirth," +
             "lib_maritalstatus_id," +
             "lib_ethnicity_id," +
+            "tbl_isIps," +
+            "tbl_isIsettlers," +
             "lib_religion_id," +
             "tbl_withspecialneeds," +
             "lib_disability_id," +
@@ -436,7 +439,7 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_ismembergsis," +
             "tbl_ismemberphilhealth," +
             "tbl_adependentofaphilhealthmember" +
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             householdid,
             data.tbl_fname,
@@ -450,6 +453,8 @@ function AddDemographyScreen({ navigation, route }) {
             String(_date),
             data.lib_maritalstatus_id.id,
             data.lib_ethnicity_id,
+            data.tbl_isIps ? 1 : 0,
+            data.tbl_isIsettlers ? 1 : 0,
             data.lib_religion_id,
             data.tbl_withspecialneeds ? 1 : 0,
             data.lib_disability_id.id,
@@ -657,6 +662,8 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_datebirth =?," +
             "lib_maritalstatus_id =?," +
             "lib_ethnicity_id =?," +
+            "tbl_isIps =?," +
+            "tbl_isIsettlers =?," +
             "lib_religion_id =?," +
             "tbl_withspecialneeds =?," +
             "lib_disability_id =?," +
@@ -688,6 +695,8 @@ function AddDemographyScreen({ navigation, route }) {
             String(data.tbl_datebirth),
             data.lib_maritalstatus_id.id,
             data.lib_ethnicity_id,
+            data.tbl_isIps ? 1 : 0,
+            data.tbl_isIsettlers ? 1 : 0,
             data.lib_religion_id,
             data.tbl_withspecialneeds ? 1 : 0,
             data.lib_disability_id.id,
@@ -896,6 +905,16 @@ function AddDemographyScreen({ navigation, route }) {
             lib_ethnicity_id: route.params.update
               ? demograpy.lib_ethnicity_id
               : "",
+            tbl_isIps: route.params.update
+              ? demograpy.tbl_isIps == 1
+                ? true
+                : false
+              : false, 
+            tbl_isIsettlers: route.params.update
+              ? demograpy.tbl_isIsettlers == 1
+                ? true
+                : false
+              : false,         
             lib_religion_id: route.params.update
               ? demograpy.lib_religion_id
               : "",
@@ -1155,6 +1174,17 @@ function AddDemographyScreen({ navigation, route }) {
             icon="account-outline"
             name="lib_ethnicity_id"
             placeholder="Ethnicity/Tribe"
+          />
+
+         <SwitchInput
+            icon="account-question"
+            name="tbl_isIps"
+            placeholder="Is IP's"
+          />
+         <SwitchInput
+            icon="account-question"
+            name="tbl_isIsettlers"
+            placeholder="Is Informal Settlers"
           />
 
           <FormField
@@ -1482,6 +1512,37 @@ function AddDemographyScreen({ navigation, route }) {
                 >
                   <Text style={styles.moreInforDataTxt}>
                     {tempData.lib_ethnicity_id}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Is member of Indigenous Peoples</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_isIps ? "Yes" : "No" }
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.moreInfoTable}>
+                <View style={styles.moreInfolabel}>
+                  <Text style={styles.moreInfolabeltxt}>Is informal Settler</Text>
+                </View>
+                <View
+                  style={
+                    (styles.moreInforData,
+                    { flexDirection: "row", flex: 1, flexWrap: "wrap" })
+                  }
+                >
+                  <Text style={styles.moreInforDataTxt}>
+                    {tempData.tbl_isIsettlers ? "Yes" : "No"}
                   </Text>
                 </View>
               </View>
