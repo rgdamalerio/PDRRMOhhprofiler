@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState,useEffect, useRef, useCallback } from "react";
 import {
   View,
   StyleSheet,
@@ -35,6 +35,11 @@ function LocationInput({
   const [isMapReady, setMapReady] = useState(false);
   const mapRef = useRef(null);
 
+
+  useEffect(() => {
+    getCurrentPosition();
+  }, []);
+
   const onChangeCoord = () => {
     onChangeCoordinates(region);
   };
@@ -58,7 +63,7 @@ function LocationInput({
       (position) => {
         setLatitude(position.coords.latitude);
         setLongitude(position.coords.longitude);
-        mapRef.current.animateCamera({
+        /*mapRef.current.animateCamera({
           center: {
             latitude: latitude,
             longitude: longitude,
@@ -66,6 +71,7 @@ function LocationInput({
           heading: 0,
           zoom: 15,
         });
+        */
       },
       (error) => {
         alert(error.message);
@@ -106,7 +112,7 @@ function LocationInput({
             followsUserLocation={true}
             initialRegion={region}
             onRegionChangeComplete={(region) => {
-              setRegion(region);
+              setRegion(region);                        
             }}
             onMapReady={() => {
               handleMapReady();
@@ -131,7 +137,7 @@ function LocationInput({
                     latitudeDelta: latitudeDelta,
                     longitudeDelta: longitudeDelta,
                   });
-                }}
+                }}               
               />
             )}
           </MapView>
