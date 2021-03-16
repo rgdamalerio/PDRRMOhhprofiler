@@ -128,17 +128,19 @@ function AddProgramScreen({ navigation, route }) {
             "lib_pname," +
             "lib_pnumbeni," +
             "lib_pimplementor," +
+            "extracted," +
             "created_at," +
             "updated_at," +
             "created_by," +
             "updated_by" +
-            ") values (?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?)",
           [
             householdid,
             data.typeProgram.id,
             data.programname,
             data.numberBenificiaries,
             data.programEmplementer,
+            0,
             String(date),
             String(date),
             user.idtbl_enumerator,
@@ -259,6 +261,7 @@ function AddProgramScreen({ navigation, route }) {
             "lib_pname=?," +
             "lib_pnumbeni =?," +
             "lib_pimplementor =?," +
+            "extracted," +
             "updated_at = ?," +
             "updated_by= ?  WHERE id = ?",
           [
@@ -266,6 +269,7 @@ function AddProgramScreen({ navigation, route }) {
             data.programname,
             data.numberBenificiaries,
             data.programEmplementer,
+            0,
             String(date),
             user.idtbl_enumerator,
             route.params.program.programid,
