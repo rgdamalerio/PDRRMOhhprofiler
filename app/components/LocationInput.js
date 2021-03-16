@@ -37,7 +37,12 @@ function LocationInput({
 
 
   useEffect(() => {
-    getCurrentPosition();
+    try {
+      getCurrentPosition();
+    } catch (error) {
+      
+    }
+    
   }, []);
 
   const onChangeCoord = () => {

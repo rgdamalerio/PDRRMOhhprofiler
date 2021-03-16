@@ -12,6 +12,7 @@ import * as Random from "expo-random";
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 import Constants from "expo-constants";
+import { useIsFocused } from '@react-navigation/native';
 
 import PickerItem from "../components/PickerItem";
 import {
@@ -117,11 +118,15 @@ function ProfilerScreen({ navigation, route }) {
   const { user } = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [tempData, settemData] = useState();
+  const isFocused = useIsFocused();
 
-  
+
   useEffect(() => {
     setUuid(Constants.installationId + "-" + new Date().getTime())
-    console.log(uuid);
+    console.log('Unique ID: '+uuid);
+  },[isFocused]);
+
+  useEffect(() => {
     route.params.update
       ? navigation.setOptions({ title: "Update Household info" })
       : "";
