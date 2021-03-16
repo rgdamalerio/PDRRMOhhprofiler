@@ -694,6 +694,8 @@ function AnimatedScreen({ navigation }) {
             "lib_maritalstatus_id," +
             "lib_msname," +
             "lib_ethnicity_id," +
+            "tbl_isIps," +
+            "tbl_isIsettlers," +
             "lib_religion_id," +
             "tbl_withspecialneeds," +
             "lib_disability_id," +
@@ -1384,6 +1386,8 @@ function AnimatedScreen({ navigation }) {
       "lib_maritalstatus_id," + //tbl_hhdemography->lib_maritalstatus
       "lib_msname," + //tbl_hhdemography->lib_maritalstatus
       "lib_ethnicity_id," +
+      "tbl_isIps," +
+      "tbl_isIsettlers," +
       "lib_religion_id," +
       "tbl_withspecialneeds," +
       "lib_disability_id," + //tbl_hhdemography->lib_disability
@@ -1869,6 +1873,8 @@ function AnimatedScreen({ navigation }) {
         "Marital status (ID)",
         "Marital status",
         "Ethnicity by blood",
+        "Is Member of Indigenous Peoples (IPs)",
+        "Is Informal Settler",
         "Religion",
         "Is a person with Special Needs?",
         "Types of Disabilities (ID)",
@@ -1943,7 +1949,9 @@ function AnimatedScreen({ navigation }) {
           rowArray.lib_ethnicity_id
             ? rowArray.lib_ethnicity_id.replace(/,/g, " ")
             : rowArray.lib_ethnicity_id
-        }`,
+        }`,   
+        `${rowArray.tbl_isIps == 1 ? "Yes" : "No"}`,
+        `${rowArray.tbl_isIsettlers == 1 ? "Yes" : "No"}`,
         `${
           rowArray.lib_religion_id
             ? rowArray.lib_religion_id.replace(/,/g, " ")
