@@ -583,6 +583,7 @@ function AnimatedScreen({ navigation }) {
             "tbl_householdpuroksittio," +
             "tbl_hhimage," +
             "tbl_respondent," +
+            "extracted," +
             "idtbl_psgc_brgy," + //tbl_psgc_brgy
             "tbl_psgc_brgyname," +
             "tbl_psgc_mun_id_fk," +
@@ -651,6 +652,7 @@ function AnimatedScreen({ navigation }) {
             "lib_pname," +
             "lib_pnumbeni," +
             "lib_pimplementor," +
+            "extracted," +
             "lib_typeofprogram.id as typeofprogramid," + //lib_typeofprogram
             "lib_topname " +
             "FROM tbl_programs " +
@@ -718,7 +720,8 @@ function AnimatedScreen({ navigation }) {
             "tbl_ismembersss," +
             "tbl_ismembergsis," +
             "tbl_ismemberphilhealth," +
-            "tbl_adependentofaphilhealthmember " +
+            "tbl_adependentofaphilhealthmember," +
+            "extracted " +
             "FROM tbl_hhdemography " +
             "LEFT JOIN lib_gender ON tbl_hhdemography.lib_gender_id=lib_gender.id " + //lib_gender
             "LEFT JOIN lib_maritalstatus ON tbl_hhdemography.lib_maritalstatus_id=lib_maritalstatus.id " + //lib_maritalstatus
@@ -761,6 +764,7 @@ function AnimatedScreen({ navigation }) {
             "tbl_livelihoodproducts," +
             "lib_tenuralstatus_id," +
             "tbl_tsname," +
+            "extracted," +
             "tbl_livelihoodiswithinsurance " +
             "FROM tbl_livelihood " +
             "LEFT JOIN lib_livelihood ON tbl_livelihood.lib_typeoflivelihood=lib_livelihood.id " + //lib_livelihood
