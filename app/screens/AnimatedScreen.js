@@ -1015,8 +1015,7 @@ function AnimatedScreen({ navigation }) {
       "tbl_hhlongitude," +
       "tbl_hhfield_editor," +
       "tbl_hhyearconstruct," +
-      "tbl_hhyearconstruct," +
-      "tbl_hhyearconstruct," +
+      "tbl_hhecost," +
       "tbl_hhnobedroms," +
       "tbl_hhnostorey," +
       "tbl_hhaelectricity," +
@@ -1027,21 +1026,23 @@ function AnimatedScreen({ navigation }) {
       "tbl_psgc_mun_id," +
       "tbl_psgc_pro_id," +
       "lib_typeofbuilding_id," +
-      "tbl_hhecost," +
       "tbl_tenuralstatus_id," +
       "tbl_typeofconmaterials_id," +
       "tbl_wallconmaterials_id," +
+      "tbl_availmedicaltreatment," +
+      "tbl_treatmentspecification," +
       "tbl_hhaccesswater," +
       "tbl_hhwaterpotable," +
       "tbl_watertenuralstatus_id," +
       "tbl_hhlvlwatersystem_id," +
-      "tbl_evacuation_areas_id," +
       "tbl_hhfloodsoccurinarea," +
       "tbl_hhfloodsoccurinareayear," +
-      "tbl_hhhasaccesshealtmedicalfacility," +
+      "tbl_hhexperienceevacuationoncalamity," +
       "tbl_hhexperienceevacuationoncalamityyear," +
-      "tbl_hasaccessdrillsandsimulations," +
+      "tbl_evacuation_areas_id," +
+      "tbl_hhhasaccesshealtmedicalfacility," +
       "tbl_hhhasaccesstelecom," +
+      "tbl_hasaccessdrillsandsimulations," +
       "tbl_household.created_at," +
       "tbl_household.updated_at," +
       "tbl_household.created_by," +
@@ -1313,8 +1314,6 @@ function AnimatedScreen({ navigation }) {
       "tbl_hhlatitude," +
       "tbl_hhlongitude," +
       "tbl_hhfield_editor," +
-      "tbl_hhyearconstruct," +
-      "tbl_hhyearconstruct," +
       "tbl_hhyearconstruct," +
       "tbl_hhnobedroms," +
       "tbl_hhnostorey," +
