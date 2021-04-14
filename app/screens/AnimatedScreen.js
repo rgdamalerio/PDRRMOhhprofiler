@@ -1050,6 +1050,7 @@ function AnimatedScreen({ navigation }) {
       "tbl_householdpuroksittio," +
       "tbl_hhimage," +
       "tbl_respondent," +
+      "tbl_household.extracted," +
       "tbl_uri," +
       "idtbl_psgc_brgy," + //tbl_psgc_brgy
       "tbl_psgc_brgyname," +
@@ -1090,7 +1091,7 @@ function AnimatedScreen({ navigation }) {
       "LEFT JOIN lib_hhwatertenuralstatus ON tbl_household.tbl_watertenuralstatus_id=lib_hhwatertenuralstatus.id " + //lib_hhwatertenuralstatus
       "LEFT JOIN lib_hhlvlwatersystem ON tbl_household.tbl_hhlvlwatersystem_id=lib_hhlvlwatersystem.id " + //lib_hhlvlwatersystem
       "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
-      "WHERE tbl_enumerator_id_fk = ?";
+      "WHERE tbl_enumerator_id_fk = ? AND tbl_household.extracted = ?";
 
     if (data != null) {
       if (data.tbl_respondent)
@@ -1161,7 +1162,7 @@ function AnimatedScreen({ navigation }) {
         (tx) => {
           tx.executeSql(
             query1 + query,
-            [user.idtbl_enumerator],
+            [user.idtbl_enumerator,0],
             (_, { rows: { _array } }) => {
               parseHhinfo(_array);
             }
@@ -1260,7 +1261,8 @@ function AnimatedScreen({ navigation }) {
       "lib_topname," + //tbl_programs
       "lib_pname," + //tbl_programs
       "lib_pnumbeni," + //tbl_programs
-      "lib_pimplementor " + //tbl_programs
+      "lib_pimplementor, " + //tbl_programs
+      "tbl_programs.extracted " + //tbl_programs
       "FROM tbl_household " +
       "LEFT JOIN tbl_psgc_brgy ON tbl_household.tbl_psgc_brgy_id=tbl_psgc_brgy.idtbl_psgc_brgy " + //tbl_psgc_brgy
       "LEFT JOIN tbl_psgc_mun ON tbl_household.tbl_psgc_mun_id=tbl_psgc_mun.idtbl_psgc_mun " + //tbl_psgc_municipality
@@ -1275,14 +1277,14 @@ function AnimatedScreen({ navigation }) {
       "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
       "INNER JOIN tbl_programs ON tbl_household.tbl_household_id=tbl_programs.tbl_household_id " + //tbl_programs
       "LEFT JOIN lib_typeofprogram ON tbl_programs.lib_typeofprogram_id=lib_typeofprogram.id " + //tbl_programs->lib_typeofprogram
-      "WHERE tbl_enumerator_id_fk = ? ";
+      "WHERE tbl_enumerator_id_fk = ? AND tbl_programs.extracted = ?";
 
     try {
       db.transaction(
         (tx) => {
           tx.executeSql(
             query2 + query,
-            [user.idtbl_enumerator],
+            [user.idtbl_enumerator,0],
             (_, { rows: { _array } }) => {
               parsePrograms(_array);
             }
@@ -1375,7 +1377,8 @@ function AnimatedScreen({ navigation }) {
       "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
       "lib_hhlvldesc," +
       "lib_heaname," + //lib_hhevacuationarea
-      "tbl_fname," + //tbl_hhdemography
+      "tbl_hhdemography.extracted," + //tbl_hhdemography
+      "tbl_fname," +
       "tbl_lname," +
       "tbl_mname," +
       "tbl_extension," +
@@ -1439,14 +1442,14 @@ function AnimatedScreen({ navigation }) {
       "LEFT JOIN lib_gradelvl as hea ON tbl_hhdemography.lib_hea_id=hea.id " + //tbl_hhdemography->lib_gradelvl
       "LEFT JOIN lib_tscshvc ON tbl_hhdemography.lib_tscshvc_id=lib_tscshvc.id " + //tbl_hhdemography->lib_tscshvc
       "LEFT JOIN lib_monthlyincome ON tbl_hhdemography.lib_monthlyincome_id=lib_monthlyincome.id " + //tbl_hhdemography->lib_monthlyincome
-      "WHERE tbl_enumerator_id_fk = ? ";
+      "WHERE tbl_enumerator_id_fk = ? AND tbl_hhdemography.extracted = ?";
 
     try {
       db.transaction(
         (tx) => {
           tx.executeSql(
             query3 + query,
-            [user.idtbl_enumerator],
+            [user.idtbl_enumerator,0],
             (_, { rows: { _array } }) => {
               parseDemography(_array);
             }
@@ -1541,6 +1544,7 @@ function AnimatedScreen({ navigation }) {
       "lib_hhwatersystemlvl," + //lib_hhlvlwatersystem
       "lib_hhlvldesc," +
       "lib_heaname," + //lib_hhevacuationarea
+      "tbl_livelihood.extracted," + //tbl_livelihood
       "lib_typeoflivelihood," + //tbl_livelihood
       "lib_desc," + //tbl_livelihood
       "tbl_livelihoodmarketvalue," + //tbl_livelihood
@@ -1565,14 +1569,14 @@ function AnimatedScreen({ navigation }) {
       "INNER JOIN tbl_livelihood ON tbl_household.tbl_household_id=tbl_livelihood.tbl_household_id " + //tbl_programs
       "LEFT JOIN lib_livelihood ON tbl_livelihood.lib_typeoflivelihood=lib_livelihood.id " + //tbl_livelihood->lib_livelihood
       "LEFT JOIN libl_tenuralstatus ON tbl_livelihood.lib_tenuralstatus_id=libl_tenuralstatus.id " + //tbl_livelihood->libl_tenuralstatus
-      "WHERE tbl_enumerator_id_fk = ? ";
+      "WHERE tbl_enumerator_id_fk = ? AND tbl_livelihood.extracted = ?";
 
     try {
       db.transaction(
         (tx) => {
           tx.executeSql(
             query4 + query,
-            [user.idtbl_enumerator],
+            [user.idtbl_enumerator,0],
             (_, { rows: { _array } }) => {
               parseLivelihood(_array);
             }
@@ -1598,6 +1602,7 @@ function AnimatedScreen({ navigation }) {
   };
 
   const parseHhinfo = async (data) => {
+    let exported = [];
     let rows = [
       [
         "Counter ID",
@@ -1649,6 +1654,7 @@ function AnimatedScreen({ navigation }) {
     ];
 
     data.forEach((rowArray) => {
+
       const arrayOne = [
         `${rowArray.tbl_household_id}`,
         `${rowArray.tbl_psgc_mun_id}`,
@@ -1769,6 +1775,8 @@ function AnimatedScreen({ navigation }) {
         }`,
       ];
       rows.push(arrayOne);
+      exported.push(`${
+          rowArray.tbl_household_id}`);
     });
 
     let csvContent = "\uFEFF";
@@ -1789,6 +1797,7 @@ function AnimatedScreen({ navigation }) {
       })
         .then(() => {
           download(fileUri);
+          HhinfoSetExported(exported);
         })
         .catch((error) => {
           alert(error);
@@ -1798,7 +1807,31 @@ function AnimatedScreen({ navigation }) {
     }
   };
 
+    const HhinfoSetExported = async (data) =>{
+
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "UPDATE tbl_household SET extracted = 1 where tbl_household_id IN ("+data+")",
+            [],
+            (tx, results) => {
+              if (results.rowsAffected > 0) {
+                console.log("Row updated household: "+results.rowsAffected);
+              } else {
+                console.log("Row updated household: "+results.rowsAffected);
+              }
+            }
+          );
+        },
+        (error) => {
+          Alert.alert("Error", error);
+        }
+      );
+      
+    }
+
   const parsePrograms = async (data) => {
+    let exported = [];
     let rows = [
       [
         "Counter ID",
@@ -1827,6 +1860,8 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.lib_pimplementor}`,
       ];
       rows.push(arrayOne);
+      exported.push(`${
+        rowArray.tbl_household_id}`);
     });
 
     let csvContent = "\uFEFF";
@@ -1847,6 +1882,7 @@ function AnimatedScreen({ navigation }) {
       })
         .then(() => {
           download(fileUri);
+          ProgramsSetExported(exported);
         })
         .catch((error) => {
           setLoading(false);
@@ -1858,7 +1894,31 @@ function AnimatedScreen({ navigation }) {
     }
   };
 
+    const ProgramsSetExported = async (data) =>{
+
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "UPDATE tbl_programs SET extracted = 1 where tbl_household_id IN ("+data+")",
+            [],
+            (tx, results) => {
+              if (results.rowsAffected > 0) {
+                console.log("Row updated programs: "+results.rowsAffected)
+              } else {
+                console.log("Row updated programs: "+results.rowsAffected)
+              }
+            }
+          );
+        },
+        (error) => {
+          Alert.alert("Error", error);
+        }
+      );
+      
+    }
+
   const parseDemography = async (data) => {
+    let exported = [];
     let rows = [
       [
         "Counter ID",
@@ -2004,6 +2064,8 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.tbl_adependentofaphilhealthmember == 1 ? "Yes" : "No"}`,
       ];
       rows.push(arrayOne);
+      exported.push(`${
+        rowArray.tbl_household_id}`);
     });
 
     let csvContent = "\uFEFF";
@@ -2024,6 +2086,7 @@ function AnimatedScreen({ navigation }) {
       })
         .then(() => {
           download(fileUri);
+          DemographySetExported(exported);
         })
         .catch((error) => {
           setLoading(false);
@@ -2035,7 +2098,31 @@ function AnimatedScreen({ navigation }) {
     }
   };
 
+    const DemographySetExported = async (data) =>{
+
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "UPDATE tbl_hhdemography SET extracted = 1 where tbl_household_id IN ("+data+")",
+            [],
+            (tx, results) => {
+              if (results.rowsAffected > 0) {
+                console.log("Row updated demograpy: "+results.rowsAffected)
+              } else {
+                console.log("Row updated demograpy: "+results.rowsAffected)
+              }
+            }
+          );
+        },
+        (error) => {
+          Alert.alert("Error", error);
+        }
+      );
+      
+    }
+
   const parseLivelihood = async (data) => {
+    let exported = [];
     let rows = [
       [
         "Counter ID",
@@ -2070,6 +2157,8 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.tbl_livelihoodiswithinsurance == 1 ? "Yes" : "No"}`,
       ];
       rows.push(arrayOne);
+      exported.push(`${
+        rowArray.tbl_household_id}`);
     });
 
     let csvContent = "\uFEFF";
@@ -2091,6 +2180,7 @@ function AnimatedScreen({ navigation }) {
         .then(() => {
           setLoading(false);
           download(fileUri);
+          LivelihoodSetExported(exported);
           alert(
             "Export data success, open download folder to see exported data"
           );
@@ -2105,10 +2195,35 @@ function AnimatedScreen({ navigation }) {
     }
   };
 
+    const LivelihoodSetExported = async (data) =>{
+
+      db.transaction(
+        (tx) => {
+          tx.executeSql(
+            "UPDATE tbl_livelihood SET extracted = 1 where tbl_household_id IN ("+data+")",
+            [],
+            (tx, results) => {
+              if (results.rowsAffected > 0) {
+                console.log("Row updated livelihood: "+results.rowsAffected)
+              } else {
+                console.log("Row updated livelihood: "+results.rowsAffected)
+              }
+            }
+          );
+        },
+        (error) => {
+          Alert.alert("Error", error);
+        }
+      );
+      
+    }
+
   const download = async (fileUri) => {
     const asset = await MediaLibrary.createAssetAsync(fileUri);
     await MediaLibrary.createAlbumAsync("Download", asset, false)
-      .then(() => {})
+      .then(() => {
+
+      })
       .catch((error) => {
         setLoading(false);
         alert("Error download, Error details: " + error);

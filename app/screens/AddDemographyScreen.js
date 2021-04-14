@@ -438,8 +438,9 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_ismembersss," +
             "tbl_ismembergsis," +
             "tbl_ismemberphilhealth," +
+            "extracted," +
             "tbl_adependentofaphilhealthmember" +
-            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            ") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
           [
             householdid,
             data.tbl_fname,
@@ -471,6 +472,7 @@ function AddDemographyScreen({ navigation, route }) {
             data.tbl_ismembersss ? 1 : 0,
             data.tbl_ismembergsis ? 1 : 0,
             data.tbl_ismemberphilhealth ? 1 : 0,
+            0,
             data.tbl_adependentofaphilhealthmember ? 1 : 0,
           ],
           (tx, results) => {

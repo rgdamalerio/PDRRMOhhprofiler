@@ -1090,7 +1090,7 @@ function ProfilerScreen({ navigation, route }) {
             items={evacuationarea}
             name="evacuationarea"
             PickerItemComponent={PickerItem}
-            placeholder="Evacuation center location"
+            placeholder="Evacuation center location *"
             setOther={setOtherEvacuation}
           />
 
