@@ -22,7 +22,8 @@ function AppFormField({ name, width, ...otherProps }) {
         value={values[name] || ""}
         {...otherProps}
       />
-      <ErrorMessage error={errors[name]} visible={touched[name]} />
+     <ErrorMessage error={errors[name]} visible={touched[name]}/>
+         
     </>
   );
 }

@@ -507,7 +507,7 @@ function AddLivelihood({ navigation, route }) {
             items={tenuralStatus}
             name="lib_tenuralstatus_id"
             PickerItemComponent={PickerItem}
-            placeholder="Tenural status"
+            placeholder="Tenural status *"
             setOther={setOthertstatus}
           />
 
@@ -524,7 +524,7 @@ function AddLivelihood({ navigation, route }) {
             autoCorrect={false}
             icon="cash"
             name="tbl_livelihoodmarketvalue"
-            placeholder="Estimated Livelihood market value"
+            placeholder="Estimated Livelihood market value *"
             width="100%"
             keyboardType="number-pad"
           />
@@ -533,7 +533,7 @@ function AddLivelihood({ navigation, route }) {
             autoCorrect={false}
             icon="bookmark-plus-outline"
             name="tbl_livelihoodtotalarea"
-            placeholder="Estimated Livelihood total area"
+            placeholder="Estimated Livelihood total area *"
             width="100%"
             keyboardType="number-pad"
           />

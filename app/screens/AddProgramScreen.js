@@ -468,7 +468,7 @@ function AddProgramScreen({ navigation, route }) {
               autoCorrect={false}
               icon="cash"
               name="numberBenificiaries"
-              placeholder="Num of benificiaries"
+              placeholder="Num of benificiaries *"
               width="75%"
               keyboardType="number-pad"
             />

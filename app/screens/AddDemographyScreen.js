@@ -1100,7 +1100,7 @@ function AddDemographyScreen({ navigation, route }) {
             autoCorrect={false}
             icon="account-outline"
             name="tbl_mname"
-            placeholder="Middlename"
+            placeholder="Middlename *"
           />
           <FormField
             autoCorrect={false}
@@ -1132,7 +1132,7 @@ function AddDemographyScreen({ navigation, route }) {
             items={relationship}
             name="tbl_relationshiphead_id"
             PickerItemComponent={PickerItem}
-            placeholder="Relationship to the head"
+            placeholder="Relationship to the head *"
             setOther={setOtherRelationship}
           />
 
@@ -1193,7 +1193,7 @@ function AddDemographyScreen({ navigation, route }) {
             autoCorrect={false}
             icon="alpha-r-box"
             name="lib_religion_id"
-            placeholder="Religion"
+            placeholder="Religion *"
           />
 
           <SwitchInput
@@ -1263,7 +1263,7 @@ function AddDemographyScreen({ navigation, route }) {
             items={gradelvl}
             name="lib_hea_id"
             PickerItemComponent={PickerItem}
-            placeholder="Highest educational attainment"
+            placeholder="Highest educational attainment *"
           />
 
           <Picker

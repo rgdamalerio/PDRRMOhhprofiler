@@ -880,12 +880,13 @@ function ProfilerScreen({ navigation, route }) {
                 : false
               : false,
           }}
-          onSubmit={(values, { resetForm }) => {
+          onSubmit={(values, { resetForm }) => {                  
             resetFormHolder = resetForm;
             reviewInput(values);
           }}
           validationSchema={validationSchema}
         >
+          
           <FormField
             autoCorrect={false}
             icon="account"
@@ -936,7 +937,7 @@ function ProfilerScreen({ navigation, route }) {
             items={tenuralStatus}
             name="tenuralstatus"
             PickerItemComponent={PickerItem}
-            placeholder="Tenural Status"
+            placeholder="Tenural Status *"
           />
 
           <FormField
@@ -961,7 +962,7 @@ function ProfilerScreen({ navigation, route }) {
             autoCorrect={false}
             icon="bed-empty"
             name="beadroom"
-            placeholder="Number of bedrooms"
+            placeholder="Number of bedrooms *"
             width="75%"
             keyboardType="number-pad"
           />
@@ -970,7 +971,7 @@ function ProfilerScreen({ navigation, route }) {
             autoCorrect={false}
             icon="office-building"
             name="storeys"
-            placeholder="Number of storeys"
+            placeholder="Number of storeys *"
             width="75%"
             keyboardType="number-pad"
           />
