@@ -123,6 +123,10 @@ function ProfilerScreen({ navigation, route }) {
 
   useEffect(() => {
     setUuid(Constants.installationId + "-" + new Date().getTime())
+    setOtherEvacuation(false);
+    setAvailtreatment(false);
+    setFloodsoccured(false);
+    setExpevacuation(false);  
     console.log('Unique ID: '+uuid);
   },[isFocused]);
 
@@ -130,6 +134,7 @@ function ProfilerScreen({ navigation, route }) {
     route.params.update
       ? navigation.setOptions({ title: "Update Household info" })
       : "";
+      
     setHhinfo(route.params.update ? route.params.hhinfo : []);
     getMunicipality();
     gettypeBuilding();
