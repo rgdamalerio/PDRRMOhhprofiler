@@ -296,6 +296,7 @@ function AddLivelihood({ navigation, route }) {
             "tbl_livelihoodproducts = ?," +
             "lib_tenuralstatus_id = ?," +
             "tbl_livelihoodiswithinsurance = ?," +
+            "extracted," +
             "updated_at = ?," +
             "updated_by= ?  WHERE id = ?",
           [
@@ -305,6 +306,7 @@ function AddLivelihood({ navigation, route }) {
             data.tbl_livelihoodproducts,
             data.lib_tenuralstatus_id.id,
             data.tbl_livelihoodiswithinsurance,
+            0,
             String(date),
             user.idtbl_enumerator,
             route.params.hhlivelihood.livelihoodid,

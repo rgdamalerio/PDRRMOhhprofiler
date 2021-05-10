@@ -683,6 +683,7 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_ismembergsis =?," +
             "tbl_ismemberphilhealth =?," +
             "tbl_adependentofaphilhealthmember =?," +
+            "extracted," +
             "updated_at = ?," +
             "updated_by= ?  WHERE id = ?",
           [
@@ -716,6 +717,7 @@ function AddDemographyScreen({ navigation, route }) {
             data.tbl_ismembergsis ? 1 : 0,
             data.tbl_ismemberphilhealth ? 1 : 0,
             data.tbl_adependentofaphilhealthmember ? 1 : 0,
+            0,
             String(date),
             user.idtbl_enumerator,
             route.params.memberinfo.id,
