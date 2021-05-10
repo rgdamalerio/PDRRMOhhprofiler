@@ -683,7 +683,7 @@ function AddDemographyScreen({ navigation, route }) {
             "tbl_ismembergsis =?," +
             "tbl_ismemberphilhealth =?," +
             "tbl_adependentofaphilhealthmember =?," +
-            "extracted," +
+            "extracted = ?," +
             "updated_at = ?," +
             "updated_by= ?  WHERE id = ?",
           [

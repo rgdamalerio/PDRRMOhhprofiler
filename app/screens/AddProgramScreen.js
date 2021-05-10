@@ -261,7 +261,7 @@ function AddProgramScreen({ navigation, route }) {
             "lib_pname=?," +
             "lib_pnumbeni =?," +
             "lib_pimplementor =?," +
-            "extracted," +
+            "extracted =?," +
             "updated_at = ?," +
             "updated_by= ?  WHERE id = ?",
           [

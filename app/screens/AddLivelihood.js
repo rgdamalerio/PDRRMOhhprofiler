@@ -296,7 +296,7 @@ function AddLivelihood({ navigation, route }) {
             "tbl_livelihoodproducts = ?," +
             "lib_tenuralstatus_id = ?," +
             "tbl_livelihoodiswithinsurance = ?," +
-            "extracted," +
+            "extracted = ?," +
             "updated_at = ?," +
             "updated_by= ?  WHERE id = ?",
           [
