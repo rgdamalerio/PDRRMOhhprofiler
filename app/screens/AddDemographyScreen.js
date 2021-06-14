@@ -477,27 +477,28 @@ function AddDemographyScreen({ navigation, route }) {
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
-              if (data.tbl_relationshiphead_id.id == relationship.length) {
+
+              if (data.tbl_relationshiphead_id.id == relationship.length - 1) {
                 db.transaction(
                   (tx) => {
                     tx.executeSql(
                       "UPDATE libl_relationshiphead SET lib_rhname = ? where id = ?",
-                      [data.otherRelationship, relationship.length],
+                      [data.otherRelationship, relationship.length - 1],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
                                 "INSERT INTO libl_relationshiphead (" +
-                                  "id," +
+                                 // "id," +
                                   "lib_rhname," +
                                   "created_at," +
                                   "created_by," +
                                   "updated_at," +
                                   "updated_by" +
-                                  ") values (?,?,?,?,?,?)",
+                                  ") values (?,?,?,?,?)",
                                 [
-                                  relationship.length + 1,
+                                  //relationship.length + 1,
                                   "Other, Please specify",
                                   String(date),
                                   user.idtbl_enumerator,
@@ -535,27 +536,28 @@ function AddDemographyScreen({ navigation, route }) {
                   }
                 );
               }
-              if (data.lib_disability_id.id == disability.length) {
+
+              if (data.lib_disability_id.id == disability.length - 1) {
                 db.transaction(
                   (tx) => {
                     tx.executeSql(
                       "UPDATE lib_disability SET lib_dname = ? where id = ?",
-                      [data.otherDisabilityval, disability.length],
+                      [data.otherDisabilityval, disability.length - 1],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
                                 "INSERT INTO lib_disability (" +
-                                  "id," +
+                                  //"id," +
                                   "lib_dname," +
                                   "created_at," +
                                   "created_by," +
                                   "updated_at," +
                                   "updated_by" +
-                                  ") values (?,?,?,?,?,?)",
+                                  ") values (?,?,?,?,?)",
                                 [
-                                  disability.length + 1,
+                                  //disability.length + 1,
                                   "Other, Please specify",
                                   String(date),
                                   user.idtbl_enumerator,
@@ -724,27 +726,28 @@ function AddDemographyScreen({ navigation, route }) {
           ],
           (tx, results) => {
             if (results.rowsAffected > 0) {
-              if (data.tbl_relationshiphead_id.id == relationship.length) {
+
+              if (data.tbl_relationshiphead_id.id == relationship.length - 1 ) {
                 db.transaction(
                   (tx) => {
                     tx.executeSql(
                       "UPDATE libl_relationshiphead SET lib_rhname = ? where id = ?",
-                      [data.otherRelationship, relationship.length],
+                      [data.otherRelationship, relationship.length - 1],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
                                 "INSERT INTO libl_relationshiphead (" +
-                                  "id," +
+                                  //"id," +
                                   "lib_rhname," +
                                   "created_at," +
                                   "created_by," +
                                   "updated_at," +
                                   "updated_by" +
-                                  ") values (?,?,?,?,?,?)",
+                                  ") values (?,?,?,?,?)",
                                 [
-                                  relationship.length + 1,
+                                  //relationship.length + 1,
                                   "Other, Please specify",
                                   String(date),
                                   user.idtbl_enumerator,
@@ -782,27 +785,28 @@ function AddDemographyScreen({ navigation, route }) {
                   }
                 );
               }
-              if (data.lib_disability_id.id == disability.length) {
+
+              if (data.lib_disability_id.id == disability.length - 1 ) {
                 db.transaction(
                   (tx) => {
                     tx.executeSql(
                       "UPDATE lib_disability SET lib_dname = ? where id = ?",
-                      [data.otherDisabilityval, disability.length],
+                      [data.otherDisabilityval, disability.length - 1],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
                                 "INSERT INTO lib_disability (" +
-                                  "id," +
+                                  //"id," +
                                   "lib_dname," +
                                   "created_at," +
                                   "created_by," +
                                   "updated_at," +
                                   "updated_by" +
-                                  ") values (?,?,?,?,?,?)",
+                                  ") values (?,?,?,?,?)",
                                 [
-                                  disability.length + 1,
+                                  //disability.length + 1,
                                   "Other, Please specify",
                                   String(date),
                                   user.idtbl_enumerator,

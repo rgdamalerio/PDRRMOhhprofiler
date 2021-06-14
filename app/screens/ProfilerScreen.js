@@ -350,6 +350,7 @@ function ProfilerScreen({ navigation, route }) {
           (_, { rows: { _array } }) => {
             _array.unshift({ id: 0, label: "Clear selection" });
             setEvacuationarea(_array);
+            console.log("Please man",_array.length);
           }
         );
       },
@@ -366,6 +367,8 @@ function ProfilerScreen({ navigation, route }) {
         );
       }
     );
+
+    
   };
 
   const getRandomBytes = async () => {
@@ -480,27 +483,27 @@ function ProfilerScreen({ navigation, route }) {
             if (results.rowsAffected > 0) {
               const insertId = results.insertId; //set newly inserted id
 
-              if (data.evacuationarea.id == evacuationarea.length) {
+              if (data.evacuationarea.id == evacuationarea.length - 1) {
                 db.transaction(
                   (tx) => {
                     tx.executeSql(
                       "UPDATE lib_hhevacuationarea SET lib_heaname = ? where id = ?",
-                      [data.otherevacuation, evacuationarea.length],
+                      [data.otherevacuation, evacuationarea.length - 1],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
                                 "INSERT INTO lib_hhevacuationarea (" +
-                                  "id," +
+                                  //"id," +
                                   "lib_heaname," +
                                   "created_at," +
                                   "created_by," +
                                   "updated_at," +
                                   "updated_by" +
-                                  ") values (?,?,?,?,?,?)",
+                                  ") values (?,?,?,?,?)",
                                 [
-                                  evacuationarea.length + 1,
+                                  //evacuationarea.length,
                                   "Other, Please specify",
                                   String(date),
                                   user.idtbl_enumerator,
@@ -541,6 +544,7 @@ function ProfilerScreen({ navigation, route }) {
                   }
                 );
               }
+
               setLoading(false);
               resetFormHolder();
               navigation.navigate("Program", {
@@ -645,28 +649,28 @@ function ProfilerScreen({ navigation, route }) {
           (tx, results) => {
             if (results.rowsAffected > 0) {
               const insertId = results.insertId; //set newly inserted id
-
-              if (data.evacuationarea.id == evacuationarea.length) {
+              
+              if (data.evacuationarea.id == evacuationarea.length - 1) {
                 db.transaction(
                   (tx) => {
                     tx.executeSql(
                       "UPDATE lib_hhevacuationarea SET lib_heaname = ? where id = ?",
-                      [data.otherevacuation, evacuationarea.length],
+                      [data.otherevacuation, evacuationarea.length - 1],
                       (tx, results) => {
                         if (results.rowsAffected > 0) {
                           db.transaction(
                             (tx) => {
                               tx.executeSql(
                                 "INSERT INTO lib_hhevacuationarea (" +
-                                  "id," +
+                                  //"id," +
                                   "lib_heaname," +
                                   "created_at," +
                                   "created_by," +
                                   "updated_at," +
                                   "updated_by" +
-                                  ") values (?,?,?,?,?,?)",
+                                  ") values (?,?,?,?,?)",
                                 [
-                                  evacuationarea.length + 1,
+                                  //evacuationarea.length,
                                   "Other, Please specify",
                                   String(date),
                                   user.idtbl_enumerator,
@@ -707,6 +711,7 @@ function ProfilerScreen({ navigation, route }) {
                   }
                 );
               }
+
               setLoading(false);
               resetFormHolder();
               navigation.navigate("Done", { screen: "AnimatedMap" });

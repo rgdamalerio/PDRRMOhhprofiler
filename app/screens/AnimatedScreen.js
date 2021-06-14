@@ -1956,6 +1956,7 @@ function AnimatedScreen({ navigation }) {
         "Track/strand/course completed (for senior high school/vocational/College",
         "Can read & write? (If not at least high school graduate)",
         "Primary Occupation (e.g elementary teacher rice farmers)",
+        "Monthly Income/M ID",
         "Monthly Income/M",
         "SSS Member",
         "GSIS Member",
@@ -2058,6 +2059,11 @@ function AnimatedScreen({ navigation }) {
         `${rowArray.tbl_canreadwriteorhighschoolgrade == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_primary_occupation}`,
         `${rowArray.lib_monthlyincome_id}`,
+        `${
+          rowArray.lib_miname
+            ? rowArray.lib_miname.replace(/,/g, " ")
+            : rowArray.lib_miname
+        }`,
         `${rowArray.tbl_ismembersss == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_ismembergsis == 1 ? "Yes" : "No"}`,
         `${rowArray.tbl_ismemberphilhealth == 1 ? "Yes" : "No"}`,
