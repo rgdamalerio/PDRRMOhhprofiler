@@ -12,6 +12,7 @@ import {
 import * as Yup from "yup";
 import * as SQLite from "expo-sqlite";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useIsFocused } from '@react-navigation/native';
 
 import colors from "../config/colors";
 import useAuth from "../auth/useAuth";
@@ -80,6 +81,7 @@ function AddDemographyScreen({ navigation, route }) {
   const [otherDisability, setOtherDisability] = useState(false);
   const [nutrituonal, setNutrituonal] = useState([]);
   const [gradelvl, setGradelvl] = useState([]);
+  const [gradelvlhea, setGradelvlhea] = useState([]);
   const [tscshvc, setTscshvc] = useState([]);
   const [income, setIncome] = useState([]);
   const [nuclearfamily, setNuclearfamily] = useState([]);
@@ -90,6 +92,12 @@ function AddDemographyScreen({ navigation, route }) {
   const [hasHead, setHasHead] = useState(false);
   const [withspecialneeds, setWithspecialneeds] = useState(false);
   const [currentlyinschool, setCurrentlyinschool] = useState(false);
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    setOtherRelationship(false);
+    setOtherDisability(false);
+  },[isFocused]);
 
   useEffect(() => {
     route.params.update
@@ -102,6 +110,7 @@ function AddDemographyScreen({ navigation, route }) {
     _setDisabilities();
     _nutrituanal();
     _gradelvl();
+    _gradelvlhea();
     _tscshvc();
     _income();
     _setNuclearfamily();
@@ -322,6 +331,33 @@ function AddDemographyScreen({ navigation, route }) {
           (_, { rows: { _array } }) => {
             _array.unshift({ id: 0, label: "Clear selection" });
             setGradelvl(_array);
+          }
+        );
+      },
+      (error) => {
+        Alert.alert(
+          "SQLITE ERROR",
+          "Error loading Grade level Library, Please contact developer, " +
+            error,
+          [
+            {
+              text: "OK",
+            },
+          ]
+        );
+      }
+    );
+  };
+
+  const _gradelvlhea = () => {
+    db.transaction(
+      (tx) => {
+        tx.executeSql(
+          `select id AS id, lib_glname AS label from lib_gradelvl`,
+          [],
+          (_, { rows: { _array } }) => {
+            _array.unshift({ id: 0, label: "Clear selection" });
+            setGradelvlhea(_array);
           }
         );
       },
@@ -626,6 +662,8 @@ function AddDemographyScreen({ navigation, route }) {
                       resetFormHolder();
                       _setNuclearfamily();
                       _sethasHead();
+                      setCurrentlyinschool(false);
+                      setWithspecialneeds(false);
                       setLoading(false);
                     },
                   },
@@ -1266,7 +1304,7 @@ function AddDemographyScreen({ navigation, route }) {
 
           <Picker
             icon="alpha-r-box"
-            items={gradelvl}
+            items={gradelvlhea}
             name="lib_hea_id"
             PickerItemComponent={PickerItem}
             placeholder="Highest educational attainment *"

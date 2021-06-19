@@ -350,7 +350,6 @@ function ProfilerScreen({ navigation, route }) {
           (_, { rows: { _array } }) => {
             _array.unshift({ id: 0, label: "Clear selection" });
             setEvacuationarea(_array);
-            console.log("Please man",_array.length);
           }
         );
       },
