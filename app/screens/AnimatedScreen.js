@@ -1091,7 +1091,7 @@ function AnimatedScreen({ navigation }) {
       "LEFT JOIN lib_hhwatertenuralstatus ON tbl_household.tbl_watertenuralstatus_id=lib_hhwatertenuralstatus.id " + //lib_hhwatertenuralstatus
       "LEFT JOIN lib_hhlvlwatersystem ON tbl_household.tbl_hhlvlwatersystem_id=lib_hhlvlwatersystem.id " + //lib_hhlvlwatersystem
       "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
-      "WHERE tbl_enumerator_id_fk = ? AND tbl_household.extracted = ?";
+      "WHERE tbl_enumerator_id_fk = ?";
 
     if (data != null) {
       if (data.tbl_respondent)
@@ -1162,7 +1162,7 @@ function AnimatedScreen({ navigation }) {
         (tx) => {
           tx.executeSql(
             query1 + query,
-            [user.idtbl_enumerator,0],
+            [user.idtbl_enumerator],
             (_, { rows: { _array } }) => {
               parseHhinfo(_array);
             }
@@ -1277,14 +1277,14 @@ function AnimatedScreen({ navigation }) {
       "LEFT JOIN lib_hhevacuationarea ON tbl_household.tbl_evacuation_areas_id=lib_hhevacuationarea.id " + //lib_hhevacuationarea
       "INNER JOIN tbl_programs ON tbl_household.tbl_household_id=tbl_programs.tbl_household_id " + //tbl_programs
       "LEFT JOIN lib_typeofprogram ON tbl_programs.lib_typeofprogram_id=lib_typeofprogram.id " + //tbl_programs->lib_typeofprogram
-      "WHERE tbl_enumerator_id_fk = ? AND tbl_programs.extracted = ?";
+      "WHERE tbl_enumerator_id_fk = ?";
 
     try {
       db.transaction(
         (tx) => {
           tx.executeSql(
             query2 + query,
-            [user.idtbl_enumerator,0],
+            [user.idtbl_enumerator],
             (_, { rows: { _array } }) => {
               parsePrograms(_array);
             }
@@ -1442,14 +1442,14 @@ function AnimatedScreen({ navigation }) {
       "LEFT JOIN lib_gradelvl as hea ON tbl_hhdemography.lib_hea_id=hea.id " + //tbl_hhdemography->lib_gradelvl
       "LEFT JOIN lib_tscshvc ON tbl_hhdemography.lib_tscshvc_id=lib_tscshvc.id " + //tbl_hhdemography->lib_tscshvc
       "LEFT JOIN lib_monthlyincome ON tbl_hhdemography.lib_monthlyincome_id=lib_monthlyincome.id " + //tbl_hhdemography->lib_monthlyincome
-      "WHERE tbl_enumerator_id_fk = ? AND tbl_hhdemography.extracted = ?";
+      "WHERE tbl_enumerator_id_fk = ?";
 
     try {
       db.transaction(
         (tx) => {
           tx.executeSql(
             query3 + query,
-            [user.idtbl_enumerator,0],
+            [user.idtbl_enumerator],
             (_, { rows: { _array } }) => {
               parseDemography(_array);
             }
@@ -1569,14 +1569,14 @@ function AnimatedScreen({ navigation }) {
       "INNER JOIN tbl_livelihood ON tbl_household.tbl_household_id=tbl_livelihood.tbl_household_id " + //tbl_programs
       "LEFT JOIN lib_livelihood ON tbl_livelihood.lib_typeoflivelihood=lib_livelihood.id " + //tbl_livelihood->lib_livelihood
       "LEFT JOIN libl_tenuralstatus ON tbl_livelihood.lib_tenuralstatus_id=libl_tenuralstatus.id " + //tbl_livelihood->libl_tenuralstatus
-      "WHERE tbl_enumerator_id_fk = ? AND tbl_livelihood.extracted = ?";
+      "WHERE tbl_enumerator_id_fk = ?";
 
     try {
       db.transaction(
         (tx) => {
           tx.executeSql(
             query4 + query,
-            [user.idtbl_enumerator,0],
+            [user.idtbl_enumerator],
             (_, { rows: { _array } }) => {
               parseLivelihood(_array);
             }
@@ -2296,6 +2296,7 @@ function AnimatedScreen({ navigation }) {
           <Ionicons name="ios-search" size={20} />
         </TouchableHighlight>
       </View>
+
       <TouchableOpacity
         onPress={() => {
           setLoading(true);
@@ -2305,6 +2306,7 @@ function AnimatedScreen({ navigation }) {
       >
         <MaterialCommunityIcons name="cloud-download" style={styles.fabIcon} />
       </TouchableOpacity>
+      
       <ScrollView
         horizontal
         scrollEventThrottle={1}
